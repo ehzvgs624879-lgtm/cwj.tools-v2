@@ -1,0 +1,30 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #05060a;
+  color: #ffffff;
+}
+
+/* 背景光效 */
+.bg {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 20% 20%, #4f46e5, transparent),
+              radial-gradient(circle at 80% 80%, #06b6d4, transparent),
+              radial-gradient(circle at 50% 50%, #a855f7, transparent);
+  filter: blur(120px);
+  opacity: 0.45;
+  z-index: -1;
+}
+
+/* 整体布局 */
+.app {
+  display: flex;
+  height: 100vh;
+}
+
+/* 左侧栏 */
+.sidebar {
+  width: 240px;
+  padding: 20px;
+  background: rgba
