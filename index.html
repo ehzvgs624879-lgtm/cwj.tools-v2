@@ -2,22 +2,22 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>CWJ Tools</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CWJ Tools AI</title>
 
   <style>
     body{
       margin:0;
+      font-family:Arial;
       background:#0f1117;
       color:#fff;
-      font-family:Arial;
     }
 
     .topbar{
       padding:16px;
+      background:#111116;
       font-size:20px;
       font-weight:bold;
-      background:#111116;
       border-bottom:1px solid #222;
     }
 
@@ -29,18 +29,15 @@
       background:#1a1a22;
       padding:12px;
       border-radius:10px;
-      margin-bottom:10px;
+      margin-bottom:12px;
     }
 
-    button{
-      width:100%;
-      padding:12px;
-      margin-top:8px;
-      border:none;
-      border-radius:8px;
-      background:#2997ff;
-      color:#fff;
-      font-size:16px;
+    #chatBox{
+      height:220px;
+      overflow:auto;
+      background:#111116;
+      padding:10px;
+      border-radius:10px;
     }
 
     input{
@@ -49,14 +46,18 @@
       margin-top:10px;
       border-radius:8px;
       border:none;
+      outline:none;
     }
 
-    #chatBox{
-      height:200px;
-      overflow:auto;
-      background:#111116;
-      padding:10px;
-      border-radius:10px;
+    button{
+      width:100%;
+      padding:12px;
+      margin-top:10px;
+      border:none;
+      border-radius:8px;
+      background:#2997ff;
+      color:#fff;
+      font-size:16px;
     }
   </style>
 </head>
@@ -64,16 +65,10 @@
 <body>
 
   <div class="topbar">
-    CWJ Tools
+    CWJ Tools AI
   </div>
 
   <div class="container">
-
-    <div class="card">
-      <h3>工具区</h3>
-      <button>工具1</button>
-      <button>工具2</button>
-    </div>
 
     <div class="card">
       <h3>🤖 AI Chat</h3>
