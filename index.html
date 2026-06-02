@@ -1,89 +1,91 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CWJ Tools AI</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CWJ Tools AI</title>
 
-  <style>
-    body{
-      margin:0;
-      font-family:Arial;
-      background:#0f1117;
-      color:#fff;
-    }
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#0f1117;
+  color:#fff;
+}
 
-    .topbar{
-      padding:16px;
-      background:#111116;
-      font-size:20px;
-      font-weight:bold;
-      border-bottom:1px solid #222;
-    }
+.topbar{
+  padding:16px;
+  background:#111116;
+  font-size:20px;
+  font-weight:bold;
+  border-bottom:1px solid #222;
+}
 
-    .container{
-      padding:16px;
-    }
+.container{
+  padding:16px;
+}
 
-    .card{
-      background:#1a1a22;
-      padding:12px;
-      border-radius:10px;
-      margin-bottom:12px;
-    }
+.card{
+  background:#1a1a22;
+  padding:12px;
+  border-radius:10px;
+  margin-bottom:12px;
+}
 
-    #chatBox{
-      height:220px;
-      overflow:auto;
-      background:#111116;
-      padding:10px;
-      border-radius:10px;
-    }
+#chatBox{
+  height:240px;
+  overflow:auto;
+  background:#111116;
+  padding:10px;
+  border-radius:10px;
+}
 
-    input{
-      width:100%;
-      padding:10px;
-      margin-top:10px;
-      border-radius:8px;
-      border:none;
-      outline:none;
-    }
+input{
+  width:100%;
+  padding:10px;
+  margin-top:10px;
+  border-radius:8px;
+  border:none;
+  outline:none;
+}
 
-    button{
-      width:100%;
-      padding:12px;
-      margin-top:10px;
-      border:none;
-      border-radius:8px;
-      background:#2997ff;
-      color:#fff;
-      font-size:16px;
-    }
-  </style>
+button{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border:none;
+  border-radius:8px;
+  background:#2997ff;
+  color:#fff;
+  font-size:16px;
+}
+</style>
 </head>
 
 <body>
 
-  <div class="topbar">
-    CWJ Tools AI
-  </div>
+<div class="topbar">
+CWJ Tools AI
+</div>
 
-  <div class="container">
+<div class="container">
 
-    <div class="card">
-      <h3>🤖 AI Chat</h3>
+<div class="card">
+<h3>🤖 AI Chat（真实接口版）</h3>
 
-      <div id="chatBox"></div>
+<div id="chatBox"></div>
 
-      <input id="input" placeholder="输入内容...">
+<input id="input" placeholder="输入内容...">
 
-      <button onclick="sendMessage()">发送</button>
-    </div>
+<button onclick="sendMessage()">发送</button>
+</div>
 
-  </div>
+</div>
 
 <script>
-function sendMessage(){
+const API_KEY = "sk-100f5a43ebb44aec8f8bf05eff8d4a55";
+
+async function sendMessage(){
   const input = document.getElementById("input");
   const box = document.getElementById("chatBox");
 
@@ -93,12 +95,9 @@ function sendMessage(){
   box.innerHTML += "<div style='text-align:right;margin:5px 0'>你：" + text + "</div>";
   input.value = "";
 
-  setTimeout(()=>{
-    box.innerHTML += "<div style='text-align:left;margin:5px 0'>AI：这是模拟回复</div>";
-    box.scrollTop = box.scrollHeight;
-  },500);
-}
-</script>
+  const loading = document.createElement("div");
+  loading.innerHTML = "AI思考中...";
+  box.appendChild(loading);
 
-</body>
-</html>
+  try {
+    const res = await fetch("https://api.deepseek.com/v1
