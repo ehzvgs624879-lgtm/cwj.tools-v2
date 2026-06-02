@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CWJ TOOLS V8</title>
+  <title>CWJ TOOLS</title>
+
+  <!-- ✔ CSS闭环 -->
   <link rel="stylesheet" href="style.css"/>
 </head>
 
@@ -12,43 +14,37 @@
 
   <div class="app">
 
-    <!-- 左侧菜单 -->
     <aside class="sidebar">
       <h2>CWJ TOOLS</h2>
 
       <button onclick="setMode('chat')">AI Chat</button>
       <button onclick="setMode('tools')">Tools</button>
       <button onclick="setMode('system')">System</button>
-
     </aside>
 
-    <!-- 主区域 -->
     <main class="main">
 
-      <!-- AI聊天 -->
       <div id="chatBox" class="panel active">
         <textarea id="input" placeholder="输入你的问题..."></textarea>
         <button onclick="send()">发送</button>
         <div id="output" class="output"></div>
       </div>
 
-      <!-- 工具页 -->
       <div id="toolsBox" class="panel">
         <h3>工具模块</h3>
-        <p>天气 / 翻译 / 搜索 / 文件处理（待扩展）</p>
+        <p>天气 / 翻译 / 搜索 / 文件处理</p>
       </div>
 
-      <!-- 系统页 -->
       <div id="systemBox" class="panel">
         <h3>系统状态</h3>
-        <p>V8 RUNNING ✔</p>
+        <p>V9 SYSTEM ONLINE ✔</p>
       </div>
 
     </main>
 
   </div>
 
-  <!-- ⚠️ 必须最后加载 -->
+  <!-- ✔ JS闭环 -->
   <script src="app.js"></script>
 </body>
 </html>
