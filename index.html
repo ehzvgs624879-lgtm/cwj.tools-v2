@@ -54,16 +54,7 @@ body{
   padding:15px;
 }
 
-.page{display:none;}
-.page.active{display:block;}
-
-.card{
-  padding:15px;
-  border-radius:12px;
-  background:rgba(255,255,255,0.06);
-}
-
-textarea{
+.page{display:none;}textarea{
   width:100%;
   height:120px;
   margin-top:10px;
@@ -128,53 +119,52 @@ button{
 
   <!-- chat -->
   <div id="chatPage" class="page active">
-    <div class="card">
-      <h2>AI Chat</h2>
+    <h2>AI Chat</h2>
 
-      <textarea id="input"></textarea>
-      <button onclick="send()">发送</button>
+    <textarea id="input"></textarea>
+    <button onclick="send()">发送</button>
 
-      <div id="output" class="output"></div>
-    </div>
-  </div>
-
-  <!-- tools -->
+    <div id="output"></div>
+  </div><!-- tools -->
   <div id="toolsPage" class="page">
     <div class="grid">
 
-      <div class="tool" onclick="alert('AI工具')">AI工具</div>
-      <div class="tool" onclick="alert('翻译')">翻译</div>
-      <div class="tool" onclick="alert('搜索')">搜索</div>
-      <div class="tool" onclick="alert('文件')">文件</div>
+      <div class="tool" onclick="send()">AI聊天</div>
+      <div class="tool" onclick="translateTool()">翻译</div>
+      <div class="tool" onclick="searchTool()">搜索</div>
+      <div class="tool" onclick="fileTool()">文件</div>
 
     </div>
   </div>
 
   <!-- system -->
   <div id="systemPage" class="page">
-    <div class="card">
-      <h2>System</h2>
-      <p>API: ONLINE</p>
-      <p>STATUS: OK</p>
-    </div>
+    <h2>System</h2>
+    <p>API: ONLINE</p>
+    <p>STATUS: OK</p>
   </div>
 
 </div>
-
-</div>
-
 <script>
+
 function setPage(p){
   document.querySelectorAll('.page')
     .forEach(x=>x.classList.remove('active'));
   document.getElementById(p+'Page').classList.add('active');
 }
 
+function show(text){
+  document.getElementById("output").innerHTML = text;
+}
+
+/* AI */
 async function send(){
+
   const input=document.getElementById('input');
   const output=document.getElementById('output');
 
   const msg=input.value.trim();
+
   if(!msg){
     output.innerHTML='请输入内容';
     return;
@@ -196,7 +186,48 @@ async function send(){
     output.innerHTML='请求失败';
   }
 }
+
+/* 翻译 */
+function translateTool(){
+
+  const text=document.getElementById("input").value.trim() || "hello";
+
+  show(`
+    🌍 翻译结果<br><br>
+    原文：${text}<br>
+    结果：${text}（已翻译模拟）
+  `);
+}
+
+/* 搜索 */
+function searchTool(){
+
+  const text=document.getElementById("input").value.trim() || "AI";
+
+  show(`
+    🔍 搜索结果<br><br>
+    ${text} 相关内容：<br>
+    1. 结果A<br>
+    2. 结果B<br>
+    3. 结果C
+  `);
+}
+
+/* 文件 */
+function fileTool(){
+
+  show(`
+    📁 文件系统<br><br>
+    - index.html<br>
+    - style.css<br>
+    - app.js<br>
+    - api/chat.js
+  `);
+}
+
 </script>
 
 </body>
 </html>
+</div>
+.page.active{display:block;}
