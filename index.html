@@ -24,21 +24,78 @@
 
     <main class="main">
 
-      <div id="chatBox" class="panel active">
-        <textarea id="input" placeholder="输入你的问题..."></textarea>
-        <button onclick="send()">发送</button>
-        <div id="output" class="output"></div>
+  <div class="hero">
+    <h1>CWJ TOOLS</h1>
+    <p>AI OPERATING CENTER</p>
+  </div>
+
+  <div class="status-grid">
+
+    <div class="card">
+      <span>AI状态</span>
+      <h2>ONLINE</h2>
+    </div>
+
+    <div class="card">
+      <span>版本</span>
+      <h2>V9 PRO</h2>
+    </div>
+
+    <div class="card">
+      <span>系统</span>
+      <h2>NORMAL</h2>
+    </div>
+
+  </div>
+
+  <div id="chatBox" class="panel active">
+
+    <div class="chat-card">
+
+      <div class="chat-header">
+        CWJ AI Assistant
       </div>
 
-      <div id="toolsBox" class="panel">
-        <h3>工具模块</h3>
-        <p>天气 / 翻译 / 搜索 / 文件处理</p>
-      </div>
+      <textarea
+        id="input"
+        placeholder="输入你的问题..."
+      ></textarea>
 
-      <div id="systemBox" class="panel">
-        <h3>系统状态</h3>
-        <p>V9 SYSTEM ONLINE ✔</p>
-      </div>
+      <button class="send-btn" onclick="send()">
+        发送消息
+      </button>
+
+      <div id="output" class="output"></div>
+
+    </div>
+
+  </div>
+
+  <div id="toolsBox" class="panel">
+
+    <div class="tools-grid">
+
+      <div class="tool-card">AI工具</div>
+      <div class="tool-card">翻译工具</div>
+      <div class="tool-card">搜索工具</div>
+      <div class="tool-card">文件处理</div>
+
+    </div>
+
+  </div>
+
+  <div id="systemBox" class="panel">
+
+    <div class="chat-card">
+      <h2>系统状态</h2>
+
+      <p>API ONLINE</p>
+      <p>Vercel ONLINE</p>
+      <p>Version V9 PRO</p>
+
+    </div>
+
+  </div>
 
     </main>
 
