@@ -1,47 +1,72 @@
-function setMode(mode) {
-  document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
-  document.getElementById(mode + "Box").classList.add("active");
+function setPage(page){
+
+  document.querySelectorAll(".page")
+    .forEach(p => p.classList.remove("active"));
+
+  document.getElementById(page + "Page")
+    .classList.add("active");
 }
 
 function sleep(ms){
-  return new Promise(res => setTimeout(res, ms));
+  return new Promise(r => setTimeout(r, ms));
 }
 
-async function typeText(element, text){
-  element.innerHTML = "";
+async function typeWriter(el, text){
+
+  el.innerHTML = "";
+
   for(let i=0;i<text.length;i++){
-    element.innerHTML += text[i];
-    await sleep(15);
+    el.innerHTML += text[i];
+    await sleep(10);
   }
 }
 
-async function send() {
-  const inputEl = document.getElementById("input");
-  const output = document.getElementById("output");
+async function send(){
 
-  const input = inputEl.value;
+  const input = document.getElementById("input");
+  const chatOutput = document.getElementById("chatOutput");
 
-  if (!input) {
-    output.innerHTML = "请输入内容";
+  const msg = input.value.trim();
+
+  if(!msg){
+    chatOutput.innerHTML = "请输入内容";
     return;
   }
 
-  output.innerHTML = "AI 思考中...";
+  // 用户消息显示
+  chatOutput.innerHTML += `
+    <div class="msg user">👤 ${msg}</div>
+  `;
 
-  try {
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: input })
+  input.value = "";
+
+  // AI loading
+  const loadingId = "loading_" + Date.now();
+
+  chatOutput.innerHTML += `
+    <div class="msg ai" id="${loadingId}">AI思考中...</div>
+  `;
+
+  chatOutput.scrollTop = chatOutput.scrollHeight;
+
+  try{
+
+    const res = await fetch("/api/chat",{
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify({ message: msg })
     });
 
     const data = await res.json();
 
-    await typeText(output, "👉 " + data.reply);
+    const el = document.getElementById(loadingId);
 
-    inputEl.value = "";
+    await typeWriter(el, "🤖 " + data.reply);
 
-  } catch (e) {
-    output.innerHTML = "❌ 请求失败，请检查 API";
+  }catch(e){
+
+    const el = document.getElementById(loadingId);
+    el.innerHTML = "❌ 请求失败，请检查API";
+
   }
 }
