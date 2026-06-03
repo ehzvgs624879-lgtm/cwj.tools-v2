@@ -1,11 +1,113 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CWJ TOOLS PRO MAX</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CWJ TOOLS</title>
 
-  <link rel="stylesheet" href="style.css"/>
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#05060a;
+  color:#fff;
+}
+
+.bg{
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(circle at 20% 20%, #4f46e5, transparent),
+    radial-gradient(circle at 80% 20%, #06b6d4, transparent),
+    radial-gradient(circle at 50% 80%, #a855f7, transparent);
+  filter:blur(120px);
+  opacity:.45;
+  z-index:-1;
+}
+
+.app{
+  display:flex;
+  height:100vh;
+}
+
+.sidebar{
+  width:200px;
+  padding:15px;
+  background:rgba(255,255,255,0.05);
+  backdrop-filter:blur(20px);
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.sidebar button{
+  padding:10px;
+  border:none;
+  border-radius:10px;
+  background:rgba(255,255,255,0.08);
+  color:white;
+  cursor:pointer;
+}
+
+.main{
+  flex:1;
+  padding:15px;
+}
+
+.page{display:none;}
+.page.active{display:block;}
+
+.card{
+  padding:15px;
+  border-radius:12px;
+  background:rgba(255,255,255,0.06);
+}
+
+textarea{
+  width:100%;
+  height:120px;
+  margin-top:10px;
+  border:none;
+  border-radius:10px;
+  padding:10px;
+  background:rgba(255,255,255,0.08);
+  color:white;
+}
+
+button{
+  margin-top:10px;
+  padding:10px;
+  border:none;
+  border-radius:10px;
+  background:#2563eb;
+  color:white;
+  cursor:pointer;
+}
+
+.output{
+  margin-top:10px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+}
+
+.tool{
+  padding:20px;
+  background:rgba(255,255,255,0.08);
+  border-radius:12px;
+  text-align:center;
+  cursor:pointer;
+}
+
+@media(max-width:768px){
+  .app{flex-direction:column;}
+  .sidebar{width:100%;flex-direction:row;}
+  .grid{grid-template-columns:repeat(2,1fr);}
+}
+</style>
 </head>
 
 <body>
@@ -14,107 +116,87 @@
 
 <div class="app">
 
-  <!-- 左侧控制栏 -->
-  <aside class="sidebar">
+<!-- sidebar -->
+<div class="sidebar">
+  <button onclick="setPage('chat')">AI</button>
+  <button onclick="setPage('tools')">Tools</button>
+  <button onclick="setPage('system')">System</button>
+</div>
 
-    <div class="logo">
-      CWJ TOOLS
+<!-- main -->
+<div class="main">
+
+  <!-- chat -->
+  <div id="chatPage" class="page active">
+    <div class="card">
+      <h2>AI Chat</h2>
+
+      <textarea id="input"></textarea>
+      <button onclick="send()">发送</button>
+
+      <div id="output" class="output"></div>
     </div>
+  </div>
 
-    <button onclick="setPage('home')">🏠 Home</button>
-    <button onclick="setPage('chat')">💬 AI Chat</button>
-    <button onclick="setPage('tools')">🧰 Tools</button>
-    <button onclick="setPage('system')">⚙ System</button>
+  <!-- tools -->
+  <div id="toolsPage" class="page">
+    <div class="grid">
 
-  </aside>
+      <div class="tool" onclick="alert('AI工具')">AI工具</div>
+      <div class="tool" onclick="alert('翻译')">翻译</div>
+      <div class="tool" onclick="alert('搜索')">搜索</div>
+      <div class="tool" onclick="alert('文件')">文件</div>
 
-  <!-- 主区域 -->
-  <main class="main">
+    </div>
+  </div>
 
-    <!-- HOME -->
-    <section id="homePage" class="page active">
-
-      <div class="hero">
-        <h1>CWJ TOOLS PRO MAX</h1>
-        <p>AI CONTROL CENTER</p>
-      </div>
-
-      <div class="dashboard">
-
-        <div class="card">
-          <h3>AI STATUS</h3>
-          <p>ONLINE</p>
-        </div>
-
-        <div class="card">
-          <h3>SERVER</h3>
-          <p>STABLE</p>
-        </div>
-
-        <div class="card">
-          <h3>VERSION</h3>
-          <p>PRO MAX</p>
-        </div>
-
-      </div>
-
-    </section><!-- CHAT PAGE -->
-    <section id="chatPage" class="page">
-
-      <div class="chatContainer">
-
-        <div class="chatHeader">
-          💬 AI Assistant
-        </div>
-
-        <div id="chatOutput" class="chatOutput"></div>
-
-        <div class="chatInputArea">
-
-          <textarea id="input" placeholder="输入你的问题..."></textarea>
-
-          <button onclick="send()">发送</button>
-
-        </div>
-
-      </div>
-
-    </section>
-
-    <!-- TOOLS PAGE -->
-    <section id="toolsPage" class="page">
-
-      <div class="grid">
-
-        <div class="toolCard" onclick="alert('AI工具启动')">🤖 AI工具</div>
-        <div class="toolCard" onclick="alert('翻译启动')">🌍 翻译</div>
-        <div class="toolCard" onclick="alert('搜索启动')">🔍 搜索</div>
-        <div class="toolCard" onclick="alert('文件系统')">📁 文件</div>
-
-      </div>
-
-    </section>
-
-    <!-- SYSTEM PAGE -->
-    <section id="systemPage" class="page">
-
-      <div class="systemBox">
-
-        <h2>System Status</h2>
-
-        <p>API: ONLINE</p>
-        <p>SERVER: OK</p>
-        <p>AI ENGINE: ACTIVE</p>
-
-      </div>
-
-    </section>
-
-  </main>
+  <!-- system -->
+  <div id="systemPage" class="page">
+    <div class="card">
+      <h2>System</h2>
+      <p>API: ONLINE</p>
+      <p>STATUS: OK</p>
+    </div>
+  </div>
 
 </div>
 
-<script src="app.js"></script>
+</div>
+
+<script>
+function setPage(p){
+  document.querySelectorAll('.page')
+    .forEach(x=>x.classList.remove('active'));
+  document.getElementById(p+'Page').classList.add('active');
+}
+
+async function send(){
+  const input=document.getElementById('input');
+  const output=document.getElementById('output');
+
+  const msg=input.value.trim();
+  if(!msg){
+    output.innerHTML='请输入内容';
+    return;
+  }
+
+  output.innerHTML='AI思考中...';
+
+  try{
+    const res=await fetch('/api/chat',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({message:msg})
+    });
+
+    const data=await res.json();
+    output.innerHTML='👉 '+data.reply;
+
+  }catch(e){
+    output.innerHTML='请求失败';
+  }
+}
+</script>
 
 </body>
 </html>
