@@ -1,59 +1,201 @@
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #05060a;
-  color: #ffffff;
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+  background:#020617;
+  color:#fff;
+  overflow:hidden;
 }
 
-/* 背景光晕样式完全保留你的原版 */
-.bg {
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(circle at 20% 20%, #4f46e5, transparent),
-              radial-gradient(circle at 80% 80%, #06b6d4, transparent),
-              radial-gradient(circle at 50% 50%, #a855f7, transparent);
-  filter: blur(120px);
-  opacity: 0.45;
-  z-index: -1;
+/* 背景光效 */
+.bg{
+  position:fixed;
+  inset:0;
+  background:
+  radial-gradient(circle at 20% 20%,#2563eb,transparent),
+  radial-gradient(circle at 80% 20%,#06b6d4,transparent),
+  radial-gradient(circle at 50% 80%,#9333ea,transparent);
+  filter:blur(140px);
+  opacity:.5;
+  z-index:-1;
 }
 
-/* 全局左右弹性布局 */
-.app {
-  display: flex;
-  height: 100vh;
+/* 主布局 */
+.app{
+  display:flex;
+  height:100vh;
 }
 
-/* 左侧导航（修复你半截断掉的rgba代码） */
-.sidebar {
-  width: 240px;
-  padding: 20px;
-  background: rgba(255,255,255,0.05);
-  display: flex;
-  flex-direction: column;
-  gap:16px;
+/* 左侧栏 */
+.sidebar{
+  width:250px;
+  padding:24px;
+  display:flex;
+  flex-direction:column;
+  gap:15px;
+  background:rgba(255,255,255,.04);
+  backdrop-filter:blur(20px);
+  border-right:1px solid rgba(255,255,255,.08);
 }
+
+.sidebar h2{
+  margin-bottom:20px;
+}
+
 .sidebar button{
-  padding:8px;
-  font-size:16px;
+  border:none;
+  padding:14px;
+  border-radius:14px;
+  background:rgba(255,255,255,.05);
+  color:white;
+  cursor:pointer;
+  transition:.3s;
 }
 
-/* 右侧内容区域 */
+.sidebar button:hover{
+  transform:translateY(-3px);
+  background:rgba(59,130,246,.2);
+}
+
+/* 主区域 */
 .main{
-  flex: 1;
+  flex:1;
   padding:30px;
+  overflow:auto;
 }
 
-/* 面板显隐，配合JS切换 */
-.panel{
-  display: none;
-}
-.panel.active{
-  display: block;
+/* 顶部标题 */
+.hero h1{
+  font-size:42px;
+  margin:0;
 }
 
-/* 聊天输入框尺寸 */
+.hero p{
+  opacity:.7;
+  margin-top:10px;
+}
+
+/* 状态卡片 */
+.status-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:15px;
+  margin-top:25px;
+  margin-bottom:25px;
+}
+
+.card{
+  padding:20px;
+  border-radius:22px;
+  background:rgba(255,255,255,.05);
+  backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,.08);
+  transition:.3s;
+}
+
+.card:hover{
+  transform:translateY(-4px);
+  box-shadow:0 0 30px rgba(59,130,246,.25);
+}
+
+/* 聊天卡片 */
+.chat-card{
+  padding:25px;
+  border-radius:24px;
+  background:rgba(255,255,255,.05);
+  backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,.08);
+}
+
+.chat-header{
+  font-size:22px;
+  margin-bottom:20px;
+}
+
+/* 输入框 */
 #input{
-  width:330px;
-  height:105px;
-  padding:6px;
+  width:100%;
+  height:120px;
+  border:none;
+  outline:none;
+  border-radius:16px;
+  padding:15px;
+  background:rgba(255,255,255,.05);
+  color:white;
+  resize:none;
+}
+
+/* 发送按钮 */
+.send-btn{
+  margin-top:15px;
+  padding:12px 24px;
+  border:none;
+  border-radius:14px;
+  background:#2563eb;
+  color:white;
+  cursor:pointer;
+}
+
+/* 输出区域 */
+.output{
+  margin-top:20px;
+  padding:20px;
+  border-radius:16px;
+  background:rgba(255,255,255,.04);
+  min-height:80px;
+}
+
+/* 工具网格 */
+.tools-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:15px;
+}
+
+.tool-card{
+  padding:30px;
+  border-radius:22px;
+  background:rgba(255,255,255,.05);
+  backdrop-filter:blur(20px);
+  text-align:center;
+  transition:.3s;
+}
+
+.tool-card:hover{
+  transform:translateY(-4px);
+  box-shadow:0 0 25px rgba(59,130,246,.3);
+}
+
+/* 页面切换 */
+.panel{
+  display:none;
+}
+
+.panel.active{
+  display:block;
+}
+
+/* 手机适配 */
+@media(max-width:768px){
+
+  .app{
+    flex-direction:column;
+  }
+
+  .sidebar{
+    width:auto;
+    flex-direction:row;
+    overflow-x:auto;
+  }
+
+  .status-grid{
+    grid-template-columns:1fr;
+  }
+
+  .tools-grid{
+    grid-template-columns:1fr;
+  }
+
+  .hero h1{
+    font-size:30px;
+  }
 }
