@@ -3,17 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CWJ TOOLS</title>
+  <title>CWJ TOOLS V9 PRO</title>
 
-  <!-- ✔ CSS闭环 -->
   <link rel="stylesheet" href="style.css"/>
 </head>
 
 <body>
+
+  <!-- 背景 -->
   <div class="bg"></div>
 
   <div class="app">
 
+    <!-- 左侧导航 -->
     <aside class="sidebar">
       <h2>CWJ TOOLS</h2>
 
@@ -22,86 +24,85 @@
       <button onclick="setMode('system')">System</button>
     </aside>
 
+    <!-- 主内容 -->
     <main class="main">
 
-  <div class="hero">
-    <h1>CWJ TOOLS</h1>
-    <p>AI OPERATING CENTER</p>
-  </div>
-
-  <div class="status-grid">
-
-    <div class="card">
-      <span>AI状态</span>
-      <h2>ONLINE</h2>
-    </div>
-
-    <div class="card">
-      <span>版本</span>
-      <h2>V9 PRO</h2>
-    </div>
-
-    <div class="card">
-      <span>系统</span>
-      <h2>NORMAL</h2>
-    </div>
-
-  </div>
-
-  <div id="chatBox" class="panel active">
-
-    <div class="chat-card">
-
-      <div class="chat-header">
-        CWJ AI Assistant
+      <!-- 顶部标题 -->
+      <div class="hero">
+        <h1>CWJ TOOLS</h1>
+        <p>AI OPERATING CENTER</p>
       </div>
 
-      <textarea
-        id="input"
-        placeholder="输入你的问题..."
-      ></textarea>
+      <!-- 状态卡片 -->
+      <div class="status-grid">
 
-      <button class="send-btn" onclick="send()">
-        发送消息
-      </button>
+        <div class="card">
+          <span>AI状态</span>
+          <h2>ONLINE</h2>
+        </div>
 
-      <div id="output" class="output"></div>
+        <div class="card">
+          <span>版本</span>
+          <h2>V9 PRO</h2>
+        </div>
 
-    </div>
+        <div class="card">
+          <span>系统</span>
+          <h2>NORMAL</h2>
+        </div>
 
-  </div>
+      </div>
 
-  <div id="toolsBox" class="panel">
+      <!-- AI聊天 -->
+      <div id="chatBox" class="panel active">
 
-    <div class="tools-grid">
+        <div class="chat-card">
 
-      <div class="tool-card">AI工具</div>
-      <div class="tool-card">翻译工具</div>
-      <div class="tool-card">搜索工具</div>
-      <div class="tool-card">文件处理</div>
+          <div class="chat-header">
+            CWJ AI Assistant
+          </div>
 
-    </div>
+          <textarea id="input" placeholder="输入你的问题..."></textarea>
 
-  </div>
+          <button class="send-btn" onclick="send()">
+            发送消息
+          </button>
 
-  <div id="systemBox" class="panel">
+          <div id="output" class="output"></div>
 
-    <div class="chat-card">
-      <h2>系统状态</h2>
+        </div>
 
-      <p>API ONLINE</p>
-      <p>Vercel ONLINE</p>
-      <p>Version V9 PRO</p>
+      </div>
 
-    </div>
+      <!-- 工具模块 -->
+      <div id="toolsBox" class="panel">
 
-  </div>
+        <div class="tools-grid">
+
+          <div class="tool-card">AI工具</div>
+          <div class="tool-card">翻译工具</div>
+          <div class="tool-card">搜索工具</div>
+          <div class="tool-card">文件处理</div>
+
+        </div>
+
+      </div>
+
+      <!-- 系统状态 -->
+      <div id="systemBox" class="panel">
+
+        <div class="chat-card">
+
+          <h2>系统状态</h2>
+
+          <p>API：ONLINE</p>
+          <p>Vercel：ONLINE</p>
+          <p>Version：V9 PRO</p>
+
+        </div>
+
+      </div>
 
     </main>
 
   </div>
-
-  <!-- ✔ JS闭环 -->
-  <script src="app.js"></script>
-</body>
-</html>
