@@ -1,108 +1,120 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CWJ TOOLS V9 PRO</title>
+  <title>CWJ TOOLS PRO MAX</title>
 
   <link rel="stylesheet" href="style.css"/>
 </head>
 
 <body>
 
-  <!-- 背景 -->
-  <div class="bg"></div>
+<div class="bg"></div>
 
-  <div class="app">
+<div class="app">
 
-    <!-- 左侧导航 -->
-    <aside class="sidebar">
-      <h2>CWJ TOOLS</h2>
+  <!-- 左侧控制栏 -->
+  <aside class="sidebar">
 
-      <button onclick="setMode('chat')">AI Chat</button>
-      <button onclick="setMode('tools')">Tools</button>
-      <button onclick="setMode('system')">System</button>
-    </aside>
+    <div class="logo">
+      CWJ TOOLS
+    </div>
 
-    <!-- 主内容 -->
-    <main class="main">
+    <button onclick="setPage('home')">🏠 Home</button>
+    <button onclick="setPage('chat')">💬 AI Chat</button>
+    <button onclick="setPage('tools')">🧰 Tools</button>
+    <button onclick="setPage('system')">⚙ System</button>
 
-      <!-- 顶部标题 -->
+  </aside>
+
+  <!-- 主区域 -->
+  <main class="main">
+
+    <!-- HOME -->
+    <section id="homePage" class="page active">
+
       <div class="hero">
-        <h1>CWJ TOOLS</h1>
-        <p>AI OPERATING CENTER</p>
+        <h1>CWJ TOOLS PRO MAX</h1>
+        <p>AI CONTROL CENTER</p>
       </div>
 
-      <!-- 状态卡片 -->
-      <div class="status-grid">
+      <div class="dashboard">
 
         <div class="card">
-          <span>AI状态</span>
-          <h2>ONLINE</h2>
+          <h3>AI STATUS</h3>
+          <p>ONLINE</p>
         </div>
 
         <div class="card">
-          <span>版本</span>
-          <h2>V9 PRO</h2>
+          <h3>SERVER</h3>
+          <p>STABLE</p>
         </div>
 
         <div class="card">
-          <span>系统</span>
-          <h2>NORMAL</h2>
+          <h3>VERSION</h3>
+          <p>PRO MAX</p>
         </div>
 
       </div>
 
-      <!-- AI聊天 -->
-      <div id="chatBox" class="panel active">
+    </section><!-- CHAT PAGE -->
+    <section id="chatPage" class="page">
 
-        <div class="chat-card">
+      <div class="chatContainer">
 
-          <div class="chat-header">
-            CWJ AI Assistant
-          </div>
+        <div class="chatHeader">
+          💬 AI Assistant
+        </div>
+
+        <div id="chatOutput" class="chatOutput"></div>
+
+        <div class="chatInputArea">
 
           <textarea id="input" placeholder="输入你的问题..."></textarea>
 
-          <button class="send-btn" onclick="send()">
-            发送消息
-          </button>
-
-          <div id="output" class="output"></div>
+          <button onclick="send()">发送</button>
 
         </div>
 
       </div>
 
-      <!-- 工具模块 -->
-      <div id="toolsBox" class="panel">
+    </section>
 
-        <div class="tools-grid">
+    <!-- TOOLS PAGE -->
+    <section id="toolsPage" class="page">
 
-          <div class="tool-card">AI工具</div>
-          <div class="tool-card">翻译工具</div>
-          <div class="tool-card">搜索工具</div>
-          <div class="tool-card">文件处理</div>
+      <div class="grid">
 
-        </div>
-
-      </div>
-
-      <!-- 系统状态 -->
-      <div id="systemBox" class="panel">
-
-        <div class="chat-card">
-
-          <h2>系统状态</h2>
-
-          <p>API：ONLINE</p>
-          <p>Vercel：ONLINE</p>
-          <p>Version：V9 PRO</p>
-
-        </div>
+        <div class="toolCard" onclick="alert('AI工具启动')">🤖 AI工具</div>
+        <div class="toolCard" onclick="alert('翻译启动')">🌍 翻译</div>
+        <div class="toolCard" onclick="alert('搜索启动')">🔍 搜索</div>
+        <div class="toolCard" onclick="alert('文件系统')">📁 文件</div>
 
       </div>
 
-    </main>
+    </section>
 
-  </div>
+    <!-- SYSTEM PAGE -->
+    <section id="systemPage" class="page">
+
+      <div class="systemBox">
+
+        <h2>System Status</h2>
+
+        <p>API: ONLINE</p>
+        <p>SERVER: OK</p>
+        <p>AI ENGINE: ACTIVE</p>
+
+      </div>
+
+    </section>
+
+  </main>
+
+</div>
+
+<script src="app.js"></script>
+
+</body>
+</html>
