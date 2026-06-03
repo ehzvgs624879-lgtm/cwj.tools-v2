@@ -3,9 +3,23 @@ function setMode(mode) {
   document.getElementById(mode + "Box").classList.add("active");
 }
 
+function sleep(ms){
+  return new Promise(res => setTimeout(res, ms));
+}
+
+async function typeText(element, text){
+  element.innerHTML = "";
+  for(let i=0;i<text.length;i++){
+    element.innerHTML += text[i];
+    await sleep(15);
+  }
+}
+
 async function send() {
-  const input = document.getElementById("input").value;
+  const inputEl = document.getElementById("input");
   const output = document.getElementById("output");
+
+  const input = inputEl.value;
 
   if (!input) {
     output.innerHTML = "请输入内容";
@@ -22,8 +36,12 @@ async function send() {
     });
 
     const data = await res.json();
-    output.innerHTML = "👉 " + data.reply;
+
+    await typeText(output, "👉 " + data.reply);
+
+    inputEl.value = "";
+
   } catch (e) {
-    output.innerHTML = "❌ 请求失败";
+    output.innerHTML = "❌ 请求失败，请检查 API";
   }
 }
