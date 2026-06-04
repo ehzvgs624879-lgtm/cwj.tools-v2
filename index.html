@@ -3,172 +3,184 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Ultimate WebGL Shaders</title>
+    <title>3D Interactive Warp Page</title>
     <style>
         body {
             margin: 0;
             overflow: hidden;
-            background-color: #010202; /* 极暗深渊色 */
-            font-family: -apple-system, sans-serif;
+            background-color: #0d110e; /* 极高级的暗色底 */
             touch-action: none;
         }
-        #canvas-container { width: 100vw; height: 100vh; position: absolute; z-index: 1; }
-        .overlay {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            z-index: 10; text-align: center; color: white; pointer-events: none; mix-blend-mode: overlay;
+        #canvas-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
         }
-        h1 { font-size: 3rem; font-weight: 100; letter-spacing: 1rem; margin: 0; opacity: 0.8; }
-        p { font-size: 0.8rem; letter-spacing: 0.5rem; opacity: 0.5; margin-top: 10px; }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
     <div id="canvas-container"></div>
-    <div class="overlay">
-        <h1>FLUID</h1>
-        <p>TOUCH THE ENTITY</p>
-    </div>
 
     <script>
-        // 核心技术：顶点着色器 (Vertex Shader) - 控制 3D 几何体的极度扭曲
+        // 创建后台高性能 Canvas，动态绘制高清的网页文本与排版
+        const textureCanvas = document.createElement('canvas');
+        textureCanvas.width = 2048;  // 超高分辨率保证文字极其清晰
+        textureCanvas.height = 2048;
+        const ctx = textureCanvas.getContext('2d');
+
+        // 绘制高档现代网页背景与精细排版
+        ctx.fillStyle = '#f4f6f4'; // 带有高级质感的微白纸张色
+        ctx.fillRect(0, 0, 2048, 2048);
+
+        // 模拟大牌官网的栅格线条
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.05)';
+        ctx.lineWidth = 2;
+        for(let i = 200; i < 2048; i += 400) {
+            ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, 2048); ctx.stroke();
+        }
+
+        // 写入极具未来感的网页大标题
+        ctx.fillStyle = '#050b08';
+        ctx.font = 'bold 90px "Helvetica Neue", Helvetica, Arial, sans-serif';
+        ctx.fillText('DESIGNED FOR PERFORMANCE', 150, 400);
+
+        ctx.font = '100 55px "Helvetica Neue", Arial, sans-serif';
+        ctx.fillStyle = '#2a4d3d';
+        ctx.fillText('Built to run smoothly at 60FPS.', 150, 520);
+
+        // 写入模拟的正文段落
+        ctx.fillStyle = '#555555';
+        ctx.font = '36px "Courier New", monospace';
+        const lines = [
+            "Translating costly DOM operations into core GPU threads.",
+            "Warping standard HTML layouts within a custom WebGL context.",
+            "Interaction proximity: active - Dynamic curvature enabled.",
+            "Designed by CWJ-TOOLS // 2026 Ultimate Creative Engineering."
+        ];
+        lines.forEach((line, index) => {
+            ctx.fillText(line, 150, 750 + index * 80);
+        });
+
+        // 绘制一些极简的技术几何色块
+        ctx.fillStyle = '#3ae397';
+        ctx.fillRect(150, 1100, 400, 15);
+        ctx.fillStyle = '#050b08';
+        ctx.fillRect(150, 1150, 800, 400);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 40px sans-serif';
+        ctx.fillText('CORE GRAPHICS ENGINE ACTIVE', 220, 1380);
+        // 核心技术：GPU 顶点着色器 (让整张网页像布料/纸张一样产生 3D 卷曲波浪)
         const vertexShader = `
             uniform float u_time;
-            uniform float u_intensity;
+            uniform vec2 u_pointer;
+            uniform float u_waveIntensity;
             varying vec2 vUv;
-            varying float vDisplacement;
-
-            // GPU 级 3D 噪波算法 (Simplex Noise)
-            vec4 permute(vec4 x){return mod(((x*34.0)+1.0)*x, 289.0);}
-            vec4 taylorInvSqrt(vec4 r){return 1.79284291400159 - 0.85373472095314 * r;}
-            float snoise(vec3 v){ 
-                const vec2  C = vec2(1.0/6.0, 1.0/3.0) ;
-                const vec4  D = vec4(0.0, 0.5, 1.0, 2.0);
-                vec3 i  = floor(v + dot(v, C.yyy) );
-                vec3 x0 = v - i + dot(i, C.xxx) ;
-                vec3 g = step(x0.yzx, x0.xyz);
-                vec3 l = 1.0 - g;
-                vec3 i1 = min( g.xyz, l.zxy );
-                vec3 i2 = max( g.xyz, l.zxy );
-                vec3 x1 = x0 - i1 + 1.0 * C.xxx;
-                vec3 x2 = x0 - i2 + 2.0 * C.xxx;
-                vec3 x3 = x0 - 1.0 + 3.0 * C.xxx;
-                i = mod(i, 289.0 ); 
-                vec4 p = permute( permute( permute( 
-                            i.z + vec4(0.0, i1.z, i2.z, 1.0 ))
-                          + i.y + vec4(0.0, i1.y, i2.y, 1.0 )) 
-                          + i.x + vec4(0.0, i1.x, i2.x, 1.0 ));
-                float n_ = 1.0/7.0;
-                vec3  ns = n_ * D.wyz - D.xzx;
-                vec4 j = p - 49.0 * floor(p * ns.z *ns.z);
-                vec4 x_ = floor(j * ns.z);
-                vec4 y_ = floor(j - 7.0 * x_ );
-                vec4 x = x_ *ns.x + ns.yyyy;
-                vec4 y = y_ *ns.x + ns.yyyy;
-                vec4 h = 1.0 - abs(x) - abs(y);
-                vec4 b0 = vec4( x.xy, y.xy );
-                vec4 b1 = vec4( x.zw, y.zw );
-                vec4 s0 = floor(b0)*2.0 + 1.0;
-                vec4 s1 = floor(b1)*2.0 + 1.0;
-                vec4 sh = -step(h, vec4(0.0));
-                vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy ;
-                vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww ;
-                vec3 p0 = vec3(a0.xy,h.x);
-                vec3 p1 = vec3(a0.zw,h.y);
-                vec3 p2 = vec3(a1.xy,h.z);
-                vec3 p3 = vec3(a1.zw,h.w);
-                vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
-                p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;
-                vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
-                m = m * m;
-                return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3) ) );
-            }
+            varying float vDepthShadow;
 
             void main() {
                 vUv = uv;
-                // 利用 GPU 计算极度复杂的流体力学扭曲
-                float noise = snoise(vec3(position.x * 1.5, position.y * 1.5 + u_time * 0.3, position.z * 1.5));
+                vec3 pos = position;
+
+                // 算法 1：基础的飘动风吹波浪（模拟网页在空间中悬浮的呼吸感）
+                float baseWave = sin(pos.x * 0.3 + u_time * 1.2) * cos(pos.y * 0.3 + u_time * 0.8) * 0.25;
                 
-                // 触摸时的狂暴模式
-                float distortion = noise * (0.8 + u_intensity * 3.5);
-                vDisplacement = distortion;
+                // 算法 2：手指触控引起的局部超强卷曲折叠（接近函数 Proximity 变形）
+                float dist = distance(pos.xy, u_pointer * vec2(4.5, 3.0));
+                float touchInfluence = smoothstep(3.5, 0.0, dist);
                 
-                vec3 newPosition = position + normal * (distortion * 0.5);
-                gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
+                // 综合变形：基础飘动 + 手指划过时的剧后凸起与卷曲
+                pos.z += baseWave + (touchInfluence * u_waveIntensity * 2.2);
+                
+                // 给边缘增加一个类似高档胶片特有的自然反卷弧度
+                pos.z += sin(pos.x * 0.15 - 1.0) * 0.4;
+
+                vDepthShadow = pos.z; // 传递深度用于计算光影阴影
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
             }
         `;
-        // 核心技术：片元着色器 (Fragment Shader) - GPU 级光影与全息色彩渲染
-        const fragmentShader = `
-            uniform float u_intensity;
-            uniform float u_time;
-            varying vec2 vUv;
-            varying float vDisplacement;
 
-            // 宇宙级余弦渐变算法 (Cosine Color Palette)
-            vec3 palette( in float t, in vec3 a, in vec3 b, in vec3 c, in vec3 d ) {
-                return a + b * cos( 6.28318 * (c * t + d) );
-            }
+        // 片元着色器：动态渲染网页材质并根据弯曲程度计算阴影，强化 3D 立体感
+        const fragmentShader = `
+            uniform sampler2D u_texture;
+            varying vec2 vUv;
+            varying float vDepthShadow;
 
             void main() {
-                // 根据物体的扭曲程度和时间，生成梦幻的颜色
-                float distort = vDisplacement * 0.5 + 0.5;
+                // 采样我们第一段在 Canvas 里画好的高清网页文字贴图
+                vec4 texColor = texture2D(u_texture, vUv);
                 
-                // 基础色：深空绿 ➔ 爆发色：赛博粉蓝
-                vec3 colorA = vec3(0.05, 0.2, 0.1); 
-                vec3 colorB = vec3(0.2, 0.8, 0.5); 
-                vec3 colorC = vec3(1.0, 1.0, 1.0); 
-                vec3 colorD = vec3(0.0, 0.33, 0.67); 
-                
-                // 根据手指按下强度混合色板
-                vec3 finalColor = palette(distort - u_time * 0.1 + (u_intensity * 0.5), colorA, colorB, colorC, colorD);
-                
-                // 边缘发光效应 (Fresnel 模拟)
-                float glow = smoothstep(0.0, 1.2, distort);
-                finalColor += vec3(glow * 0.3) * u_intensity;
+                // 依据网格的弯曲深度计算光影阴影（深的地方暗，凸起的地方亮，产生绝佳的立体折痕效果）
+                float shadow = 0.85 + (vDepthShadow * 0.15);
+                shadow = clamp(shadow, 0.6, 1.3);
 
-                gl_FragColor = vec4(finalColor, 1.0);
+                gl_FragColor = vec4(texColor.rgb * shadow, texColor.a);
             }
         `;
 
+        // 初始化 Three.js 3D 舞台
         const container = document.getElementById('canvas-container');
         const scene = new THREE.Scene();
-        
-        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
-        camera.position.set(0, 0, 8);
 
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.set(0, 0, 7);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         container.appendChild(renderer.domElement);
 
-        // 创建高精度几何体 (Icosahedron - 128个面细分，总计几万个顶点供显卡扭曲)
-        const geometry = new THREE.IcosahedronGeometry(2, 128);
+        // 将 Canvas 转化为 WebGL 硬件纹理
+        const pageTexture = new THREE.CanvasTexture(textureCanvas);
+        pageTexture.minFilter = THREE.LinearFilter;
 
-        // 将显卡着色器绑定到材质上
+        // 创建高密度网格面（128x128个细分格子，确保纸张弯曲时如丝般顺滑，毫无锯齿）
+        const geometry = new THREE.PlaneGeometry(9, 6, 128, 128);
+
+        // 绑定材质与 GPU 变量
         const material = new THREE.ShaderMaterial({
             vertexShader: vertexShader,
             fragmentShader: fragmentShader,
+            side: THREE.DoubleSide, // 双面渲染，翻转过来也能看到网页背面
             uniforms: {
+                u_texture: { value: pageTexture },
                 u_time: { value: 0.0 },
-                u_intensity: { value: 0.0 }
-            },
-            wireframe: false // 设置为 true 就可以看到震撼的网格撕裂效果
+                u_pointer: { value: new THREE.Vector2(0, 0) },
+                u_waveIntensity: { value: 0.0 }
+            }
         });
 
-        const mesh = new THREE.Mesh(geometry, material);
-        scene.add(mesh);
-        let isTouching = false;
+        const pageMesh = new THREE.Mesh(geometry, material);
+        // 让整个网页稍微倾斜一点，更具 3D 空间透视感
+        pageMesh.rotation.set(-0.15, -0.25, 0.05);
+        scene.add(pageMesh);
+        // 触摸与手势交互控制
+        let pointer = new THREE.Vector2(0, 0);
         let targetIntensity = 0.0;
         let currentIntensity = 0.0;
 
-        // 交互监听
-        const onTouchStart = () => { isTouching = true; targetIntensity = 1.0; };
-        const onTouchEnd = () => { isTouching = false; targetIntensity = 0.0; };
+        function updatePointer(x, y) {
+            // 将屏幕坐标标准化为符合 3D 空间的规范化坐标 (-1 到 1)
+            pointer.x = (x / window.innerWidth) * 2 - 1;
+            pointer.y = -(y / window.innerHeight) * 2 + 1;
+        }
 
-        window.addEventListener('mousedown', onTouchStart);
-        window.addEventListener('mouseup', onTouchEnd);
-        window.addEventListener('touchstart', onTouchStart, { passive: false });
-        window.addEventListener('touchend', onTouchEnd);
+        // 监听手指滑动和点击
+        window.addEventListener('pointermove', (e) => {
+            updatePointer(e.clientX, e.clientY);
+        });
 
+        window.addEventListener('pointerdown', (e) => {
+            targetIntensity = 1.0; // 手指按下时，网页弯曲强度拉满
+            updatePointer(e.clientX, e.clientY);
+        });
+
+        window.addEventListener('pointerup', () => {
+            targetIntensity = 0.0; // 手指松开时，网页纸张恢复平整
+        });
+
+        // 适配手机屏幕旋转和尺寸缩放
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
@@ -177,25 +189,25 @@
 
         const clock = new THREE.Clock();
 
+        // 核心硬件渲染主循环
         function animate() {
             requestAnimationFrame(animate);
 
             const time = clock.getElapsedTime();
-            
-            // 弹性阻尼算法：让交互过渡如丝般顺滑
-            currentIntensity += (targetIntensity - currentIntensity) * 0.05;
 
-            // 实时将数据传递给 GPU 着色器
+            // 缓动阻尼算法：让网页在松开或按下时有真实的纸张回弹动画
+            currentIntensity += (targetIntensity - currentIntensity) * 0.08;
+
+            // 实时将物理数据推送给 GPU
             material.uniforms.u_time.value = time;
-            material.uniforms.u_intensity.value = currentIntensity;
+            material.uniforms.u_pointer.value.lerp(pointer, 0.1); // 手指位置平滑插值
+            material.uniforms.u_waveIntensity.value = currentIntensity;
 
-            // 整体缓慢自转，触摸时急剧翻滚
-            mesh.rotation.y = time * 0.1 + (currentIntensity * 2.0);
-            mesh.rotation.x = time * 0.05 + (currentIntensity * 1.5);
-
+            // 渲染执行
             renderer.render(scene, camera);
         }
 
+        // 引擎启动
         animate();
     </script>
 </body>
