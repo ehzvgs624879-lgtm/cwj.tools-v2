@@ -397,7 +397,63 @@ input.search:focus{border-color:var(--ac);box-shadow:0 0 0 3px var(--ac-glow);ba
     }
   });
 
-})();
+})();@media (max-width:768px){
+
+  /* 更紧凑内容 */
+  .content{
+    padding:14px 12px;
+  }
+
+  /* stats 更适配手机 */
+  .stats{
+    gap:10px;
+  }
+
+  .stat{
+    padding:14px 12px;
+  }
+
+  .stat-v{
+    font-size:20px;
+  }
+
+  /* grid 卡片更舒服 */
+  .grid{
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
+  }
+
+  .card{
+    padding:16px 12px;
+    border-radius:10px;
+  }
+
+  .c-em{
+    font-size:22px;
+  }
+
+  .c-t{
+    font-size:13px;
+  }
+
+  .c-d{
+    font-size:11px;
+    line-height:1.4;
+  }
+
+  /* sidebar 动画增强 */
+  .sidebar{
+    transition:transform .28s cubic-bezier(.4,0,.2,1);
+  }
+
+  /* modal 更适配手机 */
+  .modal{
+    width:92%;
+    padding:26px 18px;
+    border-radius:14px;
+  }
+
+     }
 </script>
 </body>
 </html>
