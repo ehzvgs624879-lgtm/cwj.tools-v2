@@ -1,233 +1,159 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CWJ TOOLS</title>
-
-<style>
-body{
-  margin:0;
-  font-family:Arial;
-  background:#05060a;
-  color:#fff;
-}
-
-.bg{
-  position:fixed;
-  inset:0;
-  background:
-    radial-gradient(circle at 20% 20%, #4f46e5, transparent),
-    radial-gradient(circle at 80% 20%, #06b6d4, transparent),
-    radial-gradient(circle at 50% 80%, #a855f7, transparent);
-  filter:blur(120px);
-  opacity:.45;
-  z-index:-1;
-}
-
-.app{
-  display:flex;
-  height:100vh;
-}
-
-.sidebar{
-  width:200px;
-  padding:15px;
-  background:rgba(255,255,255,0.05);
-  backdrop-filter:blur(20px);
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
-
-.sidebar button{
-  padding:10px;
-  border:none;
-  border-radius:10px;
-  background:rgba(255,255,255,0.08);
-  color:white;
-  cursor:pointer;
-}
-
-.main{
-  flex:1;
-  padding:15px;
-}
-
-.page{display:none;}textarea{
-  width:100%;
-  height:120px;
-  margin-top:10px;
-  border:none;
-  border-radius:10px;
-  padding:10px;
-  background:rgba(255,255,255,0.08);
-  color:white;
-}
-
-button{
-  margin-top:10px;
-  padding:10px;
-  border:none;
-  border-radius:10px;
-  background:#2563eb;
-  color:white;
-  cursor:pointer;
-}
-
-.output{
-  margin-top:10px;
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:10px;
-}
-
-.tool{
-  padding:20px;
-  background:rgba(255,255,255,0.08);
-  border-radius:12px;
-  text-align:center;
-  cursor:pointer;
-}
-
-@media(max-width:768px){
-  .app{flex-direction:column;}
-  .sidebar{width:100%;flex-direction:row;}
-  .grid{grid-template-columns:repeat(2,1fr);}
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>3D Mathematical Interactive Space</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #050b08;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        #webgl-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        .ui-overlay {
+            position: absolute;
+            top: 8%;
+            left: 6%;
+            z-index: 10;
+            color: #ffffff;
+            pointer-events: none;
+        }
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            letter-spacing: -1px;
+            margin: 0 0 8px 0;
+            line-height: 1.1;
+            text-transform: uppercase;
+        }
+        p {
+            font-size: 0.9rem;
+            color: #5a8f76;
+            margin: 0;
+            letter-spacing: 1px;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
-
 <body>
-
-<div class="bg"></div>
-
-<div class="app">
-
-<!-- sidebar -->
-<div class="sidebar">
-  <button onclick="setPage('chat')">AI</button>
-  <button onclick="setPage('tools')">Tools</button>
-  <button onclick="setPage('system')">System</button>
-</div>
-
-<!-- main -->
-<div class="main">
-
-  <!-- chat -->
-  <div id="chatPage" class="page active">
-    <h2>AI Chat</h2>
-
-    <textarea id="input"></textarea>
-    <button onclick="send()">发送</button>
-
-    <div id="output"></div>
-  </div><!-- tools -->
-  <div id="toolsPage" class="page">
-    <div class="grid">
-
-      <div class="tool" onclick="send()">AI聊天</div>
-      <div class="tool" onclick="translateTool()">翻译</div>
-      <div class="tool" onclick="searchTool()">搜索</div>
-      <div class="tool" onclick="fileTool()">文件</div>
-
+    <div id="webgl-container"></div>
+    <div class="ui-overlay">
+        <h1>MOSS<br>GEOMETRY</h1>
+        <p>TOUCH & DRAG TO WARP THE NODES</p>
     </div>
-  </div>
+    <script>
+        const container = document.getElementById('webgl-container');
+        const scene = new THREE.Scene();
+        
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 18, 45);
+        camera.lookAt(0, 0, 0);
 
-  <!-- system -->
-  <div id="systemPage" class="page">
-    <h2>System</h2>
-    <p>API: ONLINE</p>
-    <p>STATUS: OK</p>
-  </div>
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
 
-</div>
-<script>
+        const count = 60; 
+        const spacing = 1.2; 
+        const totalParticles = count * count;
+        const positions = new Float32Array(totalParticles * 3);
+        
+        let idx = 0;
+        for (let i = 0; i < count; i++) {
+            for (let j = 0; j < count; j++) {
+                positions[idx * 3] = (i - count / 2) * spacing;     
+                positions[idx * 3 + 1] = 0;                         
+                positions[idx * 3 + 2] = (j - count / 2) * spacing; 
+                idx++;
+            }
+        }
 
-function setPage(p){
-  document.querySelectorAll('.page')
-    .forEach(x=>x.classList.remove('active'));
-  document.getElementById(p+'Page').classList.add('active');
-}
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
-function show(text){
-  document.getElementById("output").innerHTML = text;
-}
+        const material = new THREE.PointsMaterial({
+            color: 0x3ae397, 
+            size: 0.35,
+            transparent: true,
+            opacity: 0.75,
+            blending: THREE.AdditiveBlending 
+        });
 
-/* AI */
-async function send(){
+        const particleSystem = new THREE.Points(geometry, material);
+        scene.add(particleSystem);
 
-  const input=document.getElementById('input');
-  const output=document.getElementById('output');
+        let mouseX = 0, mouseY = 0;     
+        let targetX = 0, targetY = 0;   
 
-  const msg=input.value.trim();
+        function handlePointer(x, y) {
+            mouseX = (x / window.innerWidth) * 2 - 1;
+            mouseY = -(y / window.innerHeight) * 2 + 1;
+        }
 
-  if(!msg){
-    output.innerHTML='请输入内容';
-    return;
-  }
+        window.addEventListener('mousemove', (e) => handlePointer(e.clientX, e.clientY));
+        window.addEventListener('touchmove', (e) => {
+            if (e.touches.length > 0) {
+                handlePointer(e.touches[0].clientX, e.touches[0].clientY);
+            }
+        }, { passive: true });
 
-  output.innerHTML='AI思考中...';
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        const clock = new THREE.Clock();
 
-  try{
-    const res=await fetch('/api/chat',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({message:msg})
-    });
+        function animate() {
+            requestAnimationFrame(animate);
 
-    const data=await res.json();
-    output.innerHTML='👉 '+data.reply;
+            const time = clock.getElapsedTime();
+            const positionAttribute = geometry.attributes.position;
+            
+            targetX += (mouseX - targetX) * 0.08;
+            targetY += (mouseY - targetY) * 0.08;
 
-  }catch(e){
-    output.innerHTML='请求失败';
-  }
-}
+            particleSystem.rotation.y = time * 0.02;
 
-/* 翻译 */
-function translateTool(){
+            let pointerIdx = 0;
+            for (let i = 0; i < count; i++) {
+                for (let j = 0; j < count; j++) {
+                    const x = positionAttribute.getX(pointerIdx);
+                    const z = positionAttribute.getZ(pointerIdx);
 
-  const text=document.getElementById("input").value.trim() || "hello";
+                    let y = Math.sin(x * 0.15 + time) * 2.5 + Math.cos(z * 0.15 + time) * 2.5;
 
-  show(`
-    🌍 翻译结果<br><br>
-    原文：${text}<br>
-    结果：${text}（已翻译模拟）
-  `);
-}
+                    const influenceX = targetX * 35;
+                    const influenceZ = -targetY * 35;
+                    
+                    const distance = Math.sqrt(Math.pow(x - influenceX, 2) + Math.pow(z - influenceZ, 2));
 
-/* 搜索 */
-function searchTool(){
+                    const maxDistance = 16; 
+                    if (distance < maxDistance) {
+                        const strength = (maxDistance - distance) / maxDistance;
+                        y += Math.pow(strength, 2) * 12 * (Math.sin(time * 3) * 0.3 + 1);
+                    }
 
-  const text=document.getElementById("input").value.trim() || "AI";
+                    positionAttribute.setY(pointerIdx, y);
+                    pointerIdx++;
+                }
+            }
 
-  show(`
-    🔍 搜索结果<br><br>
-    ${text} 相关内容：<br>
-    1. 结果A<br>
-    2. 结果B<br>
-    3. 结果C
-  `);
-}
+            positionAttribute.needsUpdate = true;
+            renderer.render(scene, camera);
+        }
 
-/* 文件 */
-function fileTool(){
-
-  show(`
-    📁 文件系统<br><br>
-    - index.html<br>
-    - style.css<br>
-    - app.js<br>
-    - api/chat.js
-  `);
-}
-
-</script>
-
+        animate();
+    </script>
 </body>
 </html>
-</div>
-.page.active{display:block;}
