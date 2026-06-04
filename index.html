@@ -287,50 +287,116 @@ input.search:focus{border-color:var(--ac);box-shadow:0 0 0 3px var(--ac-glow);ba
 </div>
 <script>
 (function(){
-  var burger=document.getElementById('burger');
-  var sidebar=document.getElementById('sidebar');
-  var sOverlay=document.getElementById('sOverlay');
-  function closeSidebar(){sidebar.classList.remove('open');sOverlay.classList.remove('show');}
-  burger.addEventListener('click',function(){sidebar.classList.contains('open')?closeSidebar():(sidebar.classList.add('open'),sOverlay.classList.add('show'));});
-  sOverlay.addEventListener('click',closeSidebar);
-  document.querySelectorAll('.nav-item').forEach(function(item){
-    item.addEventListener('click',function(){
-      document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active');});
+
+  var burger = document.getElementById('burger');
+  var sidebar = document.getElementById('sidebar');
+  var sOverlay = document.getElementById('sOverlay');
+
+  function closeSidebar(){
+    if(!sidebar || !sOverlay) return;
+    sidebar.classList.remove('open');
+    sOverlay.classList.remove('show');
+  }
+
+  if(burger && sidebar && sOverlay){
+    burger.addEventListener('click', function(){
+      if(sidebar.classList.contains('open')){
+        closeSidebar();
+      }else{
+        sidebar.classList.add('open');
+        sOverlay.classList.add('show');
+      }
+    });
+  }
+
+  if(sOverlay){
+    sOverlay.addEventListener('click', closeSidebar);
+  }
+
+  var navItems = document.querySelectorAll('.nav-item');
+  navItems.forEach(function(item){
+    item.addEventListener('click', function(){
+      navItems.forEach(function(n){ n.classList.remove('active'); });
       item.classList.add('active');
-      if(window.innerWidth<=768)closeSidebar();
+      if(window.innerWidth <= 768){
+        closeSidebar();
+      }
     });
   });
-  var searchInput=document.getElementById('searchInput');
-  var cards=document.querySelectorAll('.card');
-  var toolCount=document.getElementById('toolCount');
-  var noResult=document.getElementById('noResult');
-  searchInput.addEventListener('input',function(){
-    var q=this.value.toLowerCase().trim();
-    var v=0;
+
+  var searchInput = document.getElementById('searchInput');
+  var cards = document.querySelectorAll('.card');
+  var toolCount = document.getElementById('toolCount');
+  var noResult = document.getElementById('noResult');
+
+  if(searchInput){
+    searchInput.addEventListener('input', function(){
+      var q = this.value.toLowerCase().trim();
+      var v = 0;
+
+      cards.forEach(function(c){
+        var name = (c.dataset.name || '').toLowerCase();
+        var descEl = c.querySelector('.c-d');
+        var desc = descEl ? descEl.textContent.toLowerCase() : '';
+
+        if(name.includes(q) || desc.includes(q)){
+          c.classList.remove('hide');
+          v++;
+        }else{
+          c.classList.add('hide');
+        }
+      });
+
+      if(toolCount){
+        toolCount.textContent = v + ' 个工具';
+      }
+
+      if(noResult){
+        noResult.style.display = (v === 0) ? 'block' : 'none';
+      }
+    });
+  }
+
+  var mOverlay = document.getElementById('mOverlay');
+  var mEm = document.getElementById('mEm');
+  var mTitle = document.getElementById('mTitle');
+  var mClose = document.getElementById('mClose');
+
+  function closeModal(){
+    if(mOverlay){
+      mOverlay.classList.remove('show');
+    }
+  }
+
+  if(cards.length && mOverlay){
     cards.forEach(function(c){
-      var n=(c.dataset.name||'').toLowerCase();
-      var d=c.querySelector('.c-d')?c.querySelector('.c-d').textContent.toLowerCase():'';
-      if(n.includes(q)||d.includes(q)){c.classList.remove('hide');v++;}
-      else c.classList.add('hide');
+      c.addEventListener('click', function(){
+        var icon = c.querySelector('.c-em');
+        if(mEm) mEm.textContent = icon ? icon.textContent : '🚀';
+        if(mTitle) mTitle.textContent = c.dataset.name || '工具';
+        mOverlay.classList.add('show');
+      });
     });
-    toolCount.textContent=v+' 个工具';
-    noResult.classList.toggle('show',v===0);
-  });
-  var mOverlay=document.getElementById('mOverlay');
-  var mEm=document.getElementById('mEm');
-  var mTitle=document.getElementById('mTitle');
-  var mClose=document.getElementById('mClose');
-  function closeModal(){mOverlay.classList.remove('show');}
-  cards.forEach(function(c){
-    c.addEventListener('click',function(){
-      mEm.textContent=c.querySelector('.c-em')?c.querySelector('.c-em').textContent:'🚀';
-      mTitle.textContent=c.dataset.name||'工具';
-      mOverlay.classList.add('show');
+  }
+
+  if(mClose){
+    mClose.addEventListener('click', closeModal);
+  }
+
+  if(mOverlay){
+    mOverlay.addEventListener('click', function(e){
+      if(e.target === mOverlay){
+        closeModal();
+      }
     });
+  }
+
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape'){
+      closeModal();
+    }
   });
-  mClose.addEventListener('click',closeModal);
-  mOverlay.addEventListener('click',function(e){if(e.target===mOverlay)closeModal();});
-  document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal();});
+
 })();
 </script>
 </body>
