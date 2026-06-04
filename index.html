@@ -2,30 +2,60 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>CWJ-TOOLS Official Site</title>
     <style>
         body {
             margin: 0; overflow: hidden; background-color: #030504;
-            touch-action: none; font-family: -apple-system, sans-serif;
+            touch-action: none; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
         #canvas-container { position: absolute; width: 100vw; height: 100vh; z-index: 1; }
         
-        /* 极致奢华的原生 HTML 顶置导航栏 */
+        /* 📱 移动端重塑：高奢全息航空导航栏 */
         #nav-overlay {
             position: absolute; top: 0; left: 0; width: 100%; z-index: 10;
             display: flex; justify-content: space-between; align-items: center;
-            box-sizing: border-box; padding: 30px 24px; pointer-events: none;
+            box-sizing: border-box; 
+            
+            /* 核心修正：加大顶部内边距（56px），完美避开手机的时间和电池图标，并适配刘海屏 */
+            padding: calc(20px + env(safe-area-inset-top, 36px)) 28px 20px 28px; 
+            pointer-events: none;
         }
+        
         .logo {
-            color: #ffffff; font-weight: bold; font-size: 16px; letter-spacing: 2px;
+            color: #ffffff; 
+            font-weight: 800; 
+            font-size: 21px;       /* 放大字号，凸显品牌感 */
+            letter-spacing: 1.5px;
+            font-family: "Helvetica Neue", Arial, sans-serif;
         }
-        .nav-links { display: flex; gap: 20px; pointer-events: auto; }
+        
+        .nav-links { 
+            display: flex; 
+            gap: 24px;            /* 增大按钮之间的间距，防止误触 */
+            pointer-events: auto; 
+        }
+        
         .nav-item {
-            color: #888888; text-decoration: none; font-size: 13px;
-            font-weight: 500; letter-spacing: 1px; transition: color 0.3s; cursor: pointer;
+            color: #83958b; 
+            text-decoration: none; 
+            font-size: 16px;       /* 升级到手机端黄金阅读字号 */
+            font-weight: 600; 
+            letter-spacing: 1.2px; 
+            transition: all 0.25s ease; 
+            cursor: pointer;
+            
+            /* 核心修正：增加上下左右的隐形点击热区，让触控极其灵敏舒适 */
+            padding: 10px 6px; 
+            display: inline-block;
         }
-        .nav-item.active { color: #3ae397; font-weight: bold; }
+        
+        /* 激活状态的高级荧光微光 */
+        .nav-item.active { 
+            color: #3ae397; 
+            font-weight: 700;
+            text-shadow: 0 0 12px rgba(58, 227, 151, 0.4); 
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
@@ -69,19 +99,16 @@
         const ctx = textureCanvas.getContext('2d');
         let pageTexture; 
 
-        // 渲染页面内容的工程函数
         function renderCanvasContent(pageKey) {
             const data = SITE_DATABASE[pageKey];
             ctx.fillStyle = '#0a0d0b'; ctx.fillRect(0, 0, 1500, 2400);
 
-            // 绘制高级科技网格
             ctx.strokeStyle = 'rgba(255, 255, 255, 0.02)'; ctx.lineWidth = 1.5;
             for(let i = 0; i < 2400; i += 80) {
                 ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, 2400); ctx.stroke();
                 ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(1500, i); ctx.stroke();
             }
 
-            // 渲染动态文本
             ctx.fillStyle = '#ffffff';
             ctx.font = 'bold 96px "Helvetica Neue", Arial, sans-serif';
             ctx.fillText(data.title1, 120, 400);
@@ -95,171 +122,11 @@
             ctx.font = '28px "Courier New", monospace';
             data.lines.forEach((line, i) => ctx.fillText(line, 120, 800 + i * 70));
 
-            // 动态按钮区域
             ctx.fillStyle = '#ffffff'; ctx.fillRect(120, 1200, 1260, 500);
             ctx.fillStyle = '#000000'; ctx.font = 'bold 55px sans-serif';
             ctx.fillText(data.btnText, 200, 1470);
             
-            if(pageTexture) pageTexture.needsUpdate = true; // 通知显卡更新贴图
+            if(pageTexture) pageTexture.needsUpdate = true;
         }
 
-        // 初始化渲染首页
         renderCanvasContent('home');
-        // 2. 着色器代码保持电影级渲染质量（包含级联波纹与色散）
-        const vertexShader = `
-            uniform float u_time;
-            uniform vec2 u_pointer;
-            uniform float u_intensity;
-            varying vec2 vUv;
-            varying vec3 vNormal;
-            varying vec3 vViewPosition;
-            varying float vWave;
-            varying float vWarpFactor;
-
-            void main() {
-                vUv = uv;
-                vec3 pos = position;
-                float base = sin(pos.x * 0.4 + u_time * 1.2) * cos(pos.y * 0.3 + u_time * 0.9) * 0.15;
-                float dist = distance(pos.xy, u_pointer * vec2(2.2, 3.8));
-                float ripple = sin(dist * 3.5 - u_time * 4.0) * smoothstep(3.0, 0.0, dist);
-                
-                float totalWave = base + (ripple * u_intensity * 0.5);
-                pos.z += totalWave;
-                
-                vWave = totalWave;
-                vWarpFactor = smoothstep(2.5, 0.0, dist) * u_intensity;
-
-                vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
-                vViewPosition = -mvPosition.xyz;
-                vNormal = normalize(normalMatrix * normal);
-                gl_Position = projectionMatrix * mvPosition;
-            }
-        `;
-
-        const fragmentShader = `
-            uniform sampler2D u_texture;
-            varying vec2 vUv;
-            varying vec3 vNormal;
-            varying vec3 vViewPosition;
-            varying float vWave;
-            varying float vWarpFactor;
-
-            void main() {
-                float dispersion = vWarpFactor * 0.025;
-                float r = texture2D(u_texture, vUv + vec2(dispersion, 0.0)).r;
-                float g = texture2D(u_texture, vUv).g;
-                float b = texture2D(u_texture, vUv - vec2(dispersion, 0.0)).b;
-                vec3 texColor = vec3(r, g, b);
-                
-                vec3 normal = normalize(vNormal);
-                vec3 viewDir = normalize(vViewPosition);
-                float fresnel = pow(1.0 - max(dot(normal, viewDir), 0.0), 3.0);
-                vec3 rainbow = 0.5 + 0.5 * cos(6.28318 * (vWave * 0.8 + vec3(0.0, 0.33, 0.67)));
-                float specular = pow(max(dot(reflect(-viewDir, normal), normal), 0.0), 32.0);
-
-                vec3 baseColor = texColor * (0.8 + vWave * 0.15);
-                vec3 finalColor = mix(baseColor, rainbow, fresnel * 0.3);
-                finalColor += vec3(specular * 0.4);
-                gl_FragColor = vec4(finalColor, 1.0);
-            }
-        `;
-
-        // 3. WebGL 初始化
-        const container = document.getElementById('canvas-container');
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
-        camera.position.set(0, 0, 8);
-
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        container.appendChild(renderer.domElement);
-
-        pageTexture = new THREE.CanvasTexture(textureCanvas);
-        const geometry = new THREE.PlaneGeometry(3.8, 6.4, 200, 200);
-
-        const material = new THREE.ShaderMaterial({
-            vertexShader: vertexShader, fragmentShader: fragmentShader,
-            side: THREE.DoubleSide,
-            uniforms: {
-                u_texture: { value: pageTexture }, u_time: { value: 0.0 },
-                u_pointer: { value: new THREE.Vector2(0, 0) }, u_intensity: { value: 0.0 }
-            }
-        });
-
-        const pageMesh = new THREE.Mesh(geometry, material);
-        pageMesh.rotation.set(-0.08, -0.12, 0.01);
-        scene.add(pageMesh);
-        // 4. 路由切页与物理震荡核心控制
-        let pointer = new THREE.Vector2(0, 0);
-        let targetIntensity = 0.0;
-        let currentIntensity = 0.0;
-        
-        // 切换页面核心函数：注入高频脉冲，擦写渲染内容
-        function changePage(pageKey, element) {
-            // 更新 HTML 导航栏样式
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            element.classList.add('active');
-
-            // 1. 物理层：瞬间拉满形变能量，让箔片产生极高频闪动的“折射波纹”作为切页过渡
-            currentIntensity = 3.5; 
-            
-            // 2. 数据层：延时 60 毫秒（在波纹达到极值的瞬间）悄悄替换画布内容，丝滑无缝
-            setTimeout(() => {
-                renderCanvasContent(pageKey);
-            }, 60);
-        }
-
-        function updatePointer(x, y) {
-            pointer.x = (x / window.innerWidth) * 2 - 1;
-            pointer.y = -(y / window.innerHeight) * 2 + 1;
-        }
-
-        function handleResize() {
-            const width = window.innerWidth; const height = window.innerHeight;
-            camera.aspect = width / height; camera.updateProjectionMatrix();
-            renderer.setSize(width, height);
-            const aspect = width / height;
-            if (aspect < 1) { pageMesh.scale.setScalar(aspect * 1.45); } 
-            else { pageMesh.scale.setScalar(1.0); }
-        }
-
-        // 高级手势事件绑定
-        window.addEventListener('touchmove', (e) => { 
-            if(e.touches.length > 0) updatePointer(e.touches[0].clientX, e.touches[0].clientY); 
-        }, { passive: true });
-        window.addEventListener('touchstart', (e) => { 
-            targetIntensity = 1.2; 
-            if(e.touches.length > 0) updatePointer(e.touches[0].clientX, e.touches[0].clientY); 
-        }, { passive: true });
-        window.addEventListener('touchend', () => targetIntensity = 0.0);
-
-        window.addEventListener('pointermove', (e) => updatePointer(e.clientX, e.clientY));
-        window.addEventListener('pointerdown', () => targetIntensity = 1.2);
-        window.addEventListener('pointerup', () => targetIntensity = 0.0);
-        window.addEventListener('resize', handleResize);
-        handleResize();
-
-        const clock = new THREE.Clock();
-
-        // 5. 渲染动力循环
-        function animate() {
-            requestAnimationFrame(animate);
-            const time = clock.getElapsedTime();
-
-            // 缓动阻尼：切换页面时从 3.5 的脉冲能量平滑衰减回手势能量
-            currentIntensity += (targetIntensity - currentIntensity) * 0.06;
-
-            material.uniforms.u_time.value = time;
-            material.uniforms.u_pointer.value.lerp(pointer, 0.06);
-            material.uniforms.u_intensity.value = currentIntensity;
-
-            pageMesh.rotation.y = -0.12 + Math.sin(time * 0.3) * 0.015;
-
-            renderer.render(scene, camera);
-        }
-
-        animate();
-    </script>
-</body>
-</html>
