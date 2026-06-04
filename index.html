@@ -3,211 +3,196 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>3D Interactive Warp Page</title>
+    <title>Holographic Liquid WebGL</title>
     <style>
         body {
-            margin: 0;
-            overflow: hidden;
-            background-color: #0d110e; /* 极高级的暗色底 */
-            touch-action: none;
+            margin: 0; overflow: hidden; background-color: #050706; /* 极奢黑 */
+            touch-action: none; font-family: -apple-system, sans-serif;
         }
-        #canvas-container {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
+        #canvas-container { position: absolute; width: 100%; height: 100%; z-index: 1; }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
     <div id="canvas-container"></div>
-
     <script>
-        // 创建后台高性能 Canvas，动态绘制高清的网页文本与排版
+        // 1. 动态生成超高清的科技感平铺画布
         const textureCanvas = document.createElement('canvas');
-        textureCanvas.width = 2048;  // 超高分辨率保证文字极其清晰
-        textureCanvas.height = 2048;
+        textureCanvas.width = 2048; textureCanvas.height = 2048;
         const ctx = textureCanvas.getContext('2d');
 
-        // 绘制高档现代网页背景与精细排版
-        ctx.fillStyle = '#f4f6f4'; // 带有高级质感的微白纸张色
-        ctx.fillRect(0, 0, 2048, 2048);
+        // 底色改为富有质感的深钛灰色，便于金属反光
+        ctx.fillStyle = '#111412'; ctx.fillRect(0, 0, 2048, 2048);
 
-        // 模拟大牌官网的栅格线条
-        ctx.strokeStyle = 'rgba(0, 0, 0, 0.05)';
-        ctx.lineWidth = 2;
-        for(let i = 200; i < 2048; i += 400) {
+        // 细腻的黑白双色高级科技栅格
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)'; ctx.lineWidth = 1;
+        for(let i = 0; i < 2048; i += 100) {
             ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, 2048); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(2048, i); ctx.stroke();
         }
 
-        // 写入极具未来感的网页大标题
-        ctx.fillStyle = '#050b08';
-        ctx.font = 'bold 90px "Helvetica Neue", Helvetica, Arial, sans-serif';
-        ctx.fillText('DESIGNED FOR PERFORMANCE', 150, 400);
-
-        ctx.font = '100 55px "Helvetica Neue", Arial, sans-serif';
-        ctx.fillStyle = '#2a4d3d';
-        ctx.fillText('Built to run smoothly at 60FPS.', 150, 520);
-
-        // 写入模拟的正文段落
-        ctx.fillStyle = '#555555';
-        ctx.font = '36px "Courier New", monospace';
-        const lines = [
-            "Translating costly DOM operations into core GPU threads.",
-            "Warping standard HTML layouts within a custom WebGL context.",
-            "Interaction proximity: active - Dynamic curvature enabled.",
-            "Designed by CWJ-TOOLS // 2026 Ultimate Creative Engineering."
-        ];
-        lines.forEach((line, index) => {
-            ctx.fillText(line, 150, 750 + index * 80);
-        });
-
-        // 绘制一些极简的技术几何色块
-        ctx.fillStyle = '#3ae397';
-        ctx.fillRect(150, 1100, 400, 15);
-        ctx.fillStyle = '#050b08';
-        ctx.fillRect(150, 1150, 800, 400);
+        // 极致排版：大牌极简风
         ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 40px sans-serif';
-        ctx.fillText('CORE GRAPHICS ENGINE ACTIVE', 220, 1380);
-        // 核心技术：GPU 顶点着色器 (让整张网页像布料/纸张一样产生 3D 卷曲波浪)
+        ctx.font = 'bold 100px "Helvetica Neue", Arial, sans-serif';
+        ctx.fillText('DESIGNED FOR PERFORMANCE', 150, 450);
+
+        ctx.font = '100 55px "Helvetica Neue", sans-serif';
+        ctx.fillStyle = '#3ae397';
+        ctx.fillText('Built to run at 60FPS. Fully GPU Accelerated.', 150, 580);
+
+        ctx.fillStyle = '#888888';
+        ctx.font = '34px "Courier New", monospace';
+        const paragrah = [
+            "// DEPLOYMENT STATUS: ACTIVE IN WEBGL CONTEXT",
+            "// TRACKING INTERACTION VELOCITY FOR PROPAGATION",
+            "// REWRITING STANDARD DOM INTO CORE GPU THREADS",
+            "// CWJ-TOOLS PROTOCOL VER. 2026.06 // EXT INTERACTION"
+        ];
+        paragrah.forEach((line, i) => ctx.fillText(line, 150, 800 + i * 75));
+
+        // 极简实色块块，用于反射测试
+        ctx.fillStyle = '#ffffff'; ctx.fillRect(150, 1150, 600, 450);
+        ctx.fillStyle = '#000000'; ctx.font = 'bold 50px sans-serif';
+        ctx.fillText('INTELLIGENT MATERIAL', 220, 1380);
+        // 2. 顶点着色器：计算复杂的正弦波与触控挤压
         const vertexShader = `
             uniform float u_time;
             uniform vec2 u_pointer;
-            uniform float u_waveIntensity;
+            uniform float u_intensity;
             varying vec2 vUv;
-            varying float vDepthShadow;
+            varying vec3 vNormal;
+            varying vec3 vViewPosition;
+            varying float vWave;
 
             void main() {
                 vUv = uv;
                 vec3 pos = position;
 
-                // 算法 1：基础的飘动风吹波浪（模拟网页在空间中悬浮的呼吸感）
-                float baseWave = sin(pos.x * 0.3 + u_time * 1.2) * cos(pos.y * 0.3 + u_time * 0.8) * 0.25;
-                
-                // 算法 2：手指触控引起的局部超强卷曲折叠（接近函数 Proximity 变形）
-                float dist = distance(pos.xy, u_pointer * vec2(4.5, 3.0));
-                float touchInfluence = smoothstep(3.5, 0.0, dist);
-                
-                // 综合变形：基础飘动 + 手指划过时的剧后凸起与卷曲
-                pos.z += baseWave + (touchInfluence * u_waveIntensity * 2.2);
-                
-                // 给边缘增加一个类似高档胶片特有的自然反卷弧度
-                pos.z += sin(pos.x * 0.15 - 1.0) * 0.4;
+                // 物理算法：双重交叉正弦波，模拟丝绸的风吹质感
+                float waveX = sin(pos.x * 0.4 + u_time * 1.5) * cos(pos.y * 0.2 + u_time * 1.0);
+                float waveY = cos(pos.y * 0.5 - u_time * 1.2) * sin(pos.x * 0.3 + u_time * 0.7);
+                float baseWave = (waveX + waveY) * 0.25;
 
-                vDepthShadow = pos.z; // 传递深度用于计算光影阴影
-                gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+                // 触控吸引力算法
+                float dist = distance(pos.xy, u_pointer * vec2(4.5, 3.0));
+                float touch = smoothstep(3.0, 0.0, dist) * u_intensity;
+                
+                pos.z += baseWave + (touch * 1.8);
+                vWave = baseWave + touch; // 传递波动数据
+
+                // 计算 3D 空间内的实时光照变量
+                vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+                vViewPosition = -mvPosition.xyz;
+                vNormal = normalize(normalMatrix * normal);
+                
+                gl_Position = projectionMatrix * mvPosition;
             }
         `;
 
-        // 片元着色器：动态渲染网页材质并根据弯曲程度计算阴影，强化 3D 立体感
+        // 片元着色器：绝美的液态银 + 全息色散算法
         const fragmentShader = `
             uniform sampler2D u_texture;
             varying vec2 vUv;
-            varying float vDepthShadow;
+            varying vec3 vNormal;
+            varying vec3 vViewPosition;
+            varying float vWave;
 
             void main() {
-                // 采样我们第一段在 Canvas 里画好的高清网页文字贴图
+                // 采样原始 Canvas 网页贴图
                 vec4 texColor = texture2D(u_texture, vUv);
                 
-                // 依据网格的弯曲深度计算光影阴影（深的地方暗，凸起的地方亮，产生绝佳的立体折痕效果）
-                float shadow = 0.85 + (vDepthShadow * 0.15);
-                shadow = clamp(shadow, 0.6, 1.3);
+                // 实时计算法线与视线的夹角 (Fresnel 菲涅尔反射模拟)
+                vec3 normal = normalize(vNormal);
+                vec3 viewDir = normalize(vViewPosition);
+                float fresnel = pow(1.0 - max(dot(normal, viewDir), 0.0), 3.0);
 
-                gl_FragColor = vec4(texColor.rgb * shadow, texColor.a);
+                // 模拟高档银色金属箔片的菲涅尔全息偏光（光谱色散）
+                vec3 rainbow = 0.5 + 0.5 * cos(6.28318 * (vWave * 0.5 + vec3(0.0, 0.33, 0.67)));
+                
+                // 核心高光反射：计算高档胶片/金属反光
+                float specular = pow(max(dot(reflect(-viewDir, normal), normal), 0.0), 16.0);
+
+                // 完美融合：基础网页色彩 + 金属暗部阴影 + 镭射全息偏光 + 强光反光
+                vec3 baseColor = texColor.rgb * (0.7 + vWave * 0.15); // 阴影折痕
+                vec3 finalColor = mix(baseColor, rainbow, fresnel * 0.4); // 边缘全息
+                finalColor += vec3(specular * 0.35); // 表面亮银高光
+
+                gl_FragColor = vec4(finalColor, 1.0);
             }
         `;
 
-        // 初始化 Three.js 3D 舞台
+        // 3. 搭建 3D 渲染舞台
         const container = document.getElementById('canvas-container');
         const scene = new THREE.Scene();
-
         const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
-        camera.position.set(0, 0, 7);
+        camera.position.set(0, 0, 7.5);
 
-        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         container.appendChild(renderer.domElement);
 
-        // 将 Canvas 转化为 WebGL 硬件纹理
         const pageTexture = new THREE.CanvasTexture(textureCanvas);
-        pageTexture.minFilter = THREE.LinearFilter;
+        // 极其重要：增加 180x180 的细密网格，保证流体金属扭曲时丝滑如水
+        const geometry = new THREE.PlaneGeometry(9, 6, 180, 180);
 
-        // 创建高密度网格面（128x128个细分格子，确保纸张弯曲时如丝般顺滑，毫无锯齿）
-        const geometry = new THREE.PlaneGeometry(9, 6, 128, 128);
-
-        // 绑定材质与 GPU 变量
         const material = new THREE.ShaderMaterial({
-            vertexShader: vertexShader,
-            fragmentShader: fragmentShader,
-            side: THREE.DoubleSide, // 双面渲染，翻转过来也能看到网页背面
+            vertexShader: vertexShader, fragmentShader: fragmentShader,
+            side: THREE.DoubleSide,
             uniforms: {
-                u_texture: { value: pageTexture },
-                u_time: { value: 0.0 },
-                u_pointer: { value: new THREE.Vector2(0, 0) },
-                u_waveIntensity: { value: 0.0 }
+                u_texture: { value: pageTexture }, u_time: { value: 0.0 },
+                u_pointer: { value: new THREE.Vector2(0, 0) }, u_intensity: { value: 0.0 }
             }
         });
 
         const pageMesh = new THREE.Mesh(geometry, material);
-        // 让整个网页稍微倾斜一点，更具 3D 空间透视感
-        pageMesh.rotation.set(-0.15, -0.25, 0.05);
+        pageMesh.rotation.set(-0.1, -0.2, 0.02); // 优雅的黄金透视斜角
         scene.add(pageMesh);
-        // 触摸与手势交互控制
+        // 4. 触控物理学：引入滑动的速度惯性
         let pointer = new THREE.Vector2(0, 0);
         let targetIntensity = 0.0;
         let currentIntensity = 0.0;
 
         function updatePointer(x, y) {
-            // 将屏幕坐标标准化为符合 3D 空间的规范化坐标 (-1 到 1)
             pointer.x = (x / window.innerWidth) * 2 - 1;
             pointer.y = -(y / window.innerHeight) * 2 + 1;
         }
 
-        // 监听手指滑动和点击
-        window.addEventListener('pointermove', (e) => {
-            updatePointer(e.clientX, e.clientY);
-        });
+        window.addEventListener('pointermove', (e) => updatePointer(e.clientX, e.clientY));
+        window.addEventListener('pointerdown', (e) => { targetIntensity = 1.0; updatePointer(e.clientX, e.clientY); });
+        window.addEventListener('pointerup', () => targetIntensity = 0.0);
 
-        window.addEventListener('pointerdown', (e) => {
-            targetIntensity = 1.0; // 手指按下时，网页弯曲强度拉满
-            updatePointer(e.clientX, e.clientY);
-        });
+        // 兼容手机端轻触
+        window.addEventListener('touchmove', (e) => { if(e.touches.length > 0) updatePointer(e.touches[0].clientX, e.touches[0].clientY); });
+        window.addEventListener('touchstart', (e) => { targetIntensity = 1.0; if(e.touches.length > 0) updatePointer(e.touches[0].clientX, e.touches[0].clientY); });
+        window.addEventListener('touchend', () => targetIntensity = 0.0);
 
-        window.addEventListener('pointerup', () => {
-            targetIntensity = 0.0; // 手指松开时，网页纸张恢复平整
-        });
-
-        // 适配手机屏幕旋转和尺寸缩放
         window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
+            camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
         const clock = new THREE.Clock();
 
-        // 核心硬件渲染主循环
+        // 5. 极速硬件渲染循环
         function animate() {
             requestAnimationFrame(animate);
-
             const time = clock.getElapsedTime();
 
-            // 缓动阻尼算法：让网页在松开或按下时有真实的纸张回弹动画
-            currentIntensity += (targetIntensity - currentIntensity) * 0.08;
+            // 缓动阻尼算法：让金属网页恢复时带有一种软黏土/水流般的弹性惯性
+            currentIntensity += (targetIntensity - currentIntensity) * 0.06;
 
-            // 实时将物理数据推送给 GPU
+            // 数据实时注入显卡 GPU
             material.uniforms.u_time.value = time;
-            material.uniforms.u_pointer.value.lerp(pointer, 0.1); // 手指位置平滑插值
-            material.uniforms.u_waveIntensity.value = currentIntensity;
+            material.uniforms.u_pointer.value.lerp(pointer, 0.08); // 动作跟随延迟，更具肉感
+            material.uniforms.u_intensity.value = currentIntensity;
 
-            // 渲染执行
+            // 整个模块带有微弱的整体悬浮晃动
+            pageMesh.rotation.y = -0.2 + Math.sin(time * 0.5) * 0.03;
+
             renderer.render(scene, camera);
         }
 
-        // 引擎启动
         animate();
     </script>
 </body>
