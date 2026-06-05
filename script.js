@@ -315,3 +315,56 @@ function tapMuyu(){
   
   setTimeout(() => textNode.remove(), 600);
 }
+/* =========================
+   MUYU TOOL LOGIC
+========================= */
+// 🎧 创建木鱼音频对象，内置清脆的敲击声
+const muyuAudio = new Audio("https://www.soundjay.com/buttons/sounds/button-16.mp3");
+
+function tapMuyu(){
+  // 🎵 每次点击将音频进度归零，保证连点时不卡顿、不断音
+  muyuAudio.currentTime = 0;
+  muyuAudio.play().catch(e => console.log("等待手势激活音频:", e));
+
+  state.muyuCount = (state.muyuCount || 0) + 1;
+  saveState();
+  
+  const countEl = document.getElementById("muyuCount");
+  if(countEl) countEl.innerText = state.muyuCount;
+  
+  const muyu = document.getElementById("muyuNode");
+  if(muyu) {
+    muyu.style.transform = "scale(0.85)";
+    setTimeout(() => muyu.style.transform = "scale(1)", 60);
+  }
+  
+  if (navigator.vibrate) {
+    navigator.vibrate(10); // 手机震动反馈
+  }
+
+  const floatBox = document.getElementById("muyuFloat");
+  if(!floatBox) return;
+  const textNode = document.createElement("div");
+  
+  const words = ["功德 +1", "焦虑 -1", "好运 +1", "头发 +1", "Bug -1", "薪资 +1"];
+  textNode.innerText = words[Math.floor(Math.random() * words.length)];
+  
+  textNode.style.position = "absolute";
+  textNode.style.color = "#4da3ff";
+  textNode.style.fontSize = "20px";
+  textNode.style.fontWeight = "bold";
+  textNode.style.whiteSpace = "nowrap";
+  textNode.style.transform = "translateX(-50%)";
+  
+  floatBox.appendChild(textNode);
+  
+  textNode.animate([
+    { transform: 'translate(-50%, 0px)', opacity: 1 },
+    { transform: 'translate(-50%, -80px)', opacity: 0 }
+  ], {
+    duration: 600,
+    easing: 'ease-out'
+  });
+  
+  setTimeout(() => textNode.remove(), 600);
+}
