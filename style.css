@@ -11,14 +11,21 @@
 body {
   margin: 0;
   font-family: -apple-system, 'SF Pro Text', sans-serif;
-  background: #0f1115;
-  /* 顶部蓝色光晕，增加层次感 */
-  background-image: radial-gradient(
-    ellipse at 50% -10%,
-    rgba(77,163,255,0.13) 0%,
-    transparent 60%
-  );
+
+  /* 多背景叠加：先写的光晕在上层，渐变为底层 */
+  background-image: 
+    /* 顶部蓝色光晕（椭圆，位于顶部中央偏上，半透明蓝，逐渐消失） */
+    radial-gradient(
+      ellipse at 50% -10%,              /* 圆心位置：水平50%，垂直-10%（超出顶部） */
+      rgba(77,163,255, 0.13) 0%,       /* 中心颜色：亮蓝，透明度0.13 */
+      transparent 60%                  /* 边缘完全透明，渐变范围60%半径 */
+    ),
+    /* 深色高级渐变（从深紫到暗蓝） */
+    linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+  
+  /* 背景固定不滚动，视觉更沉浸 */
   background-attachment: fixed;
+  
   color: white;
   -webkit-font-smoothing: antialiased;
 }
