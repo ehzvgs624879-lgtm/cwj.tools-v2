@@ -48,6 +48,7 @@ function renderHome(){
   filtered.forEach(t => {
     const card = document.createElement("div");
     card.className = "card fade";
+    card.setAttribute("data-id", t.id);
     card.innerHTML = `
       <div class="card-icon">${t.icon}</div>
       <div class="card-content">
