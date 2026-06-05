@@ -38,6 +38,37 @@ function renderHome(){
   const list = document.getElementById("list");
   if(!list) return;
   list.innerHTML = ""; // 清空旧列表
+    // 🌟 新增：最近常用工具栏（只有没搜索时显示）
+  if (q === "" && state.recentTools && state.recentTools.length > 0) {
+    const recentsWrapper = document.createElement("div");
+    recentsWrapper.style.margin = "0 0 20px 0";
+    
+    let recentsHTML = `
+      <div style="font-size: 12px; color: rgba(255,255,255,0.3); font-weight: 600; margin-bottom: 10px;">⏱️ 最近常用</div>
+      <div style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px;">
+    `;
+    
+    state.recentTools.slice(0, 4).forEach(id => {
+      const t = tools.find(item => item.id === id);
+      if (t) {
+        recentsHTML += `
+          <div onclick="renderTool('${t.id}')" style="flex: 0 0 calc(25% - 8px); background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 10px 4px; text-align: center;">
+            <div style="font-size: 20px; margin-bottom: 4px;">${t.icon}</div>
+            <div style="font-size: 11px; color: rgba(255,255,255,0.8); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${t.name}</div>
+          </div>
+        `;
+      }
+    });
+    recentsHTML += `</div>`;
+    recentsWrapper.innerHTML = recentsHTML;
+    list.appendChild(recentsWrapper);
+
+    const titleEl = document.createElement("div");
+    titleEl.style.cssText = "font-size: 12px; color: rgba(255,255,255,0.3); font-weight: 600; margin-bottom: 10px;";
+    titleEl.innerText = "📱 全部工具";
+    list.appendChild(titleEl);
+  }
+
 
   // 1. 精准过滤工具
   const filtered = tools.filter(t => 
