@@ -28,103 +28,24 @@ let state = loadState() || {
 ========================= */
 function renderHome(){
   const searchEl = document.getElementById("search");
-  
-  // 🔍 核心修复：只要页面加载，原地无感激活搜索框的打字监听
-  if (searchEl && !searchEl.oninput) {
-    searchEl.oninput = renderHome;
-  }
-
-  const q = searchEl ? searchEl.value.toLowerCase().trim() : "";
+  const q    = searchEl ? searchEl.value.toLowerCase() : "";
   const list = document.getElementById("list");
   if(!list) return;
-  list.innerHTML = ""; // 清空旧列表
-    // 🌟 新增：最近常用工具栏（只有没搜索时显示）
-  if (q === "" && state.recentTools && state.recentTools.length > 0) {
-    const recentsWrapper = document.createElement("div");
-    recentsWrapper.style.margin = "0 0 20px 0";
-    
-    let recentsHTML = `
-      <div style="font-size: 12px; color: rgba(255,255,255,0.3); font-weight: 600; margin-bottom: 10px;">⏱️ 最近常用</div>
-      <div style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px;">
-    `;
-    
-    state.recentTools.slice(0, 4).forEach(id => {
-      const t = tools.find(item => item.id === id);
-      if (t) {
-        recentsHTML += `
-          <div onclick="renderTool('${t.id}')" style="flex: 0 0 calc(25% - 8px); background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 10px 4px; text-align: center;">
-            <div style="font-size: 20px; margin-bottom: 4px;">${t.icon}</div>
-            <div style="font-size: 11px; color: rgba(255,255,255,0.8); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${t.name}</div>
-          </div>
-        `;
-      }
-    });
-    recentsHTML += `</div>`;
-    recentsWrapper.innerHTML = recentsHTML;
-    list.appendChild(recentsWrapper);
+  list.innerHTML = "";
 
-    const titleEl = document.createElement("div");
-    titleEl.style.cssText = "font-size: 12px; color: rgba(255,255,255,0.3); font-weight: 600; margin-bottom: 10px;";
-    titleEl.innerText = "📱 全部工具";
-    list.appendChild(titleEl);
-  }
-
-
-  // 1. 精准过滤工具
-  const filtered = tools.filter(t => 
-    t.name.toLowerCase().includes(q) || 
+  const filtered = tools.filter(t =>
+    t.name.toLowerCase().includes(q) ||
     t.desc.toLowerCase().includes(q)
   );
 
-  // 2. 极简空状态处理（绝对不会卡死）
   if(filtered.length === 0){
     list.innerHTML = `
-      <div style="text-align:center; padding:40px 20px; color:rgba(255,255,255,0.3); font-size:14px;">
-        🔍 未找到与 "${q}" 相关的工具
+      <div class="empty-state">
+        😶 未找到匹配工具<br>
+        <span style="font-size:12px">换个关键词试试</span>
       </div>`;
     return;
   }
-
-  // 3. 稳健渲染卡片（自带原生 App 级别的微弱触控缩放反馈）
-  filtered.forEach(t => {
-    const card = document.createElement("div");
-    
-    // 注入纯正的暗黑 OS 玻璃质感内联样式，确保百分之百可见！
-    card.style.cssText = `
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 16px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 16px;
-      margin-bottom: 12px;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.1s;
-    `;
-    
-    // 手机端手指按下去的Q弹微调反馈（松开恢复）
-    card.ontouchstart = () => card.style.transform = "scale(0.98)";
-    card.ontouchend = () => card.style.transform = "none";
-    
-    card.innerHTML = `
-      <div style="font-size:24px; background:rgba(255,255,255,0.04); width:44px; height:44px; display:flex; align-items:center; justify-content:center; border-radius:12px;">${t.icon || '🛠️'}</div>
-      <div style="flex:1; text-align:left;">
-        <div style="font-size:15px; font-weight:600; color:#fff; margin-bottom:2px;">${t.name}</div>
-        <div style="font-size:12px; color:rgba(255,255,255,0.4);">${t.desc}</div>
-      </div>
-      <div style="color:rgba(255,255,255,0.15); font-size:14px;">➔</div>
-    `;
-
-    // 点击卡片进入对应工具
-    card.onclick = () => {
-      if (typeof renderTool === 'function') renderTool(t.id);
-    };
-
-    list.appendChild(card);
-  });
-}
-
 
   filtered.forEach(t => {
     const card = document.createElement("div");
@@ -305,6 +226,7 @@ function renderChatHistory(){
   });
   box.scrollTop = box.scrollHeight;
 }
+
 /* =========================
    TEXT TOOL
 ========================= */
@@ -346,53 +268,6 @@ function runCalc(){
     out.style.color = "#ff6b6b";
     out.innerText = "计算错误，请检查表达式";
   }
-}
-
-/* =========================
-   MUYU TOOL LOGIC
-========================= */
-function tapMuyu(){
-  state.muyuCount = (state.muyuCount || 0) + 1;
-  saveState();
-  
-  const countEl = document.getElementById("muyuCount");
-  if(countEl) countEl.innerText = state.muyuCount;
-  
-  const muyu = document.getElementById("muyuNode");
-  if(muyu) {
-    muyu.style.transform = "scale(0.85)";
-    setTimeout(() => muyu.style.transform = "scale(1)", 60);
-  }
-  
-  if (navigator.vibrate) {
-    navigator.vibrate(10);
-  }
-
-  const floatBox = document.getElementById("muyuFloat");
-  if(!floatBox) return;
-  const textNode = document.createElement("div");
-  
-  const words = ["功德 +1", "焦虑 -1", "好运 +1", "头发 +1", "Bug -1", "薪资 +1"];
-  textNode.innerText = words[Math.floor(Math.random() * words.length)];
-  
-  textNode.style.position = "absolute";
-  textNode.style.color = "#4da3ff";
-  textNode.style.fontSize = "20px";
-  textNode.style.fontWeight = "bold";
-  textNode.style.whiteSpace = "nowrap";
-  textNode.style.transform = "translateX(-50%)";
-  
-  floatBox.appendChild(textNode);
-  
-  textNode.animate([
-    { transform: 'translate(-50%, 0px)', opacity: 1 },
-    { transform: 'translate(-50%, -80px)', opacity: 0 }
-  ], {
-    duration: 600,
-    easing: 'ease-out'
-  });
-  
-  setTimeout(() => textNode.remove(), 600);
 }
 /* =========================
    MUYU TOOL LOGIC
@@ -482,4 +357,3 @@ function tapMuyu(){
   
   setTimeout(() => textNode.remove(), 600);
 }
-
