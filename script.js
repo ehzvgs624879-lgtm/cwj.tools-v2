@@ -318,13 +318,38 @@ function tapMuyu(){
 /* =========================
    MUYU TOOL LOGIC
 ========================= */
-// 🎧 创建木鱼音频对象，内置清脆的敲击声
-const muyuAudio = new Audio("https://www.soundjay.com/buttons/sounds/button-16.mp3");
+// 🎵 纯代码合成赛博木鱼音效（不需要网络，永远不卡顿）
+function playCyberSound() {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    
+    // 模拟木鱼由高到低的清脆撞击频率
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(550, ctx.currentTime); 
+    osc.frequency.exponentialRampToValueAtTime(150, ctx.currentTime + 0.08); 
+    
+    // 音量在一瞬间（0.08秒内）快速衰减，形成清脆的“梆”短音
+    gain.gain.setValueAtTime(0.4, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+    
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.08);
+  } catch (e) {
+    console.log("音频初始化失败:", e);
+  }
+}
 
 function tapMuyu(){
-  // 🎵 每次点击将音频进度归零，保证连点时不卡顿、不断音
-  muyuAudio.currentTime = 0;
-  muyuAudio.play().catch(e => console.log("等待手势激活音频:", e));
+  // 💥 触发自制音效
+  playCyberSound();
 
   state.muyuCount = (state.muyuCount || 0) + 1;
   saveState();
@@ -339,7 +364,7 @@ function tapMuyu(){
   }
   
   if (navigator.vibrate) {
-    navigator.vibrate(10); // 手机震动反馈
+    navigator.vibrate(10); // 手机物理震动
   }
 
   const floatBox = document.getElementById("muyuFloat");
