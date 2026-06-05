@@ -29,115 +29,71 @@ let state = loadState() || {
 function renderHome(){
   const searchEl = document.getElementById("search");
   
-  // 🔍 智能联动：原地无感激活搜索框事件
+  // 🔍 核心修复：只要页面加载，原地无感激活搜索框的打字监听
   if (searchEl && !searchEl.oninput) {
     searchEl.oninput = renderHome;
   }
 
-  const q = searchEl ? searchEl.value.trim().toLowerCase() : "";
+  const q = searchEl ? searchEl.value.toLowerCase().trim() : "";
   const list = document.getElementById("list");
   if(!list) return;
-  list.innerHTML = "";
+  list.innerHTML = ""; // 清空旧列表
 
-  // 1. 核心高亮转化器
-  const highlight = (text, keyword) => {
-    if (!keyword) return text;
-    const regex = new RegExp(`(${keyword})`, "gi");
-    return text.replace(regex, `<span style="color: #00ffa3; text-shadow: 0 0 8px rgba(0,255,163,0.4); font-weight: 600;">$1</span>`);
-  };
-
-  // ==========================================
-  // 【状态一：纯净首页模式】当搜索框为空时
-  // ==========================================
-  if (q === "") {
-    // 🌟 1.1 动态注入：最近常用工具（横向流动丝滑舱）
-    if (state.recentTools && state.recentTools.length > 0) {
-      const recentsWrapper = document.createElement("div");
-      recentsWrapper.style.margin = "0 0 24px 0";
-      
-      let recentsHTML = `
-        <div style="font-size: 12px; color: rgba(255,255,255,0.3); font-weight: 600; letter-spacing: 1px; margin-bottom: 12px; text-transform: uppercase;">⏱️ 最近常用</div>
-        <div style="display: flex; gap: 12px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; -webkit-overflow-scrolling: touch;">
-      `;
-      
-      // 只取最近使用的前 4 个，避免拥挤
-      state.recentTools.slice(0, 4).forEach(id => {
-        const t = tools.find(item => item.id === id);
-        if (t) {
-          recentsHTML += `
-            <div onclick="renderTool('${t.id}')" style="flex: 0 0 calc(25% - 9px); background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01)); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 14px 8px; text-align: center; backdrop-filter: blur(10px); transition: transform 0.1s;">
-              <div style="font-size: 24px; margin-bottom: 6px;">${t.icon}</div>
-              <div style="font-size: 11px; color: rgba(255,255,255,0.8); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${t.name}</div>
-            </div>
-          `;
-        }
-      });
-      
-      recentsHTML += `</div>`;
-      recentsWrapper.innerHTML = recentsHTML;
-      list.appendChild(recentsWrapper);
-    }
-
-    // 🌟 1.2 动态注入：全部工具副标题
-    const titleEl = document.createElement("div");
-    titleEl.style.cssText = "font-size: 12px; color: rgba(255,255,255,0.3); font-weight: 600; letter-spacing: 1px; margin-bottom: 12px; text-transform: uppercase;";
-    titleEl.innerText = "📱 全部应用";
-    list.appendChild(titleEl);
-  }
-
-  // ==========================================
-  // 【数据层】执行条件检索过滤
-  // ==========================================
+  // 1. 精准过滤工具
   const filtered = tools.filter(t => 
     t.name.toLowerCase().includes(q) || 
     t.desc.toLowerCase().includes(q)
   );
 
-  // 🌟 2. 智能空状态（科幻流线画风）
+  // 2. 极简空状态处理（绝对不会卡死）
   if(filtered.length === 0){
     list.innerHTML = `
-      <div style="text-align:center; padding:45px 20px; background:rgba(255,255,255,0.01); border-radius:24px; border:1px dashed rgba(255,255,255,0.08); margin-top:10px;">
-        <div style="font-size:32px; margin-bottom:12px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.1));">🛸</div>
-        <div style="color:rgba(255,255,255,0.6); font-size:14px; font-weight:500;">未找到与 “${q}” 相关的工具</div>
-        <div style="color:rgba(255,255,255,0.3); font-size:12px; margin-top:6px;">检查错别字或换个词搜索</div>
-      </div>
-    `;
+      <div style="text-align:center; padding:40px 20px; color:rgba(255,255,255,0.3); font-size:14px;">
+        🔍 未找到与 "${q}" 相关的工具
+      </div>`;
     return;
   }
 
-  // 🌟 3. 豪华卡片流式渲染（带贝塞尔物理交错动效）
-  filtered.forEach((t, index) => {
+  // 3. 稳健渲染卡片（自带原生 App 级别的微弱触控缩放反馈）
+  filtered.forEach(t => {
     const card = document.createElement("div");
-    card.className = "tool-card"; // 保持你原有的 CSS 类名
+    
+    // 注入纯正的暗黑 OS 玻璃质感内联样式，确保百分之百可见！
+    card.style.cssText = `
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 16px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    `;
+    
+    // 手机端手指按下去的Q弹微调反馈（松开恢复）
+    card.ontouchstart = () => card.style.transform = "scale(0.98)";
+    card.ontouchend = () => card.style.transform = "none";
     
     card.innerHTML = `
-      <div style="display:flex; align-items:center; gap:14px; width:100%;">
-        <div style="font-size:24px; background:rgba(255,255,255,0.04); width:46px; height:46px; display:flex; align-items:center; justify-content:center; border-radius:14px; border:1px solid rgba(255,255,255,0.06); box-shadow: inset 0 1px 1px rgba(255,255,255,0.1);">${t.icon}</div>
-        <div style="flex:1; text-align:left;">
-          <div style="font-size:15px; font-weight:600; color:#fff; margin-bottom:2px; letter-spacing:0.3px;">${highlight(t.name, q)}</div>
-          <div style="font-size:12px; color:rgba(255,255,255,0.4); font-weight: 400;">${highlight(t.desc, q)}</div>
-        </div>
-        <div style="color:rgba(255,255,255,0.15); font-size:14px; margin-right:4px;">➔</div>
+      <div style="font-size:24px; background:rgba(255,255,255,0.04); width:44px; height:44px; display:flex; align-items:center; justify-content:center; border-radius:12px;">${t.icon || '🛠️'}</div>
+      <div style="flex:1; text-align:left;">
+        <div style="font-size:15px; font-weight:600; color:#fff; margin-bottom:2px;">${t.name}</div>
+        <div style="font-size:12px; color:rgba(255,255,255,0.4);">${t.desc}</div>
       </div>
+      <div style="color:rgba(255,255,255,0.15); font-size:14px;">➔</div>
     `;
 
-    // 点击进入工具
-    card.onclick = () => renderTool(t.id);
-
-    // 🏎️ OS 线性动画：根据卡片顺序（index）计算微小的延迟时间差
-    card.style.opacity = "0";
-    card.style.transform = "translateY(12px) scale(0.98)";
-    card.style.transition = `opacity 0.22s cubic-bezier(0.215, 0.610, 0.355, 1) ${index * 0.03}s, transform 0.22s cubic-bezier(0.215, 0.610, 0.355, 1) ${index * 0.03}s`;
+    // 点击卡片进入对应工具
+    card.onclick = () => {
+      if (typeof renderTool === 'function') renderTool(t.id);
+    };
 
     list.appendChild(card);
-
-    // 释放入场缓动动画
-    requestAnimationFrame(() => {
-      card.style.opacity = "1";
-      card.style.transform = "translateY(0) scale(1)";
-    });
   });
 }
+
 
   filtered.forEach(t => {
     const card = document.createElement("div");
