@@ -11,11 +11,26 @@
 body {
   margin: 0;
   font-family: -apple-system, 'SF Pro Text', sans-serif;
-  /* 强烈渐变：从红色到黄色，保证你一眼看到变化 */
-  background: linear-gradient(135deg, red, orange, yellow);
+  
+  /* 深色高级渐变：深紫 → 暗蓝 → 深灰蓝 */
+  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
   background-attachment: fixed;
+  
+  /* 让背景比屏幕大，方便移动产生流动感 */
+  background-size: 200% 200%;
+  
+  /* 动画：10秒完成一次流动，无限循环，缓动效果更自然 */
+  animation: flowBg 10s ease infinite;
+  
   color: white;
   -webkit-font-smoothing: antialiased;
+}
+
+/* 定义背景位置动画 */
+@keyframes flowBg {
+  0% { background-position: 0% 0%; }
+  50% { background-position: 100% 100%; }
+  100% { background-position: 0% 0%; }
 }
 
 #app {
