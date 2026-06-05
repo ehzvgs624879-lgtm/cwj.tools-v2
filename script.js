@@ -318,32 +318,42 @@ function tapMuyu(){
 /* =========================
    MUYU TOOL LOGIC
 ========================= */
-// 🎵 纯代码合成赛博木鱼音效（不需要网络，永远不卡顿）
+// 🎵 在外层只建一个“喇叭”，所有点击共用它，绝对不会断音
+let audioCtx = null;
+
 function playCyberSound() {
   try {
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContext) return;
+    // 第一次点击时才买喇叭（应对浏览器的自动播放拦截机制）
+    if (!audioCtx) {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContext) return;
+      audioCtx = new AudioContext();
+    }
     
-    const ctx = new AudioContext();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
+    // 如果喇叭处于休眠状态，就唤醒它
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
     
     osc.connect(gain);
-    gain.connect(ctx.destination);
+    gain.connect(audioCtx.destination);
     
     // 模拟木鱼由高到低的清脆撞击频率
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(550, ctx.currentTime); 
-    osc.frequency.exponentialRampToValueAtTime(150, ctx.currentTime + 0.08); 
+    osc.frequency.setValueAtTime(550, audioCtx.currentTime); 
+    osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.08); 
     
-    // 音量在一瞬间（0.08秒内）快速衰减，形成清脆的“梆”短音
-    gain.gain.setValueAtTime(0.4, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+    // 音量在一瞬间快速衰减
+    gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
     
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 0.08);
+    osc.start(audioCtx.currentTime);
+    osc.stop(audioCtx.currentTime + 0.08);
   } catch (e) {
-    console.log("音频初始化失败:", e);
+    console.log("音频播放失败:", e);
   }
 }
 
@@ -393,3 +403,4 @@ function tapMuyu(){
   
   setTimeout(() => textNode.remove(), 600);
 }
+
