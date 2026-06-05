@@ -328,7 +328,7 @@ pre {
 }
 /* AI Chat 图标：快速跳动 */
 .card[data-id="chat"] .card-icon {
-  animation: float 0.05s ease-in-out infinite;
+  animation: float 0.09s ease-in-out infinite;
 }
 
 /* 计算器图标：保持原速 */
