@@ -326,3 +326,14 @@ pre {
   from { opacity: 0; transform: translateY(7px); }
   to   { opacity: 1; transform: translateY(0);   }
 }
+/* 只让 AI Chat 和 计算器 的图标上下浮动 */
+.card[data-id="chat"] .card-icon,
+.card[data-id="calc"] .card-icon {
+  animation: float 2s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+  100% { transform: translateY(0px); }
+}
