@@ -3,6 +3,8 @@ const tools = [
   { id:"text", name:"文本工具",    desc:"总结 / 翻译 / 改写", icon:"📝" },
   { id:"json", name:"JSON 格式化", desc:"格式化与错误检查", icon:"🔧" },
   { id:"calc", name:"计算器",      desc:"数学表达式计算",  icon:"🧮" }
+  { id:"muyu", name:"赛博木鱼",    desc:"电子积德，焦虑消散",  icon:"✨" }
+
 ];
 
 let current = null;
@@ -128,14 +130,30 @@ function renderTool(id){
     return;
   }
 
-  if(id==="calc"){
+    if(id==="calc"){
     box.innerHTML = `
       <input id="exp" placeholder="例：(1 + 2) * 3">
       <button onclick="runCalc()">计算</button>
-      <div id="out"
-           style="margin-top:16px;font-size:28px;font-weight:700;
-                  letter-spacing:-0.5px;text-align:center"></div>
+      <div id="out" style="margin-top:16px;font-size:28px;font-weight:700;letter-spacing:-0.5px;text-align:center"></div>
     `;
+    return;
+  }
+
+
+  if(id==="muyu"){
+    state.muyuCount = state.muyuCount || 0; 
+    box.innerHTML = `
+      <div style="text-align:center; padding: 30px 0; position: relative;">
+        <div style="font-size: 14px; color: rgba(255,255,255,0.5); margin-bottom: 8px;">当前功德</div>
+        <div id="muyuCount" style="font-size: 48px; font-weight: 800; color: #fff; margin-bottom: 40px; font-variant-numeric: tabular-nums;">${state.muyuCount}</div>
+        <div id="muyuNode" onclick="tapMuyu()" style="font-size: 90px; cursor: pointer; user-select: none; display: inline-block; transition: transform 0.05s ease;">✨</div>
+        <div id="muyuFloat" style="position: absolute; top: 40%; left: 50%; transform: translateX(-50%); pointer-events: none;"></div>
+      </div>
+    `;
+    return;
+  }
+
+
   }
 }
 
@@ -246,4 +264,54 @@ function runCalc(){
     out.style.color = "#ff6b6b";
     out.innerText = "计算错误，请检查表达式";
   }
+}
+/* =========================
+   MUYU TOOL LOGIC
+========================= */
+function tapMuyu(){
+  // 1. 功德数据+1，自动触发你写好的本地存储，关掉网页数字也不会丢
+  state.muyuCount = (state.muyuCount || 0) + 1;
+  saveState();
+  
+  // 2. 实时刷新屏幕上的数字
+  document.getElementById("muyuCount").innerText = state.muyuCount;
+  
+  // 3. 敲击瞬间的缩放反馈，让大拇指点起来有肉眼可见的“Q弹”手感
+  const muyu = document.getElementById("muyuNode");
+  muyu.style.transform = "scale(0.85)";
+  setTimeout(() => muyu.style.transform = "scale(1)", 60);
+  
+  // 4. 触觉反馈：如果用手机浏览器玩，敲击时会有微妙的物理震动，极其解压
+  if (navigator.vibrate) {
+    navigator.vibrate(10);
+  }
+
+  // 5. 动态生成随机的积德文案
+  const floatBox = document.getElementById("muyuFloat");
+  const textNode = document.createElement("div");
+  
+  const words = ["功德 +1", "焦虑 -1", "好运 +1", "头发 +1", "Bug -1", "薪资 +1"];
+  textNode.innerText = words[Math.floor(Math.random() * words.length)];
+  
+  // 漂浮文字的基础样式
+  textNode.style.position = "absolute";
+  textNode.style.color = "#4da3ff";
+  textNode.style.fontSize = "20px";
+  textNode.style.fontWeight = "bold";
+  textNode.style.whiteSpace = "nowrap";
+  textNode.style.transform = "translateX(-50%)";
+  
+  floatBox.appendChild(textNode);
+  
+  // 6. 用 Web Animations 让文字向上滑行并淡出
+  textNode.animate([
+    { transform: 'translate(-50%, 0px)', opacity: 1 },
+    { transform: 'translate(-50%, -80px)', opacity: 0 }
+  ], {
+    duration: 600,
+    easing: 'ease-out'
+  });
+  
+  // 7. 动画播完自动清理垃圾节点，保证手机运行丝滑不卡顿
+  setTimeout(() => textNode.remove(), 600);
 }
