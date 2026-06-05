@@ -2,9 +2,8 @@ const tools = [
   { id:"chat", name:"AI Chat",     desc:"智能对话助手",   icon:"🤖" },
   { id:"text", name:"文本工具",    desc:"总结 / 翻译 / 改写", icon:"📝" },
   { id:"json", name:"JSON 格式化", desc:"格式化与错误检查", icon:"🔧" },
-  { id:"calc", name:"计算器",      desc:"数学表达式计算",  icon:"🧮" }
+  { id:"calc", name:"计算器",      desc:"数学表达式计算",  icon:"🧮" },
   { id:"muyu", name:"赛博木鱼",    desc:"电子积德，焦虑消散",  icon:"✨" }
-
 ];
 
 let current = null;
@@ -24,13 +23,14 @@ let state = loadState() || {
   chatHistory: [],
   recentTools: []
 };
-
 /* =========================
    HOME
 ========================= */
 function renderHome(){
-  const q    = document.getElementById("search").value.toLowerCase();
+  const searchEl = document.getElementById("search");
+  const q    = searchEl ? searchEl.value.toLowerCase() : "";
   const list = document.getElementById("list");
+  if(!list) return;
   list.innerHTML = "";
 
   const filtered = tools.filter(t =>
@@ -64,7 +64,11 @@ function renderHome(){
   });
 }
 
-renderHome();
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", renderHome);
+} else {
+  renderHome();
+}
 
 /* =========================
    NAV
@@ -81,9 +85,11 @@ function openTool(id){
   document.getElementById("title").innerText = tools.find(t=>t.id===id).name;
 
   const body = document.getElementById("body");
-  body.classList.remove("fade");
-  void body.offsetWidth;
-  body.classList.add("fade");
+  if(body) {
+    body.classList.remove("fade");
+    void body.offsetWidth;
+    body.classList.add("fade");
+  }
 
   renderTool(id);
 }
@@ -92,12 +98,12 @@ function back(){
   document.getElementById("tool").classList.remove("active");
   document.getElementById("home").classList.add("active");
 }
-
 /* =========================
    TOOL RENDER
 ========================= */
 function renderTool(id){
   const box = document.getElementById("body");
+  if(!box) return;
 
   if(id==="chat"){
     box.innerHTML = `
@@ -130,7 +136,7 @@ function renderTool(id){
     return;
   }
 
-    if(id==="calc"){
+  if(id==="calc"){
     box.innerHTML = `
       <input id="exp" placeholder="例：(1 + 2) * 3">
       <button onclick="runCalc()">计算</button>
@@ -138,7 +144,6 @@ function renderTool(id){
     `;
     return;
   }
-
 
   if(id==="muyu"){
     state.muyuCount = state.muyuCount || 0; 
@@ -152,17 +157,14 @@ function renderTool(id){
     `;
     return;
   }
-
-
-  }
 }
-
 /* =========================
    CHAT
 ========================= */
 async function sendMsg(){
   const msgInput = document.getElementById("msg");
   const box      = document.getElementById("chatBox");
+  if(!msgInput || !box) return;
   const text     = msgInput.value.trim();
 
   if(!text) return;
@@ -195,7 +197,7 @@ async function sendMsg(){
     saveState();
 
   }catch(e){
-    box.removeChild(thinkDiv);
+    if(box.contains(thinkDiv)) box.removeChild(thinkDiv);
     const errDiv = document.createElement("div");
     errDiv.className = "chat-msg ai";
     errDiv.style.color = "#ff6b6b";
@@ -215,6 +217,7 @@ async function fakeAI(history){
 function renderChatHistory(){
   const box = document.getElementById("chatBox");
   if(!box) return;
+  box.innerHTML = "";
   state.chatHistory.forEach(m=>{
     const div = document.createElement("div");
     div.className = `chat-msg ${m.role==="user"?"user":"ai"}`;
@@ -223,14 +226,13 @@ function renderChatHistory(){
   });
   box.scrollTop = box.scrollHeight;
 }
-
 /* =========================
    TEXT TOOL
 ========================= */
 function processText(){
   const v   = document.getElementById("t").value.trim();
   const out = document.getElementById("out");
-  if(!v) return;
+  if(!v || !out) return;
   out.innerText = "总结：" + v.slice(0,80) + (v.length>80?"…":"");
 }
 
@@ -239,6 +241,7 @@ function processText(){
 ========================= */
 function formatJSON(){
   const out = document.getElementById("out");
+  if(!out) return;
   try{
     const parsed = JSON.parse(document.getElementById("j").value);
     out.style.color = "";
@@ -255,7 +258,7 @@ function formatJSON(){
 function runCalc(){
   const out  = document.getElementById("out");
   const expr = document.getElementById("exp").value.trim();
-  if(!expr) return;
+  if(!expr || !out) return;
   try{
     const result = eval(expr);
     out.style.color = "#4da3ff";
@@ -265,35 +268,34 @@ function runCalc(){
     out.innerText = "计算错误，请检查表达式";
   }
 }
+
 /* =========================
    MUYU TOOL LOGIC
 ========================= */
 function tapMuyu(){
-  // 1. 功德数据+1，自动触发你写好的本地存储，关掉网页数字也不会丢
   state.muyuCount = (state.muyuCount || 0) + 1;
   saveState();
   
-  // 2. 实时刷新屏幕上的数字
-  document.getElementById("muyuCount").innerText = state.muyuCount;
+  const countEl = document.getElementById("muyuCount");
+  if(countEl) countEl.innerText = state.muyuCount;
   
-  // 3. 敲击瞬间的缩放反馈，让大拇指点起来有肉眼可见的“Q弹”手感
   const muyu = document.getElementById("muyuNode");
-  muyu.style.transform = "scale(0.85)";
-  setTimeout(() => muyu.style.transform = "scale(1)", 60);
+  if(muyu) {
+    muyu.style.transform = "scale(0.85)";
+    setTimeout(() => muyu.style.transform = "scale(1)", 60);
+  }
   
-  // 4. 触觉反馈：如果用手机浏览器玩，敲击时会有微妙的物理震动，极其解压
   if (navigator.vibrate) {
     navigator.vibrate(10);
   }
 
-  // 5. 动态生成随机的积德文案
   const floatBox = document.getElementById("muyuFloat");
+  if(!floatBox) return;
   const textNode = document.createElement("div");
   
   const words = ["功德 +1", "焦虑 -1", "好运 +1", "头发 +1", "Bug -1", "薪资 +1"];
   textNode.innerText = words[Math.floor(Math.random() * words.length)];
   
-  // 漂浮文字的基础样式
   textNode.style.position = "absolute";
   textNode.style.color = "#4da3ff";
   textNode.style.fontSize = "20px";
@@ -303,7 +305,6 @@ function tapMuyu(){
   
   floatBox.appendChild(textNode);
   
-  // 6. 用 Web Animations 让文字向上滑行并淡出
   textNode.animate([
     { transform: 'translate(-50%, 0px)', opacity: 1 },
     { transform: 'translate(-50%, -80px)', opacity: 0 }
@@ -312,6 +313,5 @@ function tapMuyu(){
     easing: 'ease-out'
   });
   
-  // 7. 动画播完自动清理垃圾节点，保证手机运行丝滑不卡顿
   setTimeout(() => textNode.remove(), 600);
 }
