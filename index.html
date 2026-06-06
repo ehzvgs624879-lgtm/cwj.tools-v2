@@ -1,20 +1,131 @@
-    <!-- 新的 JavaScript 控制逻辑：番茄钟和背景控制 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Focus Train - 极简专注</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 隐藏滚动条 */
+        body::-webkit-scrollbar { display: none; }
+        body { -ms-overflow-style: none; scrollbar-width: none; -webkit-tap-highlight-color: transparent; }
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-black text-white h-screen w-screen overflow-hidden font-sans select-none antialiased">
+
+    <div class="absolute inset-0 z-0">
+        <img id="bgImage" src="https://images.unsplash.com/photo-1505118380757-91f5f5632de0?auto=format&fit=crop&w=1000&q=80" 
+             class="w-full h-full object-cover brightness-[0.55] transition-all duration-1000" 
+             alt="窗外风景">
+    </div>
+
+    <div class="absolute inset-0 z-10 pointer-events-none bg-gradient-to-b from-black/30 via-transparent to-black/40"></div>
+
+    <div class="absolute inset-0 z-20 flex flex-col justify-between p-8 text-center safe-top safe-bottom">
+        
+        <div class="mt-4 opacity-60 text-xs tracking-[0.3em] uppercase font-light">
+            RAILROAD.AI
+        </div>
+
+        <div id="content-area" class="max-w-md mx-auto my-auto w-full space-y-6 fade-in">
+            <h1 class="text-3xl font-light tracking-tight leading-tight">
+                Focus in a Constantly<br>
+                <span class="font-normal opacity-90">Distracted World</span>
+            </h1>
+            <p class="text-xs text-neutral-400 font-light leading-relaxed max-w-xs mx-auto opacity-80">
+                屏蔽通知、信息流与无休止的打扰。在这里找回你的专注，做真正重要的事情。
+            </p>
+            <div class="pt-4">
+                <button onclick="startFocus()" class="w-full bg-white text-black text-sm font-medium py-3.5 px-6 rounded-full shadow-xl active:scale-95 transition-all">
+                    开始专注
+                </button>
+            </div>
+        </div>
+
+        <div class="mb-2 flex justify-between items-center w-full px-2">
+            <div class="text-[10px] text-neutral-500 tracking-wider font-light">
+                © 2026 Designed for Mobile Focus
+            </div>
+            <button class="w-10 h-10 bg-neutral-900/60 backdrop-blur-md rounded-full flex items-center justify-center border border-neutral-800 active:scale-90 transition-all">
+                <svg class="w-5 h-5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+
     <script>
         let timer = null;
-        let timeLeft = 25 * 60; // 默认 25 分钟，转换成秒
+        let timeLeft = 25 * 60; // 25分钟
         let isPaused = false;
 
-        // 获取 DOM 元素
-        const mainContainer = document.querySelector('.space-y-6'); // 主文案和按钮的容器
-        const focusButton = document.querySelector('button'); // "开始专注"按钮
-        const bgImage = document.querySelector('img'); // 背景图
+        function startFocus() {
+            // 1. 调暗背景，进入专注模式
+            document.getElementById('bgImage').style.filter = "brightness(0.25)";
 
-        // 定义状态一：主页状态
-        function resetToHomeState() {
+            // 2. 动态把中间的文案和按钮变成倒计时界面
+            const contentArea = document.getElementById('content-area');
+            contentArea.innerHTML = `
+                <div id="countdown" class="text-7xl font-extralight tracking-tighter tabular-nums text-white/95 drop-shadow-lg">
+                    25:00
+                </div>
+                <p class="text-xs text-neutral-500 font-light animate-pulse pt-2">
+                    屏蔽喧嚣，静听内心...
+                </p>
+                <div class="pt-8 flex gap-4 justify-center">
+                    <button onclick="togglePause()" id="pauseBtn" class="bg-white/10 text-white/70 text-xs py-2 px-6 rounded-full active:bg-white/20 transition-all">
+                        暂停
+                    </button>
+                    <button onclick="quitFocus()" class="bg-neutral-950/80 text-neutral-500 text-xs py-2 px-6 rounded-full border border-neutral-900 active:bg-neutral-900 transition-all">
+                        放弃
+                    </button>
+                </div>
+            `;
+
+            // 3. 开启倒计时
+            timeLeft = 25 * 60;
+            timer = setInterval(() => {
+                if (!isPaused) {
+                    timeLeft--;
+                    // 更新时间显示
+                    const minutes = Math.floor(timeLeft / 60);
+                    const seconds = timeLeft % 60;
+                    document.getElementById('countdown').textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                    
+                    if (timeLeft <= 0) {
+                        clearInterval(timer);
+                        alert('太棒了！你完成了一次专注！');
+                        quitFocus();
+                    }
+                }
+            }, 1000);
+        }
+
+        function togglePause() {
+            isPaused = !isPaused;
+            const pauseBtn = document.getElementById('pauseBtn');
+            if (isPaused) {
+                pauseBtn.textContent = '继续';
+                pauseBtn.classList.remove('bg-white/10', 'text-white/70');
+                pauseBtn.classList.add('bg-white', 'text-black');
+            } else {
+                pauseBtn.textContent = '暂停';
+                pauseBtn.classList.remove('bg-white', 'text-black');
+                pauseBtn.classList.add('bg-white/10', 'text-white/70');
+            }
+        }
+
+        function quitFocus() {
             clearInterval(timer);
             isPaused = false;
-            timeLeft = 25 * 60; // 重置时间
-            mainContainer.innerHTML = `
+            // 恢复背景亮度
+            document.getElementById('bgImage').style.filter = "brightness(0.55)";
+            
+            // 恢复主页内容
+            const contentArea = document.getElementById('content-area');
+            contentArea.innerHTML = `
                 <h1 class="text-3xl font-light tracking-tight leading-tight">
                     Focus in a Constantly<br>
                     <span class="font-normal opacity-90">Distracted World</span>
@@ -23,91 +134,12 @@
                     屏蔽通知、信息流与无休止的打扰。在这里找回你的专注，做真正重要的事情。
                 </p>
                 <div class="pt-4">
-                    <button id="startFocusBtn" class="w-full bg-white text-black text-sm font-medium py-3.5 px-6 rounded-full shadow-xl active:scale-95 transition-all">
+                    <button onclick="startFocus()" class="w-full bg-white text-black text-sm font-medium py-3.5 px-6 rounded-full shadow-xl active:scale-95 transition-all">
                         开始专注
                     </button>
                 </div>
             `;
-            // 重新绑定按钮事件
-            document.getElementById('startFocusBtn').addEventListener('click', startFocus);
-            // 恢复背景亮度
-            bgImage.style.filter = "brightness(0.6)"; 
         }
-
-        // 定义状态二：专注倒计时状态
-        function startFocus() {
-            // 1. 调暗背景，增加沉浸感
-            bgImage.style.filter = "brightness(0.35)"; 
-
-            // 2. 替换 UI 为极简倒计时
-            mainContainer.innerHTML = `
-                <div id="countdown" class="text-7xl font-extralight tracking-tighter tabular-nums text-white/90 drop-shadow-lg fade-in">
-                    25:00
-                </div>
-                <p class="text-xs text-neutral-500 font-light animate-pulse pt-2">
-                    屏蔽喧嚣，静听内心...
-                </p>
-                <div class="pt-10 flex gap-4 justify-center">
-                    <button id="togglePauseBtn" class="bg-white/10 text-white/70 text-xs py-2 px-6 rounded-full active:bg-white/20">
-                        暂停
-                    </button>
-                    <button id="quitFocusBtn" class="bg-neutral-900/60 text-neutral-500 text-xs py-2 px-6 rounded-full active:bg-neutral-800">
-                        放弃
-                    </button>
-                </div>
-            `;
-
-            // 3. 启动计时器
-            timer = setInterval(() => {
-                if (!isPaused) {
-                    timeLeft--;
-                    updateDisplay();
-                    if (timeLeft <= 0) {
-                        clearInterval(timer);
-                        alert('太棒了！你完成了一次专注周期！');
-                        resetToHomeState();
-                    }
-                }
-            }, 1000);
-
-            // 4. 绑定暂停和放弃按钮事件
-            document.getElementById('togglePauseBtn').addEventListener('click', togglePause);
-            document.getElementById('quitFocusBtn').addEventListener('click', resetToHomeState);
-        }
-
-        // 更新时间显示
-        function updateDisplay() {
-            const minutes = Math.floor(timeLeft / 60);
-            const seconds = timeLeft % 60;
-            document.getElementById('countdown').textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-        }
-
-        // 暂停/继续控制
-        function togglePause() {
-            isPaused = !isPaused;
-            const togglePauseBtn = document.getElementById('togglePauseBtn');
-            if (isPaused) {
-                togglePauseBtn.textContent = '继续';
-                togglePauseBtn.classList.remove('text-white/70');
-                togglePauseBtn.classList.add('bg-white', 'text-black');
-            } else {
-                togglePauseBtn.textContent = '暂停';
-                togglePauseBtn.classList.remove('bg-white', 'text-black');
-                togglePauseBtn.classList.add('text-white/70');
-            }
-        }
-
-        // 初始绑定主按钮事件
-        focusButton.addEventListener('click', startFocus);
     </script>
-
-    <!-- 在</head>之前添加一个细微的动画样式，让倒计时显示更柔和 -->
-    <style>
-        .fade-in {
-            animation: fadeIn 0.4s ease-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-    </style>
+</body>
+</html>
