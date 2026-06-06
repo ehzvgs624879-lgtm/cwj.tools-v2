@@ -6,7 +6,6 @@
     <title>Focus Train - 极简专注</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* 隐藏滚动条 */
         body::-webkit-scrollbar { display: none; }
         body { -ms-overflow-style: none; scrollbar-width: none; -webkit-tap-highlight-color: transparent; }
         .fade-in { animation: fadeIn 0.4s ease-out forwards; }
@@ -15,26 +14,30 @@
 </head>
 <body class="bg-black text-white h-screen w-screen overflow-hidden font-sans select-none antialiased">
 
-    <div class="absolute inset-0 z-0">
-        <img id="bgImage" src="https://images.unsplash.com/photo-1505118380757-91f5f5632de0?auto=format&fit=crop&w=1000&q=80" 
-             class="w-full h-full object-cover brightness-[0.55] transition-all duration-1000" 
-             alt="窗外风景">
+    <div class="absolute inset-0 z-0 bg-neutral-900">
+        <video id="bgVideo" autoplay loop muted playsinline class="w-full h-full object-cover brightness-[0.6] transition-all duration-1000">
+            <source src="https://assets.mixkit.co/videos/preview/mixkit-waves-coming-to-the-beach-5044-large.mp4" type="video/mp4">
+        </video>
     </div>
 
-    <div class="absolute inset-0 z-10 pointer-events-none bg-gradient-to-b from-black/30 via-transparent to-black/40"></div>
+    <audio id="bgAudio" loop preload="auto">
+        <source src="https://cdn.pixabay.com/audio/2022/02/22/audio_d1718ab41b.mp3" type="audio/mpeg">
+    </audio>
 
-    <div class="absolute inset-0 z-20 flex flex-col justify-between p-8 text-center safe-top safe-bottom">
+    <div class="absolute inset-0 z-10 pointer-events-none bg-gradient-to-b from-black/40 via-transparent to-black/50"></div>
+
+    <div class="absolute inset-0 z-20 flex flex-col justify-between p-6 md:p-8 text-center safe-top safe-bottom">
         
-        <div class="mt-4 opacity-60 text-xs tracking-[0.3em] uppercase font-light">
+        <div class="mt-6 opacity-70 text-xs tracking-[0.3em] uppercase font-light drop-shadow-md">
             RAILROAD.AI
         </div>
 
-        <div id="content-area" class="max-w-md mx-auto my-auto w-full space-y-6 fade-in">
-            <h1 class="text-3xl font-light tracking-tight leading-tight">
+        <div id="content-area" class="max-w-md mx-auto my-auto w-full space-y-6 fade-in px-4">
+            <h1 class="text-3xl font-light tracking-tight leading-tight drop-shadow-md">
                 Focus in a Constantly<br>
                 <span class="font-normal opacity-90">Distracted World</span>
             </h1>
-            <p class="text-xs text-neutral-400 font-light leading-relaxed max-w-xs mx-auto opacity-80">
+            <p class="text-xs text-neutral-300 font-light leading-relaxed max-w-xs mx-auto opacity-90 drop-shadow-md">
                 屏蔽通知、信息流与无休止的打扰。在这里找回你的专注，做真正重要的事情。
             </p>
             <div class="pt-4">
@@ -44,52 +47,54 @@
             </div>
         </div>
 
-        <div class="mb-2 flex justify-between items-center w-full px-2">
-            <div class="text-[10px] text-neutral-500 tracking-wider font-light">
+        <div class="mb-4 flex justify-between items-end w-full px-2">
+            <div class="text-[10px] text-neutral-400 tracking-wider font-light pb-2 drop-shadow-md">
                 © 2026 Designed for Mobile Focus
             </div>
-            <button class="w-10 h-10 bg-neutral-900/60 backdrop-blur-md rounded-full flex items-center justify-center border border-neutral-800 active:scale-90 transition-all">
-                <svg class="w-5 h-5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            <div id="soundHint" class="hidden w-11 h-11 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 shadow-lg">
+                <svg class="w-5 h-5 text-white/80" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z" clip-rule="evenodd"></path>
                 </svg>
-            </button>
+            </div>
         </div>
     </div>
-
     <script>
         let timer = null;
-        let timeLeft = 25 * 60; // 25分钟
+        let timeLeft = 25 * 60; 
         let isPaused = false;
+        
+        const bgVideo = document.getElementById('bgVideo');
+        const bgAudio = document.getElementById('bgAudio');
+        const soundHint = document.getElementById('soundHint');
 
         function startFocus() {
-            // 1. 调暗背景，进入专注模式
-            document.getElementById('bgImage').style.filter = "brightness(0.25)";
+            bgVideo.style.filter = "brightness(0.25)";
+            bgAudio.volume = 0.5; 
+            bgAudio.play();
+            soundHint.classList.remove('hidden'); 
 
-            // 2. 动态把中间的文案和按钮变成倒计时界面
             const contentArea = document.getElementById('content-area');
             contentArea.innerHTML = `
                 <div id="countdown" class="text-7xl font-extralight tracking-tighter tabular-nums text-white/95 drop-shadow-lg">
                     25:00
                 </div>
-                <p class="text-xs text-neutral-500 font-light animate-pulse pt-2">
-                    屏蔽喧嚣，静听内心...
+                <p class="text-xs text-neutral-400 font-light animate-pulse pt-2 drop-shadow-md">
+                    屏蔽喧嚣，静听海浪...
                 </p>
                 <div class="pt-8 flex gap-4 justify-center">
-                    <button onclick="togglePause()" id="pauseBtn" class="bg-white/10 text-white/70 text-xs py-2 px-6 rounded-full active:bg-white/20 transition-all">
+                    <button onclick="togglePause()" id="pauseBtn" class="bg-white/15 backdrop-blur-md text-white/90 text-xs py-2 px-6 rounded-full border border-white/20 active:bg-white/25 transition-all">
                         暂停
                     </button>
-                    <button onclick="quitFocus()" class="bg-neutral-950/80 text-neutral-500 text-xs py-2 px-6 rounded-full border border-neutral-900 active:bg-neutral-900 transition-all">
+                    <button onclick="quitFocus()" class="bg-neutral-900/60 backdrop-blur-md text-neutral-400 text-xs py-2 px-6 rounded-full border border-neutral-800 active:bg-neutral-800 transition-all">
                         放弃
                     </button>
                 </div>
             `;
 
-            // 3. 开启倒计时
             timeLeft = 25 * 60;
             timer = setInterval(() => {
                 if (!isPaused) {
                     timeLeft--;
-                    // 更新时间显示
                     const minutes = Math.floor(timeLeft / 60);
                     const seconds = timeLeft % 60;
                     document.getElementById('countdown').textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
@@ -107,30 +112,34 @@
             isPaused = !isPaused;
             const pauseBtn = document.getElementById('pauseBtn');
             if (isPaused) {
+                bgAudio.pause();
+                soundHint.classList.add('opacity-30');
                 pauseBtn.textContent = '继续';
-                pauseBtn.classList.remove('bg-white/10', 'text-white/70');
-                pauseBtn.classList.add('bg-white', 'text-black');
+                pauseBtn.className = 'bg-white text-black text-xs py-2 px-6 rounded-full shadow-lg active:scale-95 transition-all';
             } else {
+                bgAudio.play();
+                soundHint.classList.remove('opacity-30');
                 pauseBtn.textContent = '暂停';
-                pauseBtn.classList.remove('bg-white', 'text-black');
-                pauseBtn.classList.add('bg-white/10', 'text-white/70');
+                pauseBtn.className = 'bg-white/15 backdrop-blur-md text-white/90 text-xs py-2 px-6 rounded-full border border-white/20 active:bg-white/25 transition-all';
             }
         }
 
         function quitFocus() {
             clearInterval(timer);
             isPaused = false;
-            // 恢复背景亮度
-            document.getElementById('bgImage').style.filter = "brightness(0.55)";
             
-            // 恢复主页内容
+            bgVideo.style.filter = "brightness(0.6)";
+            bgAudio.pause();
+            bgAudio.currentTime = 0; 
+            soundHint.classList.add('hidden'); 
+
             const contentArea = document.getElementById('content-area');
             contentArea.innerHTML = `
-                <h1 class="text-3xl font-light tracking-tight leading-tight">
+                <h1 class="text-3xl font-light tracking-tight leading-tight drop-shadow-md">
                     Focus in a Constantly<br>
                     <span class="font-normal opacity-90">Distracted World</span>
                 </h1>
-                <p class="text-xs text-neutral-400 font-light leading-relaxed max-w-xs mx-auto opacity-80">
+                <p class="text-xs text-neutral-300 font-light leading-relaxed max-w-xs mx-auto opacity-90 drop-shadow-md">
                     屏蔽通知、信息流与无休止的打扰。在这里找回你的专注，做真正重要的事情。
                 </p>
                 <div class="pt-4">
