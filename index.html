@@ -2,13 +2,53 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的专注网站</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Focus Train - 极简专注</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; display: flex; align-items: center; justify-content: center; background: #000; color: #fff; font-family: sans-serif; }
+        /* 隐藏手机浏览器的滚动条，彻底实现沉浸感 */
+        body::-webkit-scrollbar { display: none; }
+        body { -ms-overflow-style: none; scrollbar-width: none; -webkit-tap-highlight-color: transparent; }
     </style>
 </head>
-<body>
-    <h1>欢迎来到我的工具网站</h1>
+<body class="bg-black text-white h-screen w-screen overflow-hidden font-sans select-none antialiased">
+
+    <div class="absolute inset-0 z-0">
+        <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1000&q=80" 
+             class="w-full h-full object-cover brightness-[0.6]" 
+             alt="窗外风景">
+    </div>
+
+    <div class="absolute inset-0 z-10 border-[12px] border-neutral-900/95 pointer-events-none">
+        <div class="absolute inset-0 shadow-[inset_0_0_50px_rgba(0,0,0,0.85)]"></div>
+    </div>
+
+    <div class="absolute inset-0 z-20 flex flex-col justify-between p-8 text-center">
+        
+        <div class="mt-4 opacity-60 text-xs tracking-[0.3em] uppercase font-light">
+            Railroad.ai
+        </div>
+
+        <div class="max-w-md mx-auto my-auto w-full space-y-6">
+            <h1 class="text-3xl font-light tracking-tight leading-tight">
+                Focus in a Constantly<br>
+                <span class="font-normal opacity-90">Distracted World</span>
+            </h1>
+            <p class="text-xs text-neutral-400 font-light leading-relaxed max-w-xs mx-auto opacity-80">
+                屏蔽通知、信息流与无休止的打扰。在这里找回你的专注，做真正重要的事情。
+            </p>
+            
+            <div class="pt-4">
+                <button class="w-full bg-white text-black text-sm font-medium py-3.5 px-6 rounded-full shadow-xl active:scale-95 transition-all">
+                    开始专注
+                </button>
+            </div>
+        </div>
+
+        <div class="mb-2 text-[10px] text-neutral-500 tracking-wider font-light">
+            © 2026 Designed for Mobile Focus
+        </div>
+    </div>
+
 </body>
 </html>
