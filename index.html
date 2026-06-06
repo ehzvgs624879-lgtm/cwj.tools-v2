@@ -15,7 +15,9 @@
 <body class="bg-black text-white h-screen w-screen overflow-hidden font-sans select-none antialiased">
 
     <div class="absolute inset-0 z-0 bg-neutral-900">
-        <video id="bgVideo" autoplay loop muted playsinline class="w-full h-full object-cover brightness-[0.6] transition-all duration-1000">
+        <video id="bgVideo" autoplay loop muted playsinline 
+               poster="https://images.unsplash.com/photo-1505118380757-91f5f5632de0?auto=format&fit=crop&w=1000&q=80" 
+               class="w-full h-full object-cover brightness-[0.6] transition-all duration-1000">
             <source src="https://assets.mixkit.co/videos/preview/mixkit-waves-coming-to-the-beach-5044-large.mp4" type="video/mp4">
         </video>
     </div>
@@ -58,7 +60,7 @@
             </div>
         </div>
     </div>
-    <script>
+
         let timer = null;
         let timeLeft = 25 * 60; 
         let isPaused = false;
