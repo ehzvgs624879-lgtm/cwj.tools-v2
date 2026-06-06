@@ -1,54 +1,113 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Focus Train - 极简专注</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 新的 JavaScript 控制逻辑：番茄钟和背景控制 -->
+    <script>
+        let timer = null;
+        let timeLeft = 25 * 60; // 默认 25 分钟，转换成秒
+        let isPaused = false;
+
+        // 获取 DOM 元素
+        const mainContainer = document.querySelector('.space-y-6'); // 主文案和按钮的容器
+        const focusButton = document.querySelector('button'); // "开始专注"按钮
+        const bgImage = document.querySelector('img'); // 背景图
+
+        // 定义状态一：主页状态
+        function resetToHomeState() {
+            clearInterval(timer);
+            isPaused = false;
+            timeLeft = 25 * 60; // 重置时间
+            mainContainer.innerHTML = `
+                <h1 class="text-3xl font-light tracking-tight leading-tight">
+                    Focus in a Constantly<br>
+                    <span class="font-normal opacity-90">Distracted World</span>
+                </h1>
+                <p class="text-xs text-neutral-400 font-light leading-relaxed max-w-xs mx-auto opacity-80">
+                    屏蔽通知、信息流与无休止的打扰。在这里找回你的专注，做真正重要的事情。
+                </p>
+                <div class="pt-4">
+                    <button id="startFocusBtn" class="w-full bg-white text-black text-sm font-medium py-3.5 px-6 rounded-full shadow-xl active:scale-95 transition-all">
+                        开始专注
+                    </button>
+                </div>
+            `;
+            // 重新绑定按钮事件
+            document.getElementById('startFocusBtn').addEventListener('click', startFocus);
+            // 恢复背景亮度
+            bgImage.style.filter = "brightness(0.6)"; 
+        }
+
+        // 定义状态二：专注倒计时状态
+        function startFocus() {
+            // 1. 调暗背景，增加沉浸感
+            bgImage.style.filter = "brightness(0.35)"; 
+
+            // 2. 替换 UI 为极简倒计时
+            mainContainer.innerHTML = `
+                <div id="countdown" class="text-7xl font-extralight tracking-tighter tabular-nums text-white/90 drop-shadow-lg fade-in">
+                    25:00
+                </div>
+                <p class="text-xs text-neutral-500 font-light animate-pulse pt-2">
+                    屏蔽喧嚣，静听内心...
+                </p>
+                <div class="pt-10 flex gap-4 justify-center">
+                    <button id="togglePauseBtn" class="bg-white/10 text-white/70 text-xs py-2 px-6 rounded-full active:bg-white/20">
+                        暂停
+                    </button>
+                    <button id="quitFocusBtn" class="bg-neutral-900/60 text-neutral-500 text-xs py-2 px-6 rounded-full active:bg-neutral-800">
+                        放弃
+                    </button>
+                </div>
+            `;
+
+            // 3. 启动计时器
+            timer = setInterval(() => {
+                if (!isPaused) {
+                    timeLeft--;
+                    updateDisplay();
+                    if (timeLeft <= 0) {
+                        clearInterval(timer);
+                        alert('太棒了！你完成了一次专注周期！');
+                        resetToHomeState();
+                    }
+                }
+            }, 1000);
+
+            // 4. 绑定暂停和放弃按钮事件
+            document.getElementById('togglePauseBtn').addEventListener('click', togglePause);
+            document.getElementById('quitFocusBtn').addEventListener('click', resetToHomeState);
+        }
+
+        // 更新时间显示
+        function updateDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('countdown').textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        // 暂停/继续控制
+        function togglePause() {
+            isPaused = !isPaused;
+            const togglePauseBtn = document.getElementById('togglePauseBtn');
+            if (isPaused) {
+                togglePauseBtn.textContent = '继续';
+                togglePauseBtn.classList.remove('text-white/70');
+                togglePauseBtn.classList.add('bg-white', 'text-black');
+            } else {
+                togglePauseBtn.textContent = '暂停';
+                togglePauseBtn.classList.remove('bg-white', 'text-black');
+                togglePauseBtn.classList.add('text-white/70');
+            }
+        }
+
+        // 初始绑定主按钮事件
+        focusButton.addEventListener('click', startFocus);
+    </script>
+
+    <!-- 在</head>之前添加一个细微的动画样式，让倒计时显示更柔和 -->
     <style>
-        /* 隐藏手机浏览器的滚动条，彻底实现沉浸感 */
-        body::-webkit-scrollbar { display: none; }
-        body { -ms-overflow-style: none; scrollbar-width: none; -webkit-tap-highlight-color: transparent; }
+        .fade-in {
+            animation: fadeIn 0.4s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
-</head>
-<body class="bg-black text-white h-screen w-screen overflow-hidden font-sans select-none antialiased">
-
-    <div class="absolute inset-0 z-0">
-        <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1000&q=80" 
-             class="w-full h-full object-cover brightness-[0.6]" 
-             alt="窗外风景">
-    </div>
-
-    <div class="absolute inset-0 z-10 border-[12px] border-neutral-900/95 pointer-events-none">
-        <div class="absolute inset-0 shadow-[inset_0_0_50px_rgba(0,0,0,0.85)]"></div>
-    </div>
-
-    <div class="absolute inset-0 z-20 flex flex-col justify-between p-8 text-center">
-        
-        <div class="mt-4 opacity-60 text-xs tracking-[0.3em] uppercase font-light">
-            Railroad.ai
-        </div>
-
-        <div class="max-w-md mx-auto my-auto w-full space-y-6">
-            <h1 class="text-3xl font-light tracking-tight leading-tight">
-                Focus in a Constantly<br>
-                <span class="font-normal opacity-90">Distracted World</span>
-            </h1>
-            <p class="text-xs text-neutral-400 font-light leading-relaxed max-w-xs mx-auto opacity-80">
-                屏蔽通知、信息流与无休止的打扰。在这里找回你的专注，做真正重要的事情。
-            </p>
-            
-            <div class="pt-4">
-                <button class="w-full bg-white text-black text-sm font-medium py-3.5 px-6 rounded-full shadow-xl active:scale-95 transition-all">
-                    开始专注
-                </button>
-            </div>
-        </div>
-
-        <div class="mb-2 text-[10px] text-neutral-500 tracking-wider font-light">
-            © 2026 Designed for Mobile Focus
-        </div>
-    </div>
-
-</body>
-</html>
