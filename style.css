@@ -351,3 +351,7 @@ pre {
   50% { transform: translateY(-5px); }
   100% { transform: translateY(0px); }
 }
+#app {
+  position: relative;
+  z-index: 1;
+}
