@@ -1,81 +1,449 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Focus Train</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { overflow: hidden; background: black; -webkit-tap-highlight-color: transparent; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .animate-fade { animation: fadeIn 0.5s ease-out forwards; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Flowline - 精致深色落地页</title>
+  <style>
+    /* ================= 基础重置 ================= */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #0a0a0f;
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      color: #e4e4f0;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    .bg-mesh {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        radial-gradient(ellipse at 20% 50%, rgba(120, 80, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(0, 200, 255, 0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 80%, rgba(255, 80, 160, 0.05) 0%, transparent 50%);
+      z-index: -2;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ================= 导航栏 ================= */
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 0;
+      backdrop-filter: blur(12px);
+      background: rgba(10, 10, 20, 0.65);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-weight: 700;
+      font-size: 1.5rem;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #c084fc, #60a5fa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 36px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #aaaacc;
+    }
+    
+    .nav-links span {
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    
+    .nav-links span:hover {
+      color: white;
+    }
+
+    .nav-cta {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 8px 20px;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #f0f0ff;
+      backdrop-filter: blur(8px);
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    
+    .nav-cta:hover {
+      background: rgba(255, 255, 255, 0.14);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    /* ================= 顶部横幅 (Hero) ================= */
+    .hero {
+      text-align: center;
+      padding: 80px 0 64px;
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(120, 80, 255, 0.12);
+      border: 1px solid rgba(120, 80, 255, 0.25);
+      color: #c4b5fd;
+      padding: 6px 18px;
+      border-radius: 50px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin-bottom: 28px;
+      backdrop-filter: blur(8px);
+    }
+
+    .hero h1 {
+      font-size: clamp(2.8rem, 6vw, 4.2rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 20px;
+      background: linear-gradient(to right, #f0f0ff, #c0b0ff, #a0d0ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      color: #9999bb;
+      max-width: 580px;
+      margin: 0 auto 36px;
+    }
+
+    .hero-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #7c3aed, #4f46e5);
+      border: none;
+      padding: 12px 32px;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 1rem;
+      color: white;
+      box-shadow: 0 8px 24px rgba(124, 58, 237, 0.35);
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.2s;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(124, 58, 237, 0.5);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 12px 32px;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 1rem;
+      color: #d0d0e8;
+      backdrop-filter: blur(8px);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+    /* ================= 核心能力 (Features) ================= */
+    .section-title {
+      text-align: center;
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin: 60px 0 36px;
+      color: #f0f0ff;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+      margin-bottom: 60px;
+    }
+
+    .feature-card {
+      background: rgba(20, 20, 35, 0.55);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 24px;
+      padding: 28px 24px;
+      transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(255, 255, 255, 0.18);
+      box-shadow: 0 20px 40px -16px rgba(100, 80, 255, 0.25);
+    }
+
+    .feature-icon {
+      font-size: 2rem;
+      margin-bottom: 18px;
+    }
+
+    .feature-card h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: #f0f0ff;
+    }
+
+    .feature-card p {
+      font-size: 0.95rem;
+      color: #9b9bb8;
+      line-height: 1.6;
+    }
+
+    /* ================= 评价 (Testimonials) ================= */
+    .testimonials {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 60px;
+    }
+
+    .testimonial {
+      background: rgba(22, 22, 38, 0.6);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 20px;
+      padding: 28px;
+      flex: 1 1 280px;
+      max-width: 340px;
+      transition: all 0.25s;
+    }
+    
+    .testimonial:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+      background: rgba(28, 28, 45, 0.7);
+    }
+
+    .testimonial p {
+      font-style: italic;
+      color: #c0c0dd;
+      margin-bottom: 16px;
+      font-size: 0.95rem;
+    }
+    
+    .testimonial .author {
+      font-weight: 600;
+      color: #ddddf8;
+    }
+    
+    .testimonial .role {
+      font-size: 0.8rem;
+      color: #8888aa;
+      margin-top: 2px;
+    }
+
+    /* ================= 定价 (Pricing) ================= */
+    .pricing-grid {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 80px;
+    }
+
+    .pricing-card {
+      background: rgba(18, 18, 32, 0.6);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 24px;
+      padding: 32px 28px;
+      flex: 1 1 260px;
+      max-width: 300px;
+      text-align: center;
+      transition: all 0.25s;
+    }
+    
+    .pricing-card.featured {
+      border-color: rgba(120, 80, 255, 0.4);
+      background: rgba(30, 25, 60, 0.7);
+      box-shadow: 0 8px 32px rgba(100, 70, 255, 0.2);
+    }
+    
+    .pricing-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .price {
+      font-size: 2.6rem;
+      font-weight: 700;
+      margin: 18px 0 8px;
+      color: #f0f0ff;
+    }
+    
+    .price span {
+      font-size: 1rem;
+      font-weight: 500;
+      color: #9999bb;
+    }
+
+    .pricing-btn {
+      margin-top: 24px;
+      width: 100%;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 10px 0;
+      border-radius: 50px;
+      font-weight: 600;
+      color: #e0e0f8;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .pricing-card.featured .pricing-btn {
+      background: linear-gradient(135deg, #7c3aed, #4f46e5);
+      border: none;
+      color: white;
+      box-shadow: 0 6px 18px rgba(124,58,237,0.4);
+    }
+    
+    .pricing-btn:hover {
+      background: rgba(255,255,255,0.14);
+    }
+
+    /* ================= 响应式设计 ================= */
+    @media (max-width: 640px) {
+      .nav-links {
+        display: none;
+      }
+      .hero h1 {
+        font-size: 2.4rem;
+      }
+    }
+  </style>
 </head>
-<body class="text-white h-screen w-screen font-sans">
+<body>
+  <div class="bg-mesh"></div>
+  <div class="container">
+    
+    <nav>
+      <div class="logo">Flowline</div>
+      <div class="nav-links">
+        <span>功能</span>
+        <span>价格</span>
+        <span>关于</span>
+        <span>文档</span>
+      </div>
+      <div class="nav-cta">开始使用</div>
+    </nav>
 
-    <div class="absolute inset-0 z-0 bg-neutral-900">
-        <video id="bgVideo" autoplay loop muted playsinline poster="https://images.unsplash.com/photo-1505118380757-91f5f5632de0?auto=format&fit=crop&w=1000&q=80" class="w-full h-full object-cover brightness-[0.6] transition-all duration-1000">
-            <source src="https://assets.mixkit.co/videos/preview/mixkit-waves-coming-to-the-beach-5044-large.mp4" type="video/mp4">
-        </video>
+    <section class="hero">
+      <div class="badge">✨ 全新 2.0 版本已发布</div>
+      <h1>用 AI 重塑你的<br>设计工作流</h1>
+      <p>从草图到可交互原型，分钟级完成。无需复杂工具，专注创意本身。</p>
+      <div class="hero-buttons">
+        <button class="btn-primary">免费试用</button>
+        <button class="btn-secondary">查看演示</button>
+      </div>
+    </section>
+
+    <div class="section-title">核心能力</div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>实时协作</h3>
+        <p>多人同时编辑，毫秒级同步，创意不再等待。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎨</div>
+        <h3>智能配色</h3>
+        <p>基于你的品牌自动生成色彩系统，视觉统一无忧。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🧩</div>
+        <h3>组件生态</h3>
+        <p>300+ 精品组件直接拖拽使用，加速界面构建。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔒</div>
+        <h3>权限精细</h3>
+        <p>角色级权限控制，设计资产安全分发。</p>
+      </div>
     </div>
 
-    <div class="absolute inset-0 z-20 flex flex-col justify-between p-8 text-center">
-        <div class="mt-8 opacity-70 text-xs tracking-[0.3em] uppercase">RAILROAD.AI</div>
-        
-        <div id="main-container" class="my-auto">
-            <div id="home-view" class="space-y-6 animate-fade">
-                <h1 class="text-3xl font-light">Focus in a Constantly<br><span class="font-normal opacity-90">Distracted World</span></h1>
-                <p class="text-xs text-neutral-400 max-w-xs mx-auto">屏蔽通知、信息流与无休止的打扰。在这里找回你的专注。</p>
-                <button onclick="startFocus()" class="bg-white text-black py-3 px-8 rounded-full text-sm font-medium active:scale-95 transition-all">开始专注</button>
-            </div>
-            <div id="focus-view" class="hidden space-y-6 animate-fade">
-                <div id="countdown" class="text-7xl font-extralight tabular-nums">25:00</div>
-                <div class="flex gap-4 justify-center">
-                    <button onclick="togglePause()" id="pauseBtn" class="bg-white/10 py-2 px-6 rounded-full text-xs">暂停</button>
-                    <button onclick="quitFocus()" class="bg-black/20 py-2 px-6 rounded-full text-xs border border-white/10">放弃</button>
-                </div>
-            </div>
-        </div>
-        
-        <div class="mb-4 opacity-50 text-[10px]">© 2026 Focus Mode</div>
+    <div class="section-title">创作者们怎么说</div>
+    <div class="testimonials">
+      <div class="testimonial">
+        <p>“Flowline 把我们的设计到开发时间缩短了 60%，玻璃般的质感预览太爱了。”</p>
+        <div class="author">张明</div>
+        <div class="role">产品设计师 @ 星云科技</div>
+      </div>
+      <div class="testimonial">
+        <p>“智能配色省去了我无数调色时间，整体视觉超现代，客户很满意。”</p>
+        <div class="author">李欣然</div>
+        <div class="role">独立 UI 顾问</div>
+      </div>
+      <div class="testimonial">
+        <p>“作为前端，直接拿原型代码开发，几乎没有沟通偏差，强烈推荐。”</p>
+        <div class="author">Alex Chen</div>
+        <div class="role">高级前端工程师</div>
+      </div>
     </div>
-    <audio id="bgAudio" loop preload="auto">
-        <source src="https://cdn.pixabay.com/audio/2022/02/22/audio_d1718ab41b.mp3" type="audio/mpeg">
-    </audio>
 
-    <script>
-        let timer = null, timeLeft = 1500, isPaused = false;
-        const bgVideo = document.getElementById('bgVideo'), bgAudio = document.getElementById('bgAudio');
-        const homeView = document.getElementById('home-view'), focusView = document.getElementById('focus-view');
-        
-        function startFocus() {
-            homeView.classList.add('hidden');
-            focusView.classList.remove('hidden');
-            bgVideo.style.filter = "brightness(0.25)";
-            bgAudio.play();
-            timer = setInterval(() => {
-                if (!isPaused && timeLeft > 0) {
-                    timeLeft--;
-                    document.getElementById('countdown').textContent = `${Math.floor(timeLeft/60).toString().padStart(2,'0')}:${(timeLeft%60).toString().padStart(2,'0')}`;
-                }
-            }, 1000);
-        }
+    <div class="section-title">选择你的计划</div>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <h3>入门版</h3>
+        <div class="price">¥0 <span>/月</span></div>
+        <p>最多3个项目<br>基础组件库</p>
+        <button class="pricing-btn">免费开始</button>
+      </div>
+      <div class="pricing-card featured">
+        <h3>专业版</h3>
+        <div class="price">¥99 <span>/月</span></div>
+        <p>无限项目<br>全部高级组件<br>优先支持</p>
+        <button class="pricing-btn">立即订阅</button>
+      </div>
+      <div class="pricing-card">
+        <h3>企业版</h3>
+        <div class="price">¥299 <span>/月</span></div>
+        <p>私有部署<br>SSO 集成<br>专属客服</p>
+        <button class="pricing-btn">联系销售</button>
+      </div>
+    </div>
 
-        function togglePause() {
-            isPaused = !isPaused;
-            document.getElementById('pauseBtn').textContent = isPaused ? '继续' : '暂停';
-            isPaused ? bgAudio.pause() : bgAudio.play();
-        }
-
-        function quitFocus() {
-            clearInterval(timer);
-            bgVideo.style.filter = "brightness(0.6)";
-            bgAudio.pause();
-            bgAudio.currentTime = 0;
-            focusView.classList.add('hidden');
-            homeView.classList.remove('hidden');
-            timeLeft = 1500;
-        }
-    </script>
+  </div>
 </body>
 </html>
