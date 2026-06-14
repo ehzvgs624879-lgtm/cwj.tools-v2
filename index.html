@@ -147,68 +147,52 @@
         </section>
 
         <!-- 工具中心 -->
+        
         <section class="page" id="tools">
 
-            <div class="grid">
+    <div class="tool-layout">
 
-                <div class="card tool-card">
-                    密码生成器
-                </div>
+        <div class="tool-list">
 
-                <div class="card tool-card">
-                    UUID生成器
-                </div>
-
-                <div class="card tool-card">
-                    Base64工具
-                </div>
-
-                <div class="card tool-card">
-                    JSON格式化
-                </div>
-
+            <div class="tool-item active" data-tool="password">
+                🔐 密码生成器
             </div>
 
-        </section>
-
-        <!-- 文件中心 -->
-        <section class="page" id="files">
-
-            <div class="grid">
-
-                <div class="card">PDF工具</div>
-                <div class="card">图片处理</div>
-                <div class="card">OCR识别</div>
-                <div class="card">文件压缩</div>
-
+            <div class="tool-item" data-tool="uuid">
+                🆔 UUID生成器
             </div>
 
-        </section>
-
-        <!-- 搜索中心 -->
-        <section class="page" id="search">
-
-            <div class="panel">
-
-                <h2>搜索中心</h2>
-
-                <input class="search-center" placeholder="输入关键词搜索..." />
-
+            <div class="tool-item" data-tool="base64">
+                🔤 Base64工具
             </div>
 
-        </section>
-
-        <!-- 开发工具 -->
-        <section class="page" id="developer">
-
-            <div class="grid">
-
-                <div class="card">API测试</div>
-                <div class="card">Base64编码</div>
-                <div class="card">JWT解析</div>
-                <div class="card">正则工具</div>
-
+            <div class="tool-item" data-tool="json">
+                📦 JSON格式化
             </div>
+
+        </div>
+
+        <div class="tool-center">
+
+            <h2 id="toolTitle">密码生成器</h2>
+
+            <textarea id="toolInput" placeholder="请输入内容..."></textarea>
+
+            <button id="runTool">运行工具</button>
+
+        </div>
+
+        <div class="tool-output">
+
+            <h3>输出结果</h3>
+
+            <pre id="toolResult">等待执行...</pre>
+
+            <button onclick="复制工具结果()">复制结果</button>
+
+        </div>
+
+    </div>
 
         </section>
 
