@@ -3,63 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>⚡️ MATRIX ⚡️</title>
+    <title>我的赛博掌机</title>
     <style>
-        body { margin: 0; height: 100vh; background: #050508; overflow: hidden; font-family: system-ui, sans-serif; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 90vw; max-width: 400px; aspect-ratio: 1; }
-        .pad { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; position: relative; overflow: hidden; transition: all 0.1s; -webkit-tap-highlight-color: transparent; }
-        .pad::after { content: ''; position: absolute; inset: 0; border-radius: 16px; box-shadow: inset 0 0 15px transparent; transition: all 0.3s; }
-        .pad:active { transform: scale(0.92); background: rgba(0, 242, 254, 0.1); border-color: #00f2fe; }
-        .pad:active::after { box-shadow: inset 0 0 20px #00f2fe, 0 0 30px rgba(0,242,254,0.3); }
-        /* 不同的格子给不同的霓虹光晕 */
-        .pad:nth-child(3n+1):active { border-color: #ff007f; background: rgba(255,0,127,0.1); }
-        .pad:nth-child(3n+1):active::after { box-shadow: inset 0 0 20px #ff007f, 0 0 30px rgba(255,0,127,0.3); }
-        .pad:nth-child(3n+2):active { border-color: #7000ff; background: rgba(112,0,255,0.1); }
-        .pad:nth-child(3n+2):active::after { box-shadow: inset 0 0 20px #7000ff, 0 0 30px rgba(112,0,255,0.3); }
-        .hint { color: rgba(255,255,255,0.3); font-size: 11px; letter-spacing: 3px; margin-top: 30px; text-transform: uppercase; animation: blink 2s infinite; }
-        @keyframes blink { 50% { opacity: 0.4; } }
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        
+        body { margin: 0; height: 100vh; background: #2c3e50; display: flex; justify-content: center; align-items: center; font-family: 'Press Start 2P', monospace; user-select: none; }
+        
+        /* 掌机外壳 */
+        .gameboy { width: 90vw; max-width: 380px; height: 85vh; max-height: 700px; background: #e0e0e0; border-radius: 10px 10px 40px 10px; box-shadow: inset -5px -5px 15px rgba(0,0,0,0.1), 5px 10px 20px rgba(0,0,0,0.4); padding: 20px; display: flex; flex-direction: column; align-items: center; position: relative; }
+        
+        /* 屏幕区域 */
+        .screen-bezel { background: #555; width: 100%; height: 45%; border-radius: 10px 10px 30px 10px; padding: 15px; box-sizing: border-box; display: flex; flex-direction: column; }
+        .screen { background: #8bac0f; flex-grow: 1; border-radius: 5px; box-shadow: inset 3px 3px 10px rgba(0,0,0,0.3); padding: 15px; color: #0f380f; font-size: 12px; line-height: 1.8; overflow: hidden; position: relative; text-shadow: 1px 1px 0px #9bbc0f; }
+        .screen::after { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(15, 56, 15, 0.1) 50%, transparent 50%); background-size: 100% 4px; pointer-events: none; }
+        
+        /* 品牌字样 */
+        .brand { margin-top: 20px; color: #c0c0c0; font-size: 12px; font-weight: bold; font-family: sans-serif; letter-spacing: 2px; }
+        
+        /* 控制区 */
+        .controls { width: 100%; margin-top: 40px; display: flex; justify-content: space-between; align-items: center; padding: 0 10px; box-sizing: border-box; }
+        
+        /* 十字键 */
+        .d-pad { display: grid; grid-template-columns: 30px 30px 30px; grid-template-rows: 30px 30px 30px; }
+        .btn-dir { background: #333; border-radius: 4px; box-shadow: inset -1px -1px 2px rgba(0,0,0,0.5), 1px 2px 4px rgba(0,0,0,0.3); cursor: pointer; }
+        .btn-dir:active { box-shadow: inset 2px 2px 4px rgba(0,0,0,0.8); }
+        .up { grid-column: 2; grid-row: 1; border-radius: 4px 4px 0 0; }
+        .left { grid-column: 1; grid-row: 2; border-radius: 4px 0 0 4px; }
+        .center { grid-column: 2; grid-row: 2; background: #333; }
+        .right { grid-column: 3; grid-row: 2; border-radius: 0 4px 4px 0; }
+        .down { grid-column: 2; grid-row: 3; border-radius: 0 0 4px 4px; }
+        
+        /* AB键 */
+        .action-btns { display: flex; gap: 15px; transform: rotate(-20deg); margin-top: 20px; }
+        .btn-action { width: 45px; height: 45px; background: #900; border-radius: 50%; box-shadow: inset -2px -2px 5px rgba(0,0,0,0.3), 2px 4px 5px rgba(0,0,0,0.4); cursor: pointer; color: transparent; }
+        .btn-action:active { box-shadow: inset 2px 2px 8px rgba(0,0,0,0.6); }
+        .action-label { position: absolute; color: #a0a0a0; font-family: sans-serif; font-size: 12px; transform: rotate(20deg); margin-top: 55px; margin-left: 15px; font-weight: bold; }
+        
+        /* 闪烁光标 */
+        .cursor { display: inline-block; width: 8px; height: 12px; background: #0f380f; animation: blink 1s step-end infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
     </style>
 </head>
 <body>
 
-    <div class="grid">
-        <!-- 9个科技感触控板 -->
-        <div class="pad" onclick="synth(261.63, 'triangle')"></div>
-        <div class="pad" onclick="synth(293.66, 'square')"></div>
-        <div class="pad" onclick="synth(329.63, 'sine')"></div>
-        <div class="pad" onclick="synth(349.23, 'triangle')"></div>
-        <div class="pad" onclick="synth(392.00, 'sawtooth')"></div>
-        <div class="pad" onclick="synth(440.00, 'sine')"></div>
-        <div class="pad" onclick="synth(493.88, 'triangle')"></div>
-        <div class="pad" onclick="synth(523.25, 'square')"></div>
-        <div class="pad" onclick="synth(587.33, 'sawtooth')"></div>
+<div class="gameboy">
+    <div class="screen-bezel">
+        <div class="screen" id="screen-text">
+            > SYSTEM BOOT...<br>
+            > HELLO WORLD!<br><br>
+            按下方按钮<br>
+            查看我的秘密<span class="cursor"></span>
+        </div>
     </div>
+    
+    <div class="brand">NINTENDO'NT</div>
+    
+    <div class="controls">
+        <div class="d-pad">
+            <div class="btn-dir up" onclick="updateScreen('UP: <br><br>我的状态：<br>正在写 Bug 中...')"></div>
+            <div class="btn-dir left" onclick="updateScreen('LEFT: <br><br>最近在听：<br>Never Gonna Give You Up')"></div>
+            <div class="center"></div>
+            <div class="btn-dir right" onclick="updateScreen('RIGHT: <br><br>最喜欢的游戏：<br>塞尔达传说')"></div>
+            <div class="btn-dir down" onclick="updateScreen('DOWN: <br><br>今日电量：<br>[||||      ] 40%')"></div>
+        </div>
+        
+        <div class="action-btns">
+            <div>
+                <div class="btn-action" onclick="updateScreen('B键: <br><br>后退一步，海阔天空。')"></div>
+                <div class="action-label">B</div>
+            </div>
+            <div style="margin-top: -20px;">
+                <div class="btn-action" onclick="updateScreen('A键: <br><br>确认过眼神，你是我的人。')"></div>
+                <div class="action-label">A</div>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <div class="hint">⚡️ TAP THE MATRIX TO GENERATE AUDIO BEAT ⚡️</div>
+<script>
+    // 简单的打字机效果逻辑
+    let isTyping = false;
+    function updateScreen(text) {
+        if (isTyping) return;
+        isTyping = true;
+        const screen = document.getElementById('screen-text');
+        screen.innerHTML = "> " + "<span class='cursor'></span>";
+        
+        let i = 0;
+        const cleanText = text.replace(/<br>/g, '\n'); // 处理换行
+        screen.innerHTML = "";
+        
+        let timer = setInterval(() => {
+            if (i < cleanText.length) {
+                if (cleanText.charAt(i) === '\n') {
+                    screen.innerHTML += "<br>";
+                } else {
+                    screen.innerHTML += cleanText.charAt(i);
+                }
+                i++;
+            } else {
+                clearInterval(timer);
+                screen.innerHTML += "<span class='cursor'></span>";
+                isTyping = false;
+            }
+        }, 50); // 50ms打一个字
+    }
+</script>
 
-    <script>
-        // 手机原生音频合成引擎（Web Audio API）
-        let audioCtx = null;
-        function synth(freq, type) {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            
-            let osc = audioCtx.createOscillator();
-            let gain = audioCtx.createGain();
-            
-            osc.type = type;
-            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            
-            // 营造赛博空间回音感（淡出衰减）
-            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
-            
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.4);
-        }
-    </script>
 </body>
-</html>
 </html>
