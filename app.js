@@ -1,351 +1,186 @@
 // ======================
-// CWJ TOOLS V10
-// APP.JS
+// CWJ TOOLS V10.5（中文版）
 // ======================
 
-// Navigation
-
+// 页面切换
 const navButtons = document.querySelectorAll(".nav-btn");
 const pages = document.querySelectorAll(".page");
 
 navButtons.forEach(btn => {
-
-    btn.addEventListener("click", () => {
-
+    btn.onclick = () => {
         navButtons.forEach(b => b.classList.remove("active"));
         pages.forEach(p => p.classList.remove("active"));
 
         btn.classList.add("active");
+        document.getElementById(btn.dataset.page).classList.add("active");
+    };
+});
 
-        const pageId = btn.dataset.page;
-        document.getElementById(pageId).classList.add("active");
+
+// ======================
+// 工具函数区
+// ======================
+
+
+// 密码生成器
+function 生成密码(length = 16) {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
+    let pass = "";
+    for (let i = 0; i < length; i++) {
+        pass += chars[Math.floor(Math.random() * chars.length)];
+    }
+    return pass;
+}
+
+
+// UUID生成器
+function 生成UUID() {
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0;
+        const v = c === "x" ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
+
+
+// Base64编码
+function 编码Base64(str) {
+    return btoa(unescape(encodeURIComponent(str)));
+}
+
+
+// Base64解码
+function 解码Base64(str) {
+    return decodeURIComponent(escape(atob(str)));
+}
+
+
+// JSON格式化
+function 格式化JSON(jsonStr) {
+    try {
+        return JSON.stringify(JSON.parse(jsonStr), null, 4);
+    } catch (e) {
+        return "❌ JSON格式错误，请检查输入";
+    }
+}
+
+
+// ======================
+// 工具点击事件
+// ======================
+
+document.querySelectorAll(".tool-card").forEach(card => {
+
+    card.addEventListener("click", () => {
+
+        const tool = card.innerText.trim();
+
+        // 密码生成
+        if (tool.includes("Password") || tool.includes("密码")) {
+            const pass = 生成密码();
+            alert("🔐 生成的密码：\n\n" + pass);
+        }
+
+        // UUID
+        else if (tool.includes("UUID")) {
+            const id = 生成UUID();
+            alert("🆔 生成的UUID：\n\n" + id);
+        }
+
+        // Base64
+        else if (tool.includes("Base64")) {
+            const input = prompt("请输入要编码的内容：");
+            if (!input) return;
+            const encoded = 编码Base64(input);
+            alert("🔤 Base64结果：\n\n" + encoded);
+        }
+
+        // JSON
+        else if (tool.includes("JSON")) {
+            const input = prompt("请输入JSON内容：");
+            if (!input) return;
+            alert("📦 格式化结果：\n\n" + 格式化JSON(input));
+        }
+
+        else {
+            alert("⚙️ 功能开发中：" + tool);
+        }
 
     });
 
 });
 
+
 // ======================
-// AI CHAT
+// AI聊天（离线版）
 // ======================
 
 const chatBox = document.getElementById("chatBox");
 const userInput = document.getElementById("userInput");
 const sendBtn = document.getElementById("sendBtn");
 
-const STORAGE_KEY = "cwj_chat_history_v10";
+function 添加消息(text, type) {
+    const div = document.createElement("div");
+    div.className = "message " + type;
+    div.textContent = text;
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
 
-// Load History
+function AI回复() {
+    const replies = [
+        "系统运行正常。",
+        "工具引擎已启动。",
+        "请求已收到。",
+        "操作已完成。",
+        "CWJ系统在线运行中。",
+        "当前状态：稳定"
+    ];
+    return replies[Math.floor(Math.random() * replies.length)];
+}
 
-window.addEventListener("load", () => {
-
-    loadChatHistory();
-
-    showWelcome();
-
-});
-
-// Send
-
-sendBtn.addEventListener("click", sendMessage);
-
-userInput.addEventListener("keydown", (e) => {
-
-    if (e.key === "Enter") {
-        sendMessage();
-    }
-
-});
-
-// Main
-
-function sendMessage() {
-
+function 发送消息() {
     const text = userInput.value.trim();
-
     if (!text) return;
 
-    addMessage(text, "user");
-
+    添加消息(text, "user");
     userInput.value = "";
 
-    fakeTyping();
-
-}
-
-// Add Message
-
-function addMessage(text, type) {
-
-    const div = document.createElement("div");
-
-    div.className = `message ${type}`;
-
-    div.textContent = text;
-
-    chatBox.appendChild(div);
-
-    saveChatHistory();
-
-    scrollBottom();
-
-}
-
-// Fake AI
-
-function fakeTyping() {
-
-    const loading = document.createElement("div");
-
-    loading.className = "message bot";
-
-    loading.textContent = "Thinking...";
-
-    chatBox.appendChild(loading);
-
-    scrollBottom();
-
     setTimeout(() => {
-
-        loading.remove();
-
-        const reply = generateReply();
-
-        addMessage(reply, "bot");
-
-    }, 1200);
-
+        添加消息(AI回复(), "bot");
+    }, 600);
 }
 
-// Simple AI Demo
+sendBtn.onclick = 发送消息;
 
-function generateReply() {
+userInput.addEventListener("keydown", e => {
+    if (e.key === "Enter") 发送消息();
+});
 
-    const responses = [
-
-        "CWJ AI Assistant is online.",
-        "Your request has been received.",
-        "Processing completed successfully.",
-        "System status: Stable.",
-        "AI response generated.",
-        "Tool execution finished.",
-        "CWJ Platform operational.",
-        "Search completed.",
-        "Analysis completed.",
-        "Task executed successfully."
-
-    ];
-
-    return responses[
-        Math.floor(Math.random() * responses.length)
-    ];
-
-}
 
 // ======================
-// Storage
+// 搜索功能
 // ======================
 
-function saveChatHistory() {
-
-    localStorage.setItem(
-        STORAGE_KEY,
-        chatBox.innerHTML
-    );
-
-}
-
-function loadChatHistory() {
-
-    const data =
-        localStorage.getItem(STORAGE_KEY);
-
-    if (data) {
-
-        chatBox.innerHTML = data;
-
-    }
-
-}
-
-// ======================
-// Scroll
-// ======================
-
-function scrollBottom() {
-
-    chatBox.scrollTop =
-        chatBox.scrollHeight;
-
-}
-
-// ======================
-// Welcome
-// ======================
-
-function showWelcome() {
-
-    if (
-        localStorage.getItem(
-            "cwj_welcome_done"
-        )
-    ) {
-        return;
-    }
-
-    setTimeout(() => {
-
-        addMessage(
-            "Welcome to CWJ TOOLS V10",
-            "bot"
-        );
-
-        setTimeout(() => {
-
-            addMessage(
-                "AI Workspace Ready",
-                "bot"
-            );
-
-        }, 800);
-
-        setTimeout(() => {
-
-            addMessage(
-                "System Status: Online",
-                "bot"
-            );
-
-        }, 1500);
-
-    }, 500);
-
-    localStorage.setItem(
-        "cwj_welcome_done",
-        "true"
-    );
-
-}
-
-// ======================
-// Online Status
-// ======================
-
-function updateStatus() {
-
-    const status =
-        document.querySelector(".status");
-
-    if (navigator.onLine) {
-
-        status.innerHTML =
-            `<span class="online"></span> System Online`;
-
-    } else {
-
-        status.innerHTML =
-            `<span class="online"></span> Offline`;
-
-    }
-
-}
-
-window.addEventListener(
-    "online",
-    updateStatus
-);
-
-window.addEventListener(
-    "offline",
-    updateStatus
-);
-
-updateStatus();
-
-// ======================
-// Search Center
-// ======================
-
-const searchInput =
-document.querySelector(".search-center");
+const searchInput = document.querySelector(".search-center");
 
 if (searchInput) {
+    searchInput.addEventListener("keydown", e => {
+        if (e.key === "Enter") {
+            const q = searchInput.value.trim();
+            if (!q) return;
 
-    searchInput.addEventListener(
-        "keydown",
-        function(e){
-
-            if(e.key === "Enter"){
-
-                const q =
-                searchInput.value.trim();
-
-                if(!q) return;
-
-                window.open(
-                    "https://www.google.com/search?q="
-                    + encodeURIComponent(q),
-                    "_blank"
-                );
-
-            }
-
+            window.open(
+                "https://www.google.com/search?q=" + encodeURIComponent(q),
+                "_blank"
+            );
         }
-    );
-
+    });
 }
 
-// ======================
-// Tool Cards
-// ======================
-
-document
-.querySelectorAll(".tool-card")
-.forEach(card=>{
-
-    card.addEventListener(
-        "click",
-        ()=>{
-
-            alert(
-                card.innerText +
-                " Coming Soon"
-            );
-
-        }
-    );
-
-});
 
 // ======================
-// Dashboard Animation
+// 初始化
 // ======================
 
-const cards =
-document.querySelectorAll(".card");
-
-cards.forEach((card,index)=>{
-
-    card.style.opacity = "0";
-    card.style.transform =
-    "translateY(30px)";
-
-    setTimeout(()=>{
-
-        card.style.transition =
-        ".5s";
-
-        card.style.opacity = "1";
-        card.style.transform =
-        "translateY(0)";
-
-    },index*100);
-
-});
-
-// ======================
-// Version
-// ======================
-
-console.log(
-    "CWJ TOOLS V10 Loaded"
-);
+console.log("🚀 CWJ TOOLS V10.5 中文版 已启动");
