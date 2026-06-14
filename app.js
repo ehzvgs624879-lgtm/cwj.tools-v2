@@ -1,240 +1,120 @@
-// ======================
-// UI系统
-// ======================
+document.addEventListener("DOMContentLoaded", () => {
 
-let 当前结果 = "";
+    console.log("CWJ TOOLS V10.7 已启动");
 
-// Toast
-function toast(msg){
-    const t = document.getElementById("toast");
-    t.innerText = msg;
-    t.style.opacity = 1;
+    // ======================
+    // 工具状态
+    // ======================
 
-    setTimeout(()=>{
-        t.style.opacity = 0;
-    },1500);
-}
+    let currentTool = "password";
+    let lastResult = "";
 
-// 弹窗
-function 打开弹窗(title, content){
-    document.getElementById("modal").classList.remove("hidden");
-    document.getElementById("modal-title").innerText = title;
-    document.getElementById("modal-content").innerText = content;
-    当前结果 = content;
-}
+    // ======================
+    // 工具函数（唯一版本）
+    // ======================
 
-function 关闭弹窗(){
-    document.getElementById("modal").classList.add("hidden");
-}
-
-function 复制结果(){
-    navigator.clipboard.writeText(当前结果);
-    toast("已复制到剪贴板");
-    关闭弹窗();
-}
-
-
-// ======================
-// 工具函数
-// ======================
-
-// 密码
-function 生成密码(len=16){
-    const chars="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
-    let r="";
-    for(let i=0;i<len;i++){
-        r+=chars[Math.floor(Math.random()*chars.length)];
+    function generatePassword(len = 16) {
+        const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+        let r = "";
+        for (let i = 0; i < len; i++) {
+            r += chars[Math.floor(Math.random() * chars.length)];
+        }
+        return r;
     }
-    return r;
-}
 
-// UUID
-function 生成UUID(){
-    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,c=>{
-        let r=Math.random()*16|0;
-        return (c=="x"?r:(r&0x3|0x8)).toString(16);
+    function generateUUID() {
+        return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => {
+            let r = Math.random() * 16 | 0;
+            return (c === "x" ? r : (r & 0x3 | 0x8)).toString(16);
+        });
+    }
+
+    // ======================
+    // DOM检查
+    // ======================
+
+    const items = document.querySelectorAll(".tool-item");
+    const runBtn = document.getElementById("runTool");
+    const inputBox = document.getElementById("toolInput");
+    const resultBox = document.getElementById("toolResult");
+    const titleBox = document.getElementById("toolTitle");
+
+    if (!items.length || !runBtn || !inputBox || !resultBox) {
+        console.error("❌ 工具面板未加载成功，请检查HTML结构");
+        return;
+    }
+
+    // ======================
+    // 工具切换
+    // ======================
+
+    items.forEach(item => {
+
+        item.addEventListener("click", () => {
+
+            items.forEach(i => i.classList.remove("active"));
+            item.classList.add("active");
+
+            currentTool = item.dataset.tool;
+
+            titleBox.innerText = item.innerText;
+            inputBox.value = "";
+            resultBox.innerText = "等待执行...";
+
+        });
+
     });
-}
 
-// Base64
-function 编码(text){
-    return btoa(unescape(encodeURIComponent(text)));
-}
+    // ======================
+    // 执行工具
+    // ======================
 
-function 解码(text){
-    return decodeURIComponent(escape(atob(text)));
-}
+    runBtn.addEventListener("click", () => {
 
-// JSON
-function 格式化(json){
-    try{
-        return JSON.stringify(JSON.parse(json),null,4);
-    }catch(e){
-        return "JSON格式错误";
-    }
-}
+        const input = inputBox.value;
 
+        let result = "";
 
-// ======================
-// 工具点击系统
-// ======================
+        switch (currentTool) {
 
-document.querySelectorAll(".tool-card").forEach(card=>{
+            case "password":
+                result = generatePassword();
+                break;
 
-    card.onclick=()=>{
+            case "uuid":
+                result = generateUUID();
+                break;
 
-        const name=card.innerText;
+            case "base64":
+                result = btoa(unescape(encodeURIComponent(input || "")));
+                break;
 
-        if(name.includes("密码")){
-            打开弹窗("密码生成器",生成密码());
+            case "json":
+                try {
+                    result = JSON.stringify(JSON.parse(input), null, 4);
+                } catch (e) {
+                    result = "JSON格式错误";
+                }
+                break;
+
+            default:
+                result = "未知工具";
         }
 
-        else if(name.includes("UUID")){
-            打开弹窗("UUID生成器",生成UUID());
-        }
+        lastResult = result;
+        resultBox.innerText = result;
 
-        else if(name.includes("Base64")){
-            let t=prompt("请输入文本");
-            if(!t)return;
-            打开弹窗("Base64编码",编码(t));
-        }
+        toast("执行成功");
 
-        else if(name.includes("JSON")){
-            let t=prompt("请输入JSON");
-            if(!t)return;
-            打开弹窗("JSON格式化",格式化(t));
-        }
+    });
 
-        else{
-            toast("功能开发中");
-        }
+    // ======================
+    // 复制
+    // ======================
+
+    window.复制工具结果 = function () {
+        navigator.clipboard.writeText(lastResult);
+        toast("已复制结果");
     };
 
 });
-
-
-// ======================
-// AI聊天（优化版）
-// ======================
-
-const chatBox=document.getElementById("chatBox");
-const input=document.getElementById("userInput");
-const send=document.getElementById("sendBtn");
-
-function add(text,type){
-    let d=document.createElement("div");
-    d.className="message "+type;
-    d.innerText=text;
-    chatBox.appendChild(d);
-    chatBox.scrollTop=chatBox.scrollHeight;
-}
-
-function reply(){
-    const arr=[
-        "系统运行正常",
-        "任务已执行",
-        "CWJ工具箱在线",
-        "处理完成"
-    ];
-    return arr[Math.floor(Math.random()*arr.length)];
-}
-
-function sendMsg(){
-    let t=input.value.trim();
-    if(!t)return;
-
-    add(t,"user");
-    input.value="";
-
-    setTimeout(()=>{
-        add(reply(),"bot");
-    },500);
-}
-
-send.onclick=sendMsg;
-
-input.addEventListener("keydown",e=>{
-    if(e.key==="Enter")sendMsg();
-});
-
-
-// ======================
-// 搜索
-// ======================
-
-document.querySelector(".search-center")?.addEventListener("keydown",e=>{
-    if(e.key==="Enter"){
-        let q=e.target.value;
-        window.open("https://www.google.com/search?q="+encodeURIComponent(q));
-    }
-});
-
-console.log("CWJ TOOLS V10.6 已启动");
-// 当前工具
-let currentTool = "password";
-let lastResult = "";
-
-// 工具切换
-document.querySelectorAll(".tool-item").forEach(item=>{
-
-    item.onclick = ()=>{
-
-        document.querySelectorAll(".tool-item")
-        .forEach(i=>i.classList.remove("active"));
-
-        item.classList.add("active");
-
-        currentTool = item.dataset.tool;
-
-        document.getElementById("toolTitle").innerText =
-        item.innerText;
-
-        document.getElementById("toolInput").value = "";
-
-        document.getElementById("toolResult").innerText =
-        "等待执行...";
-
-    };
-
-});
-
-// 执行工具
-document.getElementById("runTool").onclick = ()=>{
-
-    const input = document.getElementById("toolInput").value;
-
-    let result = "";
-
-    if(currentTool === "password"){
-        result = generatePassword();
-    }
-
-    if(currentTool === "uuid"){
-        result = generateUUID();
-    }
-
-    if(currentTool === "base64"){
-        result = btoa(unescape(encodeURIComponent(input || "")));
-    }
-
-    if(currentTool === "json"){
-        try{
-            result = JSON.stringify(JSON.parse(input),null,4);
-        }catch(e){
-            result = "JSON格式错误";
-        }
-    }
-
-    lastResult = result;
-
-    document.getElementById("toolResult").innerText = result;
-
-    toast("执行成功");
-
-};
-
-// 复制结果
-function 复制工具结果(){
-    navigator.clipboard.writeText(lastResult);
-    toast("已复制结果");
-}
