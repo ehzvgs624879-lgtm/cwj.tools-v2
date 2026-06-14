@@ -1,37 +1,65 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>未命名空间</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>⚡️ MATRIX ⚡️</title>
     <style>
-        body { margin: 0; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #09090b; color: #10b981; font-family: monospace; }
-        .box { text-align: center; padding: 20px; }
-        .btn { background: #ef4444; color: white; border: none; padding: 15px 30px; font-size: 18px; font-weight: bold; border-radius: 8px; box-shadow: 0 4px 15px rgba(239,68,68,0.4); margin-bottom: 20px; -webkit-tap-highlight-color: transparent; }
-        .btn:active { transform: scale(0.95); background: #dc2626; }
-        #msg { font-size: 18px; min-height: 30px; font-weight: bold; padding: 0 20px; word-break: break-all; }
+        body { margin: 0; height: 100vh; background: #050508; overflow: hidden; font-family: system-ui, sans-serif; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 90vw; max-width: 400px; aspect-ratio: 1; }
+        .pad { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; position: relative; overflow: hidden; transition: all 0.1s; -webkit-tap-highlight-color: transparent; }
+        .pad::after { content: ''; position: absolute; inset: 0; border-radius: 16px; box-shadow: inset 0 0 15px transparent; transition: all 0.3s; }
+        .pad:active { transform: scale(0.92); background: rgba(0, 242, 254, 0.1); border-color: #00f2fe; }
+        .pad:active::after { box-shadow: inset 0 0 20px #00f2fe, 0 0 30px rgba(0,242,254,0.3); }
+        /* 不同的格子给不同的霓虹光晕 */
+        .pad:nth-child(3n+1):active { border-color: #ff007f; background: rgba(255,0,127,0.1); }
+        .pad:nth-child(3n+1):active::after { box-shadow: inset 0 0 20px #ff007f, 0 0 30px rgba(255,0,127,0.3); }
+        .pad:nth-child(3n+2):active { border-color: #7000ff; background: rgba(112,0,255,0.1); }
+        .pad:nth-child(3n+2):active::after { box-shadow: inset 0 0 20px #7000ff, 0 0 30px rgba(112,0,255,0.3); }
+        .hint { color: rgba(255,255,255,0.3); font-size: 11px; letter-spacing: 3px; margin-top: 30px; text-transform: uppercase; animation: blink 2s infinite; }
+        @keyframes blink { 50% { opacity: 0.4; } }
     </style>
 </head>
 <body>
-    <div class="box">
-        <button class="btn" onclick="hitMe()">⚠️ 千万别点我</button>
-        <div id="msg">...</div>
+
+    <div class="grid">
+        <!-- 9个科技感触控板 -->
+        <div class="pad" onclick="synth(261.63, 'triangle')"></div>
+        <div class="pad" onclick="synth(293.66, 'square')"></div>
+        <div class="pad" onclick="synth(329.63, 'sine')"></div>
+        <div class="pad" onclick="synth(349.23, 'triangle')"></div>
+        <div class="pad" onclick="synth(392.00, 'sawtooth')"></div>
+        <div class="pad" onclick="synth(440.00, 'sine')"></div>
+        <div class="pad" onclick="synth(493.88, 'triangle')"></div>
+        <div class="pad" onclick="synth(523.25, 'square')"></div>
+        <div class="pad" onclick="synth(587.33, 'sawtooth')"></div>
     </div>
+
+    <div class="hint">⚡️ TAP THE MATRIX TO GENERATE AUDIO BEAT ⚡️</div>
+
     <script>
-        // 下面括号里的双引号内容，就是你可以随便改的恶搞文案！
-        const jokes = [
-            "不是告诉你别点了吗？",
-            "你的手机将在 10 秒后自毁 💥",
-            "再点一下试试？",
-            "V我50，告诉你宇宙的终极秘密",
-            "正在格式化系统... 99% 💀",
-            "🎉 恭喜你发现了一个毫无卵用的按钮！",
-            "别点了，老板在你身后看着你呢 👁️"
-        ];
-        function hitMe() {
-            let r = Math.floor(Math.random() * jokes.length);
-            document.getElementById('msg').innerText = jokes[r];
+        // 手机原生音频合成引擎（Web Audio API）
+        let audioCtx = null;
+        function synth(freq, type) {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            
+            let osc = audioCtx.createOscillator();
+            let gain = audioCtx.createGain();
+            
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            
+            // 营造赛博空间回音感（淡出衰减）
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+            
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.4);
         }
     </script>
 </body>
+</html>
 </html>
