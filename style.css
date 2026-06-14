@@ -96,3 +96,112 @@ body{
 pre{
     white-space:pre-wrap;
 }
+/* ======================
+基础防溢出（关键）
+====================== */
+
+*{
+    box-sizing:border-box;
+}
+
+html,body{
+    height:100%;
+    overflow:hidden;
+}
+
+/* ======================
+工具布局增强适配
+====================== */
+
+.tool-layout{
+    display:flex;
+    gap:12px;
+    height:100%;
+    min-height:0;
+}
+
+/* 左侧 */
+.tool-list{
+    width:200px;
+    min-width:160px;
+    overflow-y:auto;
+}
+
+/* 中间 */
+.tool-center{
+    flex:1;
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+}
+
+.tool-center textarea{
+    width:100%;
+    min-height:0;
+    flex:1;
+    resize:none;
+}
+
+/* 右侧 */
+.tool-output{
+    width:260px;
+    min-width:200px;
+    overflow-y:auto;
+}
+
+/* ======================
+平板适配
+====================== */
+
+@media (max-width: 900px){
+
+    .tool-layout{
+        flex-direction:column;
+        height:auto;
+    }
+
+    .tool-list{
+        width:100%;
+        display:flex;
+        overflow-x:auto;
+        gap:8px;
+        white-space:nowrap;
+    }
+
+    .tool-item{
+        flex-shrink:0;
+    }
+
+    .tool-output{
+        width:100%;
+    }
+}
+
+/* ======================
+手机适配（关键修复）
+====================== */
+
+@media (max-width: 600px){
+
+    .sidebar{
+        width:70px;
+        font-size:12px;
+    }
+
+    .nav-btn{
+        font-size:12px;
+        padding:8px;
+    }
+
+    .tool-center textarea{
+        min-height:140px;
+    }
+
+    .tool-output{
+        font-size:12px;
+    }
+
+    h1,h2,h3{
+        font-size:16px;
+    }
+}
