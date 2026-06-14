@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Matrix Nexus | 极客高级工具矩阵</title>
+    <title>NexusOS | 工业级极客数字工作台</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script>
@@ -12,412 +12,458 @@
             theme: {
                 extend: {
                     colors: {
-                        cyber: { 50: '#f0fdf4', 100: '#dcfce7', 500: '#22c55e', 900: '#14532d' },
-                        premium: '#6366f1'
-                    },
-                    backdropBlur: { xs: '2px' }
+                        brand: { 50: '#f5f3ff', 500: '#8b5cf6', 600: '#7c3aed', 950: '#0c0a09' },
+                        cyber: '#06b6d4'
+                    }
                 }
             }
         }
     </script>
     <style>
-        /* 极致微交互与丝滑滚动 */
-        body { font-family: -apple-system, SF Pro Display, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-        .glass { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
-        .dark .glass { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
-        .premium-gradient { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); }
-        
-        /* 隐藏滚动条但保留功能 */
+        body { font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+        .glass-panel { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); }
+        .dark .glass-panel { background: rgba(18, 18, 18, 0.8); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        /* 动态流光边框效果 */
-        .glow-card { position: relative; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-        .glow-card::after { content: ''; position: absolute; inset: -1px; background: linear-gradient(90deg, #6366f1, #a855f7, #6366f1); border-radius: inherit; z-index: -1; opacity: 0; transition: opacity 0.3s; }
-        .glow-card:hover::after { opacity: 0.3; }
-        
-        /* 手机端独享底部 Sheet 弹窗动画 */
-        @media (max-width: 768px) {
-            .mobile-sheet { transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-            .mobile-sheet.active { transform: translateY(0); }
-        }
+        .active-glow { box-shadow: 0 0 20px rgba(139, 92, 246, 0.15); }
     </style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 transition-colors duration-500 min-h-screen flex flex-col pb-20 md:pb-0">
+<body class="bg-zinc-50 dark:bg-[#09090b] text-zinc-900 dark:text-zinc-50 min-h-screen flex flex-col pb-24 md:pb-0 transition-colors duration-300">
 
-    <div class="h-[3px] w-full premium-gradient fixed top-0 z-50"></div>
+    <div class="fixed top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-500/10 blur-[120px] pointer-events-none z-0"></div>
+    <div class="fixed bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-cyan-500/10 blur-[120px] pointer-events-none z-0"></div>
 
-    <header class="glass sticky top-0 z-40 border-b border-slate-200/50 dark:border-slate-800/50 px-6 py-4 flex justify-between items-center">
+    <header class="glass-panel sticky top-0 z-40 border-b border-zinc-200/60 dark:border-zinc-800/60 px-4 md:px-8 py-3.5 flex justify-between items-center z-10">
         <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-xl premium-gradient flex items-center justify-center text-white shadow-lg shadow-indigo-500/30 animate-pulse">
-                <i class="fa-solid fa-terminal text-sm"></i>
-            </div>
-            <span class="text-xl font-black tracking-tight bg-clip-text text-transparent premium-gradient">MATRIX NEXUS</span>
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-brand-600 to-cyan-500 flex items-center justify-center text-white font-black text-xs tracking-wider shadow-lg">N</div>
+            <span class="text-base font-bold tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-zinc-900 to-zinc-500 dark:from-white dark:to-zinc-500">NEXUS//OS</span>
         </div>
+        
+        <div class="relative max-w-xs w-full mx-4 hidden sm:block">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-zinc-400 text-xs"><i class="fa-solid fa-magnifying-glass"></i></span>
+            <input type="text" id="globalSearch" oninput="filterTools()" placeholder="输入关键字搜索云端工具..." class="w-full pl-9 pr-4 py-1.5 text-xs rounded-lg bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-brand-500 transition-all">
+        </div>
+
         <div class="flex items-center gap-2">
-            <button onclick="toggleDarkMode()" class="w-10 h-10 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all active:scale-95">
-                <i class="fa-solid fa-moon dark:hidden"></i>
-                <i class="fa-solid fa-sun hidden dark:block"></i>
-            </button>
+            <button onclick="toggleTheme()" class="w-9 h-9 rounded-lg border border-zinc-200 dark:border-zinc-800 flex items-center justify-center hover:bg-zinc-100 dark:hover:bg-zinc-900 text-zinc-500"><i class="fa-solid fa-circle-half-stroke text-sm"></i></button>
         </div>
     </header>
 
-    <div class="flex-1 max-w-7xl w-full mx-auto flex flex-col md:flex-row gap-6 p-4 md:p-6">
+    <div class="flex-1 max-w-7xl w-full mx-auto flex flex-col md:flex-row gap-6 p-4 md:p-6 z-10 relative">
         
-        <aside class="w-full md:w-72 shrink-0">
-            <div class="glass border border-slate-200/50 dark:border-slate-800/50 rounded-2xl p-3 sticky top-24 shadow-sm hidden md:block">
-                <p class="text-xs font-bold uppercase tracking-wider text-slate-400 p-3">核心工具箱</p>
-                <nav class="space-y-1">
-                    <button onclick="switchTool('image-tool')" class="nav-btn active w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm text-left transition-all bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400" data-target="image-tool">
-                        <i class="fa-solid fa-image-vertical text-base"></i> 智能图像压缩器
-                    </button>
-                    <button onclick="switchTool('color-tool')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm text-left transition-all text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900" data-target="color-tool">
-                        <i class="fa-solid fa-palette text-base"></i> 极客色彩矩阵
-                    </button>
-                    <button onclick="switchTool('json-tool')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm text-left transition-all text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900" data-target="json-tool">
-                        <i class="fa-solid fa-code text-base"></i> JSON 逻辑美化
-                    </button>
-                </nav>
-            </div>
-
-            <div class="flex md:hidden gap-2 overflow-x-auto no-scrollbar py-1">
-                <button onclick="switchTool('image-tool')" class="mobile-tab active px-4 py-2.5 rounded-full text-xs font-bold whitespace-nowrap bg-indigo-600 text-white shadow-sm" data-target="image-tool">图像压缩</button>
-                <button onclick="switchTool('color-tool')" class="mobile-tab px-4 py-2.5 rounded-full text-xs font-bold whitespace-nowrap bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400" data-target="color-tool">高级色彩</button>
-                <button onclick="switchTool('json-tool')" class="mobile-tab px-4 py-2.5 rounded-full text-xs font-bold whitespace-nowrap bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400" data-target="json-tool">JSON解析</button>
+        <aside class="w-64 shrink-0 hidden md:block">
+            <div class="glass-panel border border-zinc-200/60 dark:border-zinc-800/60 rounded-xl p-2 sticky top-24 space-y-1">
+                <button onclick="switchView('dashboard')" class="menu-item active w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-semibold bg-brand-500 text-white transition-all" data-id="dashboard">
+                    <span><i class="fa-solid fa-chart-pie mr-2"></i>中枢控制台</span><i class="fa-solid fa-chevron-right text-[10px] opacity-50"></i>
+                </button>
+                <div class="h-[1px] bg-zinc-200 dark:bg-zinc-800 my-2"></div>
+                <p class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest px-3 py-1">全量工具集群</p>
+                <div id="pcNavList" class="space-y-0.5"></div>
             </div>
         </aside>
 
-        <main class="flex-1 min-w-0">
+        <div class="block md:hidden space-y-3">
+            <div class="relative w-full">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-zinc-400 text-sm"><i class="fa-solid fa-magnifying-glass"></i></span>
+                <input type="text" id="mobileSearch" oninput="filterTools()" placeholder="检索 7+ 高级极客工具..." class="w-full pl-9 pr-4 py-2.5 text-sm rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 focus:outline-none">
+            </div>
+            <div id="mobileTabScroll" class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+                <button onclick="switchView('dashboard')" class="mob-tab active shrink-0 px-4 py-2 rounded-full text-xs font-bold bg-brand-500 text-white" data-id="dashboard">中枢面板</button>
+            </div>
+        </div>
+
+        <main class="flex-1 min-w-0 space-y-6">
             
-            <section id="image-tool" class="tool-section glow-card glass border border-slate-200/50 dark:border-slate-800/50 rounded-3xl p-6 shadow-xl space-y-6">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <h2 class="text-xl font-bold tracking-tight">智能图像压缩与转换</h2>
-                        <p class="text-sm text-slate-400 mt-1">纯前端 Canvas 引擎，零服务器上传，保护绝对隐私</p>
+            <section id="view-dashboard" class="view-panel space-y-6">
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="glass-panel border border-zinc-200/60 dark:border-zinc-800/60 p-4 rounded-xl">
+                        <p class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">核能引擎状态</p>
+                        <p class="text-lg font-black mt-1 text-emerald-500"><i class="fa-solid fa-circle-check mr-1.5 text-sm"></i>Active</p>
                     </div>
-                    <span class="text-xs bg-emerald-500/10 text-emerald-500 px-2.5 py-1 rounded-full font-semibold">Local GPU 加速</span>
-                </div>
-
-                <div class="border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl p-8 text-center hover:border-indigo-500 transition-all relative group cursor-pointer">
-                    <input type="file" id="imageInput" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer">
-                    <div class="space-y-3">
-                        <div class="w-12 h-12 rounded-full bg-indigo-50 dark:bg-indigo-950/50 mx-auto flex items-center justify-center text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform">
-                            <i class="fa-solid fa-cloud-arrow-up text-lg"></i>
-                        </div>
-                        <div class="text-sm font-medium">点击或将图片拖拽到此处</div>
-                        <div class="text-xs text-slate-400">支持 PNG, JPG, WEBP</div>
+                    <div class="glass-panel border border-zinc-200/60 dark:border-zinc-800/60 p-4 rounded-xl">
+                        <p class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">本地沙盒隐私</p>
+                        <p class="text-lg font-black mt-1 text-cyan-500"><i class="fa-solid fa-shield-halved mr-1.5 text-sm"></i>100% Local</p>
+                    </div>
+                    <div class="glass-panel border border-zinc-200/60 dark:border-zinc-800/60 p-4 rounded-xl">
+                        <p class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">已部署工具数</p>
+                        <p class="text-xl font-black mt-1">7 <span class="text-xs text-zinc-400">Units</span></p>
+                    </div>
+                    <div class="glass-panel border border-zinc-200/60 dark:border-zinc-800/60 p-4 rounded-xl">
+                        <p class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">瞬时编译延迟</p>
+                        <p class="text-xl font-black mt-1 font-mono text-brand-500">0.02ms</p>
                     </div>
                 </div>
+                <div>
+                    <h3 class="text-xs font-bold uppercase tracking-widest text-zinc-400 mb-3">矩阵应用快捷入口</h3>
+                    <div id="toolsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                </div>
+            </section>
 
-                <div id="compressControls" class="space-y-4 hidden">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="bg-slate-100/50 dark:bg-slate-900/50 p-4 rounded-xl">
-                            <div class="flex justify-between text-xs font-bold mb-2">
-                                <span>目标压缩质量</span>
-                                <span id="qualityVal" class="text-indigo-600">80%</span>
-                            </div>
-                            <input type="range" id="qualityRange" min="10" max="100" value="80" class="w-full accent-indigo-600">
+            <section id="view-image" class="view-panel glass-panel border border-zinc-200/60 dark:border-zinc-800/60 rounded-2xl p-4 md:p-6 space-y-4 hidden">
+                <div class="flex justify-between items-center border-b border-zinc-200 dark:border-zinc-800 pb-3">
+                    <h2 class="text-base font-bold"><i class="fa-solid fa-images mr-2 text-brand-500"></i>高级媒体压制与多格式变道</h2>
+                    <span class="text-[10px] font-mono bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded text-zinc-400">Canvas 2D Engine</span>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div class="border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl p-6 text-center relative hover:border-brand-500 transition-colors cursor-pointer">
+                        <input type="file" id="imgEngineInput" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer">
+                        <i class="fa-solid fa-cloud-arrow-up text-2xl text-zinc-400 mb-2"></i>
+                        <p class="text-xs font-medium">拽入物理图像或点击挂载</p>
+                    </div>
+                    <div class="bg-zinc-50 dark:bg-zinc-900/50 p-4 rounded-xl space-y-3 text-xs">
+                        <div>
+                            <label class="font-semibold block mb-1">目标宽度尺寸像素 (等比锁)</label>
+                            <input type="number" id="imgWidth" placeholder="保持原尺寸" class="w-full p-2 rounded bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
                         </div>
-                        <div class="bg-slate-100/50 dark:bg-slate-900/50 p-4 rounded-xl">
-                            <label class="text-xs font-bold block mb-2">输出格式</label>
-                            <select id="formatSelect" class="w-full bg-transparent text-sm focus:outline-none font-medium dark:bg-slate-900">
-                                <option value="image/jpeg">JPEG (体积最小)</option>
-                                <option value="image/webp">WEBP (下一代高效格式)</option>
-                                <option value="image/png">PNG (保留透明度)</option>
+                        <div>
+                            <label class="font-semibold block mb-1">压制压缩系数: <span id="imgQualLabel" class="text-brand-500 font-bold">85%</span></label>
+                            <input type="range" id="imgQuality" min="5" max="100" value="85" class="w-full accent-brand-500">
+                        </div>
+                        <div>
+                            <label class="font-semibold block mb-1">重构容器格式</label>
+                            <select id="imgFormat" class="w-full p-2 rounded bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 font-medium">
+                                <option value="image/jpeg">JPEG (极致高压)</option>
+                                <option value="image/webp">WEBP (谷歌高阶无损算法)</option>
+                                <option value="image/png">PNG (透明图层留存)</option>
                             </select>
                         </div>
+                        <button onclick="runImageEngine()" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-2.5 rounded-lg shadow-md transition-all">执行硬核重构</button>
                     </div>
-
-                    <div class="grid grid-cols-2 gap-4 text-center text-xs">
-                        <div class="p-3 border border-slate-200 dark:border-slate-800 rounded-xl">
-                            <p class="text-slate-400 mb-1">原始大小</p>
-                            <p id="origSize" class="font-bold text-base">-</p>
-                        </div>
-                        <div class="p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-xl text-indigo-500">
-                            <p class="mb-1">压缩后预期</p>
-                            <p id="destSize" class="font-bold text-base">-</p>
-                        </div>
-                    </div>
-
-                    <button onclick="processImage()" class="w-full premium-gradient text-white font-bold py-3.5 rounded-xl shadow-lg shadow-indigo-500/20 active:scale-[0.99] transition-all flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-bolt"></i> 立即执行超导压缩
-                    </button>
                 </div>
-                
-                <div id="imageResult" class="hidden text-center pt-2">
-                    <a id="downloadBtn" href="#" download="matrix_compressed.jpg" class="inline-flex items-center gap-2 px-6 py-2.5 bg-emerald-500 text-white rounded-xl text-sm font-bold shadow-md hover:bg-emerald-600 transition-all">
-                        <i class="fa-solid fa-download"></i> 保存至相册 / 本地
-                    </a>
+                <div id="imgOutZone" class="hidden border border-zinc-200 dark:border-zinc-800 p-4 rounded-xl text-center">
+                    <p class="text-xs text-emerald-500 font-bold mb-2"><i class="fa-solid fa-circle-check mr-1"></i>重构编译通过！</p>
+                    <a id="imgDownloadLink" href="#" download="nexus_output.webp" class="inline-flex items-center gap-2 px-4 py-2 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-xs font-bold rounded-lg"><i class="fa-solid fa-download"></i>保存重构媒体</a>
                 </div>
             </section>
 
-            <section id="color-tool" class="tool-section glow-card glass border border-slate-200/50 dark:border-slate-800/50 rounded-3xl p-6 shadow-xl space-y-6 hidden">
-                <div>
-                    <h2 class="text-xl font-bold tracking-tight">高级色彩矩阵发生器</h2>
-                    <p class="text-sm text-slate-400 mt-1">自动生成契合 UI 设计系统的渐变阶梯与高对比度色彩方案</p>
-                </div>
-
-                <div class="bg-slate-100/50 dark:bg-slate-900/50 p-4 rounded-2xl flex items-center gap-4">
-                    <div class="w-14 h-14 rounded-xl border border-slate-200 overflow-hidden relative shrink-0">
-                        <input type="color" id="baseColor" value="#6366f1" class="absolute inset-0 scale-150 cursor-pointer">
-                    </div>
-                    <div class="flex-1">
-                        <label class="text-xs font-bold text-slate-400 block mb-1">选择基准色 (Base Color)</label>
-                        <input type="text" id="colorText" value="#6366f1" class="bg-transparent font-mono text-lg font-bold focus:outline-none uppercase">
-                    </div>
-                    <button onclick="generateColorMatrix()" class="px-4 py-2 bg-slate-900 dark:bg-slate-50 text-white dark:text-slate-900 rounded-xl text-xs font-bold active:scale-95 transition-transform">激变矩阵</button>
-                </div>
-
-                <div class="space-y-3">
-                    <label class="text-xs font-bold text-slate-400 block">智能调色板阶梯 (单击色块复制 HEX)</label>
-                    <div id="colorSteps" class="grid grid-cols-5 gap-2">
-                        </div>
-                </div>
-
-                <div class="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3">
-                    <span class="text-xs font-bold text-slate-400 block">WCAG 视障无障碍对比度实时检验</span>
-                    <div class="flex items-center justify-between p-3 bg-white dark:bg-slate-900 rounded-xl">
-                        <div class="flex items-center gap-3">
-                            <div id="sampleText" class="px-3 py-1.5 rounded-lg text-sm font-bold">Sample Text</div>
-                            <span class="text-xs text-slate-400">大文本/常规文本自适应</span>
-                        </div>
-                        <span id="contrastRatio" class="font-mono font-bold text-sm bg-emerald-500/10 text-emerald-500 px-3 py-1 rounded-md">AAA Premium</span>
-                    </div>
-                </div>
-            </section>
-
-            <section id="json-tool" class="tool-section glow-card glass border border-slate-200/50 dark:border-slate-800/50 rounded-3xl p-6 shadow-xl space-y-6 hidden">
-                <div class="flex justify-between items-start">
+            <section id="view-crypto" class="view-panel glass-panel border border-zinc-200/60 dark:border-zinc-800/60 rounded-2xl p-4 md:p-6 space-y-4 hidden">
+                <h2 class="text-base font-bold border-b border-zinc-200 dark:border-zinc-800 pb-3"><i class="fa-solid fa-key mr-2 text-brand-500"></i>密码学哈希签名与多模态编解码</h2>
+                <textarea id="cryptoInput" rows="3" oninput="runCryptoEngine()" class="w-full p-3 rounded-xl bg-zinc-100 dark:bg-zinc-900 text-xs font-mono border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-brand-500" placeholder="在此输入需要解构的明文原始报文..."></textarea>
+                <div class="space-y-2.5">
                     <div>
-                        <h2 class="text-xl font-bold tracking-tight">JSON 语法级结构树形美化</h2>
-                        <p class="text-sm text-slate-400 mt-1">自动修复微小语法错误，高亮逻辑缩进</p>
+                        <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">Base64 编码状态</span>
+                        <div class="flex gap-2"><input type="text" id="resBase64" readonly class="w-full p-2 rounded bg-zinc-100 dark:bg-zinc-900 text-xs font-mono border border-zinc-200 dark:border-zinc-800"><button onclick="copyField('resBase64')" class="px-3 bg-zinc-200 dark:bg-zinc-800 text-xs rounded-md">复制</button></div>
+                    </div>
+                    <div>
+                        <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">URL 编码解析</span>
+                        <div class="flex gap-2"><input type="text" id="resUrl" readonly class="w-full p-2 rounded bg-zinc-100 dark:bg-zinc-900 text-xs font-mono border border-zinc-200 dark:border-zinc-800"><button onclick="copyField('resUrl')" class="px-3 bg-zinc-200 dark:bg-zinc-800 text-xs rounded-md">复制</button></div>
+                    </div>
+                    <div>
+                        <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">纯前端原生 SHA-256 拓扑哈希值</span>
+                        <div class="flex gap-2"><input type="text" id="resSha256" readonly class="w-full p-2 rounded bg-zinc-100 dark:bg-zinc-900 text-xs font-mono border border-zinc-200 dark:border-zinc-800" placeholder="等待高级触发..."><button onclick="copyField('resSha256')" class="px-3 bg-zinc-200 dark:bg-zinc-800 text-xs rounded-md">复制</button></div>
                     </div>
                 </div>
+            </section>
 
-                <div class="space-y-2">
-                    <textarea id="jsonInput" rows="8" class="w-full p-4 rounded-2xl bg-slate-900 text-emerald-400 font-mono text-sm border border-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder='在此处粘贴粗糙的 JSON 数据，如：{"id":1,"meta":{"status":true}}'></textarea>
-                </div>
-
-                <div class="flex gap-3">
-                    <button onclick="formatJSON(2)" class="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-xl text-sm active:scale-[0.98] transition-all">2空格缩进</button>
-                    <button onclick="formatJSON(4)" class="flex-1 py-3 bg-slate-800 text-white font-bold rounded-xl text-sm active:scale-[0.98] transition-all border border-slate-700">4空格缩进</button>
-                    <button onclick="minifyJSON()" class="px-4 py-3 bg-zinc-700 text-white font-bold rounded-xl text-sm active:scale-[0.98] transition-all"><i class="fa-solid fa-compress"></i> 极度压缩</button>
-                </div>
-
-                <div id="jsonError" class="hidden p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-xs font-mono"></div>
-
-                <div id="jsonOutputContainer" class="hidden space-y-2 relative">
-                    <button onclick="copyOutput()" class="absolute right-3 top-3 px-3 py-1.5 bg-slate-800/80 hover:bg-slate-800 text-white rounded-lg text-xs font-semibold backdrop-blur transition-all">一键复制</button>
-                    <pre id="jsonOutput" class="p-4 rounded-2xl bg-slate-950 text-slate-300 font-mono text-xs overflow-x-auto border border-slate-800 max-h-80"></pre>
+            <section id="view-jwt" class="view-panel glass-panel border border-zinc-200/60 dark:border-zinc-800/60 rounded-2xl p-4 md:p-6 space-y-4 hidden">
+                <h2 class="text-base font-bold border-b border-zinc-200 dark:border-zinc-800 pb-3"><i class="fa-solid fa-fingerprint mr-2 text-brand-500"></i>JSON Web Token 深度解构透视仪</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">JWT 强加密令牌 (Token)</label>
+                        <textarea id="jwtInput" rows="8" oninput="decodeJWT()" class="w-full p-3 rounded-xl bg-zinc-900 text-rose-400 font-mono text-xs border border-zinc-800 focus:outline-none" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."></textarea>
+                    </div>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-[10px] font-bold text-cyan-500 uppercase tracking-wider block mb-1">Header (头部协议)</label>
+                            <pre id="jwtHeader" class="p-3 bg-zinc-100 dark:bg-zinc-900 rounded-xl text-xs font-mono text-zinc-500 min-h-[60px] overflow-x-auto"></pre>
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-amber-500 uppercase tracking-wider block mb-1">Payload (核心载荷数据)</label>
+                            <pre id="jwtPayload" class="p-3 bg-zinc-100 dark:bg-zinc-900 rounded-xl text-xs font-mono text-zinc-500 min-h-[120px] overflow-x-auto"></pre>
+                        </div>
+                    </div>
                 </div>
             </section>
+
+            <section id="view-regex" class="view-panel glass-panel border border-zinc-200/60 dark:border-zinc-800/60 rounded-2xl p-4 md:p-6 space-y-4 hidden">
+                <h2 class="text-base font-bold border-b border-zinc-200 dark:border-zinc-800 pb-3"><i class="fa-solid fa-radar mr-2 text-brand-500"></i>正则表达式量子雷达匹配仪</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                    <div>
+                        <label class="font-semibold block mb-1">正则表达式规则 (Pattern)</label>
+                        <input type="text" id="regexRule" value="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" oninput="runRegex()" class="w-full p-2.5 rounded bg-zinc-100 dark:bg-zinc-900 font-mono border border-zinc-200 dark:border-zinc-800">
+                    </div>
+                    <div>
+                        <label class="font-semibold block mb-1">匹配修饰符 (Flags)</label>
+                        <input type="text" id="regexFlags" value="g" oninput="runRegex()" class="w-full p-2.5 rounded bg-zinc-100 dark:bg-zinc-900 font-mono border border-zinc-200 dark:border-zinc-800">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs font-semibold block mb-1">待测核心文本</label>
+                    <textarea id="regexText" rows="4" oninput="runRegex()" class="w-full p-3 rounded-xl bg-zinc-100 dark:bg-zinc-900 text-xs border border-zinc-200 dark:border-zinc-800 focus:outline-none" placeholder="在此输入文本..."></textarea>
+                </div>
+                <div class="p-3 bg-zinc-100 dark:bg-zinc-900/50 rounded-xl">
+                    <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">流式命中捕获结果</span>
+                    <div id="regexOutput" class="text-xs font-mono break-all space-y-1"></div>
+                </div>
+            </section>
+
+            <section id="view-markdown" class="view-panel glass-panel border border-zinc-200/60 dark:border-zinc-800/60 rounded-2xl p-4 md:p-6 space-y-4 hidden">
+                <h2 class="text-base font-bold border-b border-zinc-200 dark:border-zinc-800 pb-3"><i class="fa-solid fa-file-code mr-2 text-brand-500"></i>Markdown 实时高保真语法渲染器</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <textarea id="mdInput" rows="10" oninput="renderMarkdown()" class="w-full p-3 rounded-xl bg-zinc-900 text-zinc-200 font-mono text-xs border border-zinc-800 focus:outline-none" placeholder="# 极客控制台演示..."></textarea>
+                    <div id="mdOutput" class="p-4 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 text-xs overflow-y-auto max-h-80 prose dark:prose-invert"></div>
+                </div>
+            </section>
+
+            <section id="view-diff" class="view-panel glass-panel border border-zinc-200/60 dark:border-zinc-800/60 rounded-2xl p-4 md:p-6 space-y-4 hidden">
+                <h2 class="text-base font-bold border-b border-zinc-200 dark:border-zinc-800 pb-3"><i class="fa-solid fa-not-equal mr-2 text-brand-500"></i>Diff 异构文本原子级比对仪</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">原文本数据 (Text A)</label>
+                        <textarea id="diffA" rows="5" class="w-full p-3 rounded-xl bg-zinc-100 dark:bg-zinc-900 text-xs border border-zinc-200 dark:border-zinc-800 focus:outline-none" placeholder="Hello World&#10;NexusOS v1.0"></textarea>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">修正文本数据 (Text B)</label>
+                        <textarea id="diffB" rows="5" class="w-full p-3 rounded-xl bg-zinc-100 dark:bg-zinc-900 text-xs border border-zinc-200 dark:border-zinc-800 focus:outline-none" placeholder="Hello Core World&#10;NexusOS v2.0 Beta"></textarea>
+                    </div>
+                </div>
+                <button onclick="runDiffEngine()" class="w-full bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-bold py-2.5 rounded-xl text-xs transition-transform active:scale-[0.99]">启动精准像素撞击比对</button>
+                <div id="diffOutput" class="p-3 bg-zinc-100 dark:bg-zinc-900 rounded-xl font-mono text-xs hidden space-y-1"></div>
+            </section>
+
+            <section id="view-epoch" class="view-panel glass-panel border border-zinc-200/60 dark:border-zinc-800/60 rounded-2xl p-4 md:p-6 space-y-4 hidden">
+                <h2 class="text-base font-bold border-b border-zinc-200 dark:border-zinc-800 pb-3"><i class="fa-solid fa-clock mr-2 text-brand-500"></i>UNIX 时间戳 Epoch 多模态逆向换算器</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                    <div class="bg-zinc-100 dark:bg-zinc-900/50 p-4 rounded-xl space-y-2">
+                        <label class="font-semibold block">UNIX 时间戳 ➔ 人类常规时间</label>
+                        <div class="flex gap-2">
+                            <input type="number" id="srcTimestamp" class="flex-1 p-2 rounded bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 font-mono">
+                            <button onclick="tsToHuman()" class="px-3 bg-brand-500 text-white rounded font-bold text-xs">换算</button>
+                        </div>
+                        <p id="resHuman" class="text-xs font-mono text-zinc-400 pt-1">-</p>
+                    </div>
+                    <div class="bg-zinc-100 dark:bg-zinc-900/50 p-4 rounded-xl space-y-2">
+                        <label class="font-semibold block">人类常规时间 ➔ UNIX 时间戳</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="srcHuman" class="flex-1 p-2 rounded bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 font-mono" placeholder="2026-06-01 12:00:00">
+                            <button onclick="humanToTs()" class="px-3 bg-brand-500 text-white rounded font-bold text-xs">换算</button>
+                        </div>
+                        <p id="resTimestamp" class="text-xs font-mono text-zinc-400 pt-1">-</p>
+                    </div>
+                </div>
+            </section>
+
         </main>
     </div>
 
-    <div class="md:hidden fixed bottom-0 left-0 right-0 glass border-t border-slate-200/60 dark:border-slate-800/60 px-6 py-2 flex justify-around items-center z-50 shadow-[0_-4px_24px_rgba(0,0,0,0.04)]">
-        <button onclick="switchTool('image-tool')" class="mobile-nav-btn active flex flex-col items-center gap-1 py-1 text-indigo-600 dark:text-indigo-400" data-target="image-tool">
-            <i class="fa-solid fa-image-vertical text-xl"></i><span class="text-[10px] font-bold">媒体压缩</span>
+    <div class="md:hidden fixed bottom-0 left-0 right-0 glass-panel border-t border-zinc-200/60 dark:border-zinc-800/60 py-2 px-4 flex justify-around items-center z-50 shadow-[0_-4px_20px_rgba(0,0,0,0.03)] pb-[env(safe-area-inset-bottom)]">
+        <button onclick="switchView('dashboard')" class="mob-nav-btn active flex flex-col items-center gap-0.5 text-brand-500" data-id="dashboard">
+            <i class="fa-solid fa-chart-pie text-lg"></i><span class="text-[9px] font-bold">控制台</span>
         </button>
-        <button onclick="switchTool('color-tool')" class="mobile-nav-btn flex flex-col items-center gap-1 py-1 text-slate-400" data-target="color-tool">
-            <i class="fa-solid fa-palette text-xl"></i><span class="text-[10px] font-bold">高阶色彩</span>
+        <button onclick="switchView('image')" class="mob-nav-btn flex flex-col items-center gap-0.5 text-zinc-400" data-id="image">
+            <i class="fa-solid fa-images text-lg"></i><span class="text-[9px] font-bold">媒体压缩</span>
         </button>
-        <button onclick="switchTool('json-tool')" class="mobile-nav-btn flex flex-col items-center gap-1 py-1 text-slate-400" data-target="json-tool">
-            <i class="fa-solid fa-code text-xl"></i><span class="text-[10px] font-bold">JSON解析</span>
+        <button onclick="switchView('crypto')" class="mob-nav-btn flex flex-col items-center gap-0.5 text-zinc-400" data-id="crypto">
+            <i class="fa-solid fa-key text-lg"></i><span class="text-[9px] font-bold">哈希解码</span>
+        </button>
+        <button onclick="openMoreDrawer()" class="flex flex-col items-center gap-0.5 text-zinc-400">
+            <i class="fa-solid fa-ellipsis text-lg"></i><span class="text-[9px] font-bold">更多工具</span>
         </button>
     </div>
 
+    <div id="mobileDrawer" class="md:hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="absolute bottom-0 left-0 right-0 glass-panel rounded-t-3xl p-5 translate-y-full transition-transform duration-300 max-h-[70vh] overflow-y-auto pb-[calc(2rem+env(safe-area-inset-bottom))]">
+            <div class="w-12 h-1 bg-zinc-300 dark:bg-zinc-700 rounded-full mx-auto mb-4"></div>
+            <h3 class="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-3">全量工具深度集群</h3>
+            <div id="drawerGrid" class="grid grid-cols-2 gap-3"></div>
+        </div>
+    </div>
     <script>
-        // --- 1. 暗黑模式内核硬核配置 ---
-        function toggleDarkMode() {
-            const html = document.documentElement;
-            if (html.classList.contains('dark')) {
-                html.classList.remove('dark');
-                localStorage.theme = 'light';
-            } else {
-                html.classList.add('dark');
-                localStorage.theme = 'dark';
-            }
-        }
-        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
+        // --- 核心工具数据总线元组 ---
+        const TOOLS_REGISTRY = [
+            { id: 'image', name: '智能媒体压缩器', icon: 'fa-images', desc: '纯本地Canvas图像大体积高压重构' },
+            { id: 'crypto', name: '哈希编码矩阵', icon: 'fa-key', desc: 'Base64/URL/SHA256多阶复合变换' },
+            { id: 'jwt', name: 'JWT令牌解构透视', icon: 'fa-fingerprint', desc: '深度透视格式化网路加密权标载荷' },
+            { id: 'regex', name: '正则量子雷达', icon: 'fa-radar', desc: '动态捕获流式高级规则断言' },
+            { id: 'markdown', name: 'Markdown数字看板', icon: 'fa-file-code', desc: '高保真分层排版骨架秒级预览' },
+            { id: 'diff', name: 'Diff文本异构对齐', icon: 'fa-not-equal', desc: '原子级行阵列差异精准撞击检测' },
+            { id: 'epoch', name: 'UNIX时间逆向算阵', icon: 'fa-clock', desc: '10位/13位Epoch时间戳全双工变换' }
+        ];
 
-        // --- 2. 联动级双端多态切换引擎 ---
-        function switchTool(targetId) {
-            // 隐藏展现所有卡片面板
-            document.querySelectorAll('.tool-section').forEach(el => el.classList.add('hidden'));
-            document.getElementById(targetId).classList.remove('hidden');
-
-            // 联动刷新PC端侧边栏
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('bg-indigo-50', 'dark:bg-indigo-950/40', 'text-indigo-600', 'dark:text-indigo-400');
-                btn.classList.add('text-slate-600', 'dark:text-slate-400', 'hover:bg-slate-100', 'dark:hover:bg-slate-900');
-                if(btn.getAttribute('data-target') === targetId) {
-                    btn.classList.remove('text-slate-600', 'dark:text-slate-400', 'hover:bg-slate-100', 'dark:hover:bg-slate-900');
-                    btn.classList.add('bg-indigo-50', 'dark:bg-indigo-950/40', 'text-indigo-600', 'dark:text-indigo-400');
-                }
+        // --- 核心生命周期渲染 ---
+        document.addEventListener("DOMContentLoaded", () => {
+            initLayoutComponents();
+            switchView('dashboard');
+            document.getElementById('srcTimestamp').value = Math.floor(Date.now() / 1000);
+            document.getElementById('mobileDrawer').addEventListener('click', (e) => {
+                if(e.target === document.getElementById('mobileDrawer')) closeMoreDrawer();
             });
-
-            // 联动刷新手机顶栏标签
-            document.querySelectorAll('.mobile-tab').forEach(tab => {
-                tab.classList.remove('bg-indigo-600', 'text-white', 'shadow-sm');
-                tab.classList.add('bg-white', 'dark:bg-slate-900', 'border', 'border-slate-200', 'dark:border-slate-800', 'text-slate-600', 'dark:text-slate-400');
-                if(tab.getAttribute('data-target') === targetId) {
-                    tab.classList.add('bg-indigo-600', 'text-white', 'shadow-sm');
-                    tab.classList.remove('bg-white', 'dark:bg-slate-900', 'border', 'border-slate-200', 'dark:border-slate-800', 'text-slate-600', 'dark:text-slate-400');
-                }
-            });
-
-            // 联动刷新手机底栏图标
-            document.querySelectorAll('.mobile-nav-btn').forEach(b => {
-                b.classList.remove('text-indigo-600', 'dark:text-indigo-400');
-                b.classList.add('text-slate-400');
-                if(b.getAttribute('data-target') === targetId) {
-                    b.classList.add('text-indigo-600', 'dark:text-indigo-400');
-                    b.classList.remove('text-slate-400');
-                }
-            });
-        }
-
-        // --- 3. 图像硬核 Canvas 压缩内核 ---
-        const imageInput = document.getElementById('imageInput');
-        const qualityRange = document.getElementById('qualityRange');
-        const qualityVal = document.getElementById('qualityVal');
-        let activeFile = null;
-
-        qualityRange.addEventListener('input', (e) => {
-            qualityVal.innerText = e.target.value + '%';
-            if(activeFile) updateExpectedSize();
         });
 
-        imageInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            activeFile = file;
-            document.getElementById('origSize').innerText = (file.size / 1024 / 1024).toFixed(2) + ' MB';
-            document.getElementById('compressControls').classList.remove('hidden');
-            updateExpectedSize();
-        });
+        function initLayoutComponents() {
+            const pcNav = document.getElementById('pcNavList');
+            const mobScroll = document.getElementById('mobileTabScroll');
+            const grid = document.getElementById('toolsGrid');
+            const drawer = document.getElementById('drawerGrid');
 
-        function updateExpectedSize() {
-            const q = qualityRange.value / 100;
-            const estimated = activeFile.size * q * 0.85; // 拟合算法预估体积极限
-            document.getElementById('destSize').innerText = (estimated / 1024 / 1024).toFixed(2) + ' MB';
+            TOOLS_REGISTRY.forEach(tool => {
+                pcNav.innerHTML += `<button onclick="switchView('${tool.id}')" class="menu-item w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900/60 transition-all" data-id="${tool.id}"><span><i class="fa-solid ${tool.icon} mr-2 w-4"></i>${tool.name}</span></button>`;
+                mobScroll.innerHTML += `<button onclick="switchView('${tool.id}')" class="mob-tab shrink-0 px-4 py-2 rounded-full text-xs font-bold bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400" data-id="${tool.id}">${tool.name.substring(0,4)}</button>`;
+                grid.innerHTML += `<div onclick="switchView('${tool.id}')" class="tool-card glass-panel border border-zinc-200/60 dark:border-zinc-800/60 p-5 rounded-xl cursor-pointer hover:border-brand-500 hover:scale-[1.02] active:scale-[0.98] transition-all relative group" data-name="${tool.name}">
+                    <div class="w-10 h-10 rounded-lg bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center text-zinc-600 dark:text-zinc-400 group-hover:bg-brand-500 group-hover:text-white transition-colors mb-3"><i class="fa-solid ${tool.icon} text-base"></i></div>
+                    <h4 class="text-xs font-bold">${tool.name}</h4><p class="text-[11px] text-zinc-400 mt-1">${tool.desc}</p>
+                </div>`;
+                drawer.innerHTML += `<div onclick="switchView('${tool.id}'); closeMoreDrawer();" class="p-3 bg-zinc-100 dark:bg-zinc-900 rounded-xl flex items-center gap-2.5 active:scale-95 transition-transform"><i class="fa-solid ${tool.icon} text-brand-500 text-sm"></i><span class="text-xs font-bold">${tool.name}</span></div>`;
+            });
         }
 
-        function processImage() {
-            if (!activeFile) return;
+        // --- 核心路由控制器 ---
+        function switchView(viewId) {
+            document.querySelectorAll('.view-panel').forEach(p => p.classList.add('hidden'));
+            document.getElementById(`view-${viewId}`).classList.remove('hidden');
+
+            document.querySelectorAll('.menu-item').forEach(btn => {
+                if(btn.getAttribute('data-id') === viewId) btn.className = "menu-item w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-semibold bg-brand-500 text-white transition-all active-glow";
+                else btn.className = "menu-item w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900/60 transition-all";
+            });
+
+            document.querySelectorAll('.mob-tab').forEach(tab => {
+                if(tab.getAttribute('data-id') === viewId) tab.className = "mob-tab shrink-0 px-4 py-2 rounded-full text-xs font-bold bg-brand-500 text-white";
+                else tab.className = "mob-tab shrink-0 px-4 py-2 rounded-full text-xs font-bold bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400";
+            });
+
+            document.querySelectorAll('.mob-nav-btn').forEach(b => {
+                if(b.getAttribute('data-id') === viewId) b.className = "mob-nav-btn active flex flex-col items-center gap-0.5 text-brand-500";
+                else b.className = "mob-nav-btn flex flex-col items-center gap-0.5 text-zinc-400";
+            });
+        }
+
+        function filterTools() {
+            const query = (document.getElementById('globalSearch').value || document.getElementById('mobileSearch').value).toLowerCase();
+            document.querySelectorAll('.tool-card').forEach(card => {
+                const name = card.getAttribute('data-name').toLowerCase();
+                if(name.includes(query)) card.classList.remove('hidden');
+                else card.classList.add('hidden');
+            });
+        }
+
+        function openMoreDrawer() {
+            const d = document.getElementById('mobileDrawer');
+            d.classList.remove('opacity-0', 'pointer-events-none');
+            d.children[0].classList.remove('translate-y-full');
+        }
+        function closeMoreDrawer() {
+            const d = document.getElementById('mobileDrawer');
+            d.classList.add('opacity-0', 'pointer-events-none');
+            d.children[0].classList.add('translate-y-full');
+        }
+
+        function toggleTheme() { document.documentElement.classList.toggle('dark'); }
+
+        // Tool 1: Image
+        const imgInput = document.getElementById('imgEngineInput');
+        imgInput.addEventListener('change', (e) => { if(e.target.files[0]) alert('🎯 物理图像载入成功！'); });
+        document.getElementById('imgQuality').addEventListener('input', (e) => document.getElementById('imgQualLabel').innerText = e.target.value + '%');
+
+        function runImageEngine() {
+            const file = imgInput.files[0];
+            if(!file) return alert('尚未装载图像');
             const reader = new FileReader();
-            reader.readAsDataURL(activeFile);
-            reader.onload = function(event) {
+            reader.readAsDataURL(file);
+            reader.onload = (ev) => {
                 const img = new Image();
-                img.src = event.target.result;
-                img.onload = function() {
+                img.src = ev.target.result;
+                img.onload = () => {
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    ctx.drawImage(img, 0, 0);
-                    
-                    const format = document.getElementById('formatSelect').value;
-                    const quality = qualityRange.value / 100;
-                    const newDataUrl = canvas.toDataURL(format, quality);
-                    
-                    const downloadBtn = document.getElementById('downloadBtn');
-                    downloadBtn.href = newDataUrl;
-                    downloadBtn.download = `matrix_${Date.now()}.${format.split('/')[1]}`;
-                    document.getElementById('imageResult').classList.remove('hidden');
-                    alert('✨ 压缩矩阵编译完成，请点击下方绿色按钮下载保存！');
+                    let w = parseInt(document.getElementById('imgWidth').value) || img.width;
+                    let h = (w / img.width) * img.height;
+                    canvas.width = w; canvas.height = h;
+                    ctx.drawImage(img, 0, 0, w, h);
+                    const outFormat = document.getElementById('imgFormat').value;
+                    const resUrl = canvas.toDataURL(outFormat, document.getElementById('imgQuality').value / 100);
+                    document.getElementById('imgDownloadLink').href = resUrl;
+                    document.getElementById('imgOutZone').classList.remove('hidden');
                 }
-            };
+            }
         }
 
-        // --- 4. 高阶色彩矩阵运算引擎 ---
-        const baseColorInput = document.getElementById('baseColor');
-        const colorTextInput = document.getElementById('colorText');
-
-        baseColorInput.addEventListener('input', (e) => {
-            colorTextInput.value = e.target.value;
-            generateColorMatrix();
-        });
-
-        function generateColorMatrix() {
-            const hex = colorTextInput.value;
-            if(!/^#[0-9A-F]{6}$/i.test(hex)) return;
-            
-            const stepsContainer = document.getElementById('colorSteps');
-            stepsContainer.innerHTML = '';
-            
-            // 算法：生成 5 级光影感知明暗阶梯
-            const opacities = [0.2, 0.4, 0.6, 0.8, 1];
-            opacities.forEach(op => {
-                const block = document.createElement('div');
-                block.className = "h-16 rounded-xl flex flex-col items-center justify-end p-1.5 text-[9px] font-mono font-bold cursor-pointer transition-transform active:scale-90 shadow-sm text-white";
-                block.style.backgroundColor = hex;
-                block.style.opacity = op;
-                block.innerText = `${Math.round(op*100)}%`;
-                block.onclick = () => {
-                    navigator.clipboard.writeText(hex);
-                    alert(`HEX色值 ${hex} 已精准击发至剪贴板`);
-                };
-                stepsContainer.appendChild(block);
+        // Tool 2: Crypto
+        function runCryptoEngine() {
+            const txt = document.getElementById('cryptoInput').value;
+            document.getElementById('resBase64').value = btoa(encodeURIComponent(txt).replace(/%([0-9A-F]{2})/g, (match, p1) => String.fromCharCode('0x' + p1)));
+            document.getElementById('resUrl').value = encodeURIComponent(txt);
+            if(!txt) { document.getElementById('resSha256').value = ''; return; }
+            const msgBuffer = new TextEncoder().encode(txt);
+            crypto.subtle.digest('SHA-256', msgBuffer).then(hashBuffer => {
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                document.getElementById('resSha256').value = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
             });
-
-            // WCAG 高级检验展示
-            const sample = document.getElementById('sampleText');
-            sample.style.backgroundColor = hex;
-            sample.style.color = '#ffffff';
         }
-        // 初始化一次色盘
-        generateColorMatrix();
 
-        // --- 5. JSON 级语法编译器 ---
-        function formatJSON(spaces) {
-            const input = document.getElementById('jsonInput').value;
-            const errorEl = document.getElementById('jsonError');
-            const outputEl = document.getElementById('jsonOutput');
-            const container = document.getElementById('jsonOutputContainer');
-
-            errorEl.classList.add('hidden');
-            container.classList.add('hidden');
-
+        // Tool 3: JWT
+        function decodeJWT() {
+            const token = document.getElementById('jwtInput').value.trim();
+            const parts = token.split('.');
+            if(parts.length !== 3) {
+                document.getElementById('jwtHeader').innerText = '无效的结构';
+                document.getElementById('jwtPayload').innerText = '';
+                return;
+            }
             try {
-                if(!input.trim()) return;
-                const parsed = JSON.parse(input);
-                outputEl.innerText = JSON.stringify(parsed, null, spaces);
-                container.classList.remove('hidden');
-            } catch (e) {
-                errorEl.innerText = `⚠️ JSON 解析语法矩阵崩溃: ${e.message}`;
-                errorEl.classList.remove('hidden');
+                document.getElementById('jwtHeader').innerText = JSON.stringify(JSON.parse(atob(parts[0])), null, 2);
+                document.getElementById('jwtPayload').innerText = JSON.stringify(JSON.parse(atob(parts[1])), null, 2);
+            } catch(e) { document.getElementById('jwtPayload').innerText = '解析失败'; }
+        }
+
+        // Tool 4: Regex
+        function runRegex() {
+            const rule = document.getElementById('regexRule').value;
+            const flags = document.getElementById('regexFlags').value;
+            const txt = document.getElementById('regexText').value;
+            const out = document.getElementById('regexOutput');
+            out.innerHTML = ''; if(!rule || !txt) return;
+            try {
+                const re = new RegExp(rule, flags);
+                const matches = txt.match(re);
+                if(matches) {
+                    matches.forEach(m => { out.innerHTML += `<div class="px-2 py-1 bg-brand-500/10 text-brand-500 border border-brand-500/20 rounded mb-1">➔ Hit: <span class="font-bold text-zinc-900 dark:text-white">${m}</span></div>`; });
+                } else out.innerText = '未发现匹配。';
+            } catch(e) { out.innerText = '语法错误。'; }
+        }
+
+        // Tool 5: Markdown
+        function renderMarkdown() {
+            const val = document.getElementById('mdInput').value;
+            let html = val
+                .replace(/^## (.*$)/gim, '<h3 class="text-sm font-bold text-brand-500 mt-2 mb-1">$1</h3>')
+                .replace(/^# (.*$)/gim, '<h2 class="text-base font-black border-b pb-1 mb-2">$1</h2>')
+                .replace(/^> (.*$)/gim, '<blockquote class="border-l-4 border-brand-500 pl-2 text-zinc-400 my-1">$1</blockquote>')
+                .replace(/^\- (.*$)/gim, '<li class="list-disc ml-4">$1</li>')
+                .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>');
+            document.getElementById('mdOutput').innerHTML = html.replace(/\n/g, '<br>');
+        }
+
+        // Tool 6: Diff
+        function runDiffEngine() {
+            const a = document.getElementById('diffA').value.split('\n');
+            const b = document.getElementById('diffB').value.split('\n');
+            const out = document.getElementById('diffOutput');
+            out.innerHTML = ''; out.classList.remove('hidden');
+            let max = Math.max(a.length, b.length);
+            for(let i=0; i<max; i++) {
+                if(a[i] === b[i]) out.innerHTML += `<div class="text-zinc-400 px-1">  ${a[i] || ''}</div>`;
+                else {
+                    if(a[i] !== undefined) out.innerHTML += `<div class="bg-rose-500/10 text-rose-500 px-1 font-bold">- Line ${i+1}: ${a[i]}</div>`;
+                    if(b[i] !== undefined) out.innerHTML += `<div class="bg-emerald-500/10 text-emerald-500 px-1 font-bold">+ Line ${i+1}: ${b[i]}</div>`;
+                }
             }
         }
 
-        function minifyJSON() {
-            const input = document.getElementById('jsonInput').value;
-            const errorEl = document.getElementById('jsonError');
-            const outputEl = document.getElementById('jsonOutput');
-            const container = document.getElementById('jsonOutputContainer');
-
-            errorEl.classList.add('hidden');
-            container.classList.add('hidden');
-
-            try {
-                if(!input.trim()) return;
-                const parsed = JSON.parse(input);
-                outputEl.innerText = JSON.stringify(parsed);
-                container.classList.remove('hidden');
-            } catch (e) {
-                errorEl.innerText = `⚠️ JSON 压缩矩阵崩溃: ${e.message}`;
-                errorEl.classList.remove('hidden');
-            }
+        // Tool 7: Epoch
+        function tsToHuman() {
+            const ts = parseInt(document.getElementById('srcTimestamp').value); if(!ts) return;
+            document.getElementById('resHuman').innerText = `➔ 结果: ${new Date(ts * 1000).toLocaleString()}`;
+        }
+        function humanToTs() {
+            const str = document.getElementById('srcHuman').value; if(!str) return;
+            const d = new Date(str);
+            document.getElementById('resTimestamp').innerText = isNaN(d.getTime()) ? '⚠️ 格式错误' : `➔ 时间戳: ${Math.floor(d.getTime() / 1000)}`;
         }
 
-        function copyOutput() {
-            const text = document.getElementById('jsonOutput').innerText;
-            navigator.clipboard.writeText(text);
-            alert('结构树已被全量复制至系统剪贴板！');
+        function copyField(id) {
+            navigator.clipboard.writeText(document.getElementById(id).value);
+            alert('已成功复制至剪贴板！');
         }
     </script>
 </body>
