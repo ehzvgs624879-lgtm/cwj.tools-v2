@@ -170,3 +170,71 @@ document.querySelector(".search-center")?.addEventListener("keydown",e=>{
 });
 
 console.log("CWJ TOOLS V10.6 已启动");
+// 当前工具
+let currentTool = "password";
+let lastResult = "";
+
+// 工具切换
+document.querySelectorAll(".tool-item").forEach(item=>{
+
+    item.onclick = ()=>{
+
+        document.querySelectorAll(".tool-item")
+        .forEach(i=>i.classList.remove("active"));
+
+        item.classList.add("active");
+
+        currentTool = item.dataset.tool;
+
+        document.getElementById("toolTitle").innerText =
+        item.innerText;
+
+        document.getElementById("toolInput").value = "";
+
+        document.getElementById("toolResult").innerText =
+        "等待执行...";
+
+    };
+
+});
+
+// 执行工具
+document.getElementById("runTool").onclick = ()=>{
+
+    const input = document.getElementById("toolInput").value;
+
+    let result = "";
+
+    if(currentTool === "password"){
+        result = generatePassword();
+    }
+
+    if(currentTool === "uuid"){
+        result = generateUUID();
+    }
+
+    if(currentTool === "base64"){
+        result = btoa(unescape(encodeURIComponent(input || "")));
+    }
+
+    if(currentTool === "json"){
+        try{
+            result = JSON.stringify(JSON.parse(input),null,4);
+        }catch(e){
+            result = "JSON格式错误";
+        }
+    }
+
+    lastResult = result;
+
+    document.getElementById("toolResult").innerText = result;
+
+    toast("执行成功");
+
+};
+
+// 复制结果
+function 复制工具结果(){
+    navigator.clipboard.writeText(lastResult);
+    toast("已复制结果");
+}
