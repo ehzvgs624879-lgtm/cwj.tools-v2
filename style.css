@@ -384,3 +384,87 @@ height:400px;
 }
 
 }
+@media (max-width: 768px) {
+
+    /* 整体改为上下结构 */
+    .app{
+        flex-direction: column;
+    }
+
+    /* sidebar 变成顶部横向栏 */
+    .sidebar{
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 12px;
+        overflow-x: auto;
+    }
+
+    /* logo缩小 */
+    .logo{
+        font-size: 14px;
+        gap: 6px;
+        white-space: nowrap;
+    }
+
+    /* 导航变横向 */
+    .sidebar nav{
+        flex-direction: row;
+        gap: 8px;
+    }
+
+    .nav-btn{
+        font-size: 12px;
+        padding: 8px 10px;
+        border-radius: 10px;
+        white-space: nowrap;
+    }
+
+    /* 主区域 */
+    .main{
+        height: calc(100vh - 60px);
+    }
+
+    /* 顶部栏缩小 */
+    .topbar{
+        padding: 10px;
+        height: auto;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .search-box{
+        width: 100%;
+    }
+
+    /* 卡片变单列 */
+    .grid{
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    /* hero 缩小 */
+    .hero-card h1{
+        font-size: 24px;
+    }
+
+    .hero-card{
+        padding: 20px;
+    }
+
+    /* chat 高度优化 */
+    .chat-box{
+        height: 55vh;
+    }
+
+    .chat-input{
+        flex-direction: column;
+    }
+
+    .chat-input button{
+        width: 100%;
+    }
+
+}
