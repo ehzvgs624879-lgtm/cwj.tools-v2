@@ -4,151 +4,112 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-<title>CWJ 工具箱 V10.7</title>
+<title>CWJ Tools V11</title>
 
 <link rel="stylesheet" href="style.css">
 
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/js/all.min.js"></script>
 </head>
 
 <body>
 
 <div class="app">
 
-    <!-- 左侧导航 -->
-    <aside class="sidebar">
+<!-- SIDEBAR -->
+<aside class="sidebar">
 
-        <div class="logo">
-            <div class="logo-circle"></div>
-            <span>CWJ 工具箱</span>
-        </div>
+    <div class="logo">CWJ TOOLS</div>
 
-        <nav>
+    <button class="nav-btn active" data-page="dashboard">控制台</button>
+    <button class="nav-btn" data-page="tools">工具中心</button>
+    <button class="nav-btn" data-page="ai">AI聊天</button>
+    <button class="nav-btn" data-page="files">文件中心</button>
+    <button class="nav-btn" data-page="search">搜索</button>
+    <button class="nav-btn" data-page="dev">开发工具</button>
 
-            <button class="nav-btn active" data-page="dashboard">控制台</button>
-            <button class="nav-btn" data-page="ai">AI工作台</button>
-            <button class="nav-btn" data-page="tools">工具中心</button>
-            <button class="nav-btn" data-page="files">文件中心</button>
-            <button class="nav-btn" data-page="search">搜索中心</button>
-            <button class="nav-btn" data-page="developer">开发工具</button>
+</aside>
 
-        </nav>
+<!-- MAIN -->
+<main class="main">
 
-    </aside>
+<!-- DASHBOARD -->
+<section class="page active" id="dashboard">
+    <h1>🚀 CWJ Tools V11</h1>
+    <p>稳定重构版本</p>
+</section>
 
-    <!-- 主体 -->
-    <main class="main">
+<!-- TOOLS -->
+<section class="page" id="tools">
 
-        <!-- 顶部 -->
-        <header class="topbar">
-            <input class="search-box" placeholder="搜索工具..." />
-            <div class="status">🟢 系统在线</div>
-        </header>
+<div class="tool-layout">
 
-        <!-- 控制台 -->
-        <section class="page active" id="dashboard">
+    <div class="tool-list">
 
-            <div class="hero-card">
-                <h1>CWJ 工具箱 V10.7</h1>
-                <p>AI + 工具 + 开发者平台</p>
-            </div>
+        <div class="tool-item active" data-tool="password">🔐 密码生成</div>
+        <div class="tool-item" data-tool="uuid">🆔 UUID生成</div>
+        <div class="tool-item" data-tool="base64">🔤 Base64</div>
+        <div class="tool-item" data-tool="json">📦 JSON格式化</div>
 
-        </section>
+    </div>
 
-        <!-- AI -->
-        <section class="page" id="ai">
+    <div class="tool-center">
 
-            <div class="panel">
+        <h2 id="toolTitle">密码生成</h2>
 
-                <h2>AI工作台</h2>
+        <textarea id="toolInput" placeholder="输入内容..."></textarea>
 
-                <div class="chat-box" id="chatBox"></div>
+        <button id="runTool">运行工具</button>
 
-                <input id="userInput" placeholder="输入内容..." />
-                <button id="sendBtn">发送</button>
+    </div>
 
-            </div>
+    <div class="tool-output">
 
-        </section>
+        <h3>输出</h3>
 
-        <!-- ================= TOOL SYSTEM ================= -->
-        <section class="page" id="tools">
+        <pre id="toolResult">等待执行...</pre>
 
-            <div class="tool-layout">
+        <button onclick="copyResult()">复制</button>
 
-                <!-- 左侧 -->
-                <div class="tool-list">
-
-                    <div class="tool-item active" data-tool="password">🔐 密码生成器</div>
-                    <div class="tool-item" data-tool="uuid">🆔 UUID生成器</div>
-                    <div class="tool-item" data-tool="base64">🔤 Base64工具</div>
-                    <div class="tool-item" data-tool="json">📦 JSON格式化</div>
-
-                </div>
-
-                <!-- 中间 -->
-                <div class="tool-center">
-
-                    <h2 id="toolTitle">密码生成器</h2>
-
-                    <textarea id="toolInput" placeholder="请输入内容..."></textarea>
-
-                    <button id="runTool">运行工具</button>
-
-                </div>
-
-                <!-- 右侧 -->
-                <div class="tool-output">
-
-                    <h3>输出结果</h3>
-
-                    <pre id="toolResult">等待执行...</pre>
-
-                    <button onclick="复制工具结果()">复制结果</button>
-
-                </div>
-
-            </div>
-
-        </section>
-
-        <!-- 文件 -->
-        <section class="page" id="files">
-            <div class="grid">
-                <div class="card">PDF工具</div>
-                <div class="card">图片工具</div>
-                <div class="card">OCR识别</div>
-            </div>
-        </section>
-
-        <!-- 搜索 -->
-        <section class="page" id="search">
-
-            <div class="panel">
-                <h2>搜索中心</h2>
-                <input class="search-center" placeholder="搜索关键词..." />
-            </div>
-
-        </section>
-
-        <!-- 开发 -->
-        <section class="page" id="developer">
-
-            <div class="grid">
-                <div class="card">API测试</div>
-                <div class="card">Base64</div>
-                <div class="card">JWT解析</div>
-            </div>
-
-        </section>
-
-    </main>
+    </div>
 
 </div>
 
-<!-- JS -->
+</section>
+
+<!-- AI -->
+<section class="page" id="ai">
+
+    <div class="ai-box">
+
+        <div id="chatBox"></div>
+
+        <input id="userInput" placeholder="输入..." />
+        <button id="sendBtn">发送</button>
+
+    </div>
+
+</section>
+
+<!-- FILES -->
+<section class="page" id="files">
+    <h2>文件中心</h2>
+</section>
+
+<!-- SEARCH -->
+<section class="page" id="search">
+    <input class="search-center" placeholder="搜索..." />
+</section>
+
+<!-- DEV -->
+<section class="page" id="dev">
+    <h2>开发工具</h2>
+</section>
+
+</main>
+
+</div>
+
 <script src="app.js"></script>
 
 </body>
