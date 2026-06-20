@@ -350,7 +350,7 @@ async function sendAI(){
   input.value='';box.scrollTop=box.scrollHeight;
   isAiLoading=true;
   try{
-    const res = await fetch('https://dawn-king-2fdc.ehzvgs624879.workers.dev/', {
+    const res = await fetch('https://api.cwj-tools.xyz/', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
