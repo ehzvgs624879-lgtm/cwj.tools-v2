@@ -9,59 +9,43 @@
 body{background:#020b18;color:#e0f0ff;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;overflow-x:hidden;}
 canvas#bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;}
 .wrapper{position:relative;z-index:1;}
-
-/* 顶部导航 */
 header{padding:20px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(0,180,255,0.15);backdrop-filter:blur(10px);position:sticky;top:0;z-index:100;background:rgba(2,11,24,0.8);}
 .logo{font-size:22px;font-weight:700;letter-spacing:2px;color:#fff;text-shadow:0 0 20px rgba(0,180,255,0.8);}
 .logo span{color:#00b4ff;}
 nav{display:flex;gap:16px;}
 nav a{color:rgba(200,230,255,0.7);text-decoration:none;font-size:13px;letter-spacing:1px;transition:color .3s;}
 nav a:hover{color:#00b4ff;}
-
-/* 英雄区 */
 .hero{text-align:center;padding:60px 24px 40px;}
 .hero h1{font-size:clamp(28px,6vw,52px);font-weight:800;letter-spacing:3px;line-height:1.2;margin-bottom:16px;}
 .hero h1 .glow{color:#00b4ff;text-shadow:0 0 30px rgba(0,180,255,0.9),0 0 60px rgba(0,180,255,0.4);}
 .hero p{color:rgba(180,220,255,0.6);font-size:15px;letter-spacing:1px;}
-
-/* 分类标签 */
 .tabs{display:flex;gap:10px;padding:0 20px 24px;overflow-x:auto;scrollbar-width:none;}
 .tabs::-webkit-scrollbar{display:none;}
 .tab{padding:8px 20px;border-radius:20px;border:1px solid rgba(0,180,255,0.3);background:rgba(0,180,255,0.05);color:rgba(200,230,255,0.7);font-size:13px;cursor:pointer;white-space:nowrap;transition:all .3s;}
 .tab.active,.tab:hover{background:rgba(0,180,255,0.15);border-color:#00b4ff;color:#00b4ff;box-shadow:0 0 15px rgba(0,180,255,0.2);}
-
-/* 工具网格 */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;padding:0 20px 40px;}
 .card{background:rgba(0,30,60,0.6);border:1px solid rgba(0,180,255,0.15);border-radius:16px;padding:20px 16px;cursor:pointer;transition:all .3s;backdrop-filter:blur(8px);text-align:center;}
 .card:hover,.card:active{border-color:rgba(0,180,255,0.6);background:rgba(0,60,120,0.4);box-shadow:0 0 25px rgba(0,180,255,0.2);transform:translateY(-3px);}
 .card-icon{font-size:32px;margin-bottom:10px;filter:drop-shadow(0 0 8px rgba(0,180,255,0.6));}
 .card-name{font-size:13px;font-weight:600;color:#e0f0ff;letter-spacing:0.5px;}
 .card-desc{font-size:11px;color:rgba(150,200,255,0.5);margin-top:4px;}
-</style>
-/* 工具面板 */
 .panel-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);}
 .panel-overlay.show{display:flex;}
 .panel{background:linear-gradient(135deg,rgba(2,20,45,0.98),rgba(0,10,30,0.98));border:1px solid rgba(0,180,255,0.3);border-radius:24px 24px 0 0;width:100%;max-width:600px;max-height:85vh;overflow-y:auto;padding:24px;box-shadow:0 -10px 60px rgba(0,180,255,0.15);}
 .panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
 .panel-title{font-size:18px;font-weight:700;color:#00b4ff;text-shadow:0 0 15px rgba(0,180,255,0.5);}
 .panel-close{width:32px;height:32px;border-radius:50%;border:1px solid rgba(0,180,255,0.3);background:transparent;color:#00b4ff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
-
-/* 输入输出 */
 .field{margin-bottom:14px;}
 .field label{display:block;font-size:12px;color:rgba(150,200,255,0.7);margin-bottom:6px;letter-spacing:1px;}
 .field input,.field textarea,.field select{width:100%;background:rgba(0,30,60,0.8);border:1px solid rgba(0,180,255,0.2);border-radius:10px;padding:10px 14px;color:#e0f0ff;font-size:14px;outline:none;transition:border .3s;font-family:inherit;}
 .field input:focus,.field textarea:focus,.field select:focus{border-color:rgba(0,180,255,0.6);box-shadow:0 0 10px rgba(0,180,255,0.1);}
 .field textarea{min-height:80px;resize:vertical;}
 .result-box{background:rgba(0,180,255,0.05);border:1px solid rgba(0,180,255,0.2);border-radius:10px;padding:12px 14px;font-size:13px;color:#7df0ff;word-break:break-all;min-height:44px;font-family:monospace;}
-
-/* 按钮 */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 20px;border-radius:10px;border:none;font-size:14px;font-weight:600;cursor:pointer;transition:all .3s;letter-spacing:0.5px;}
 .btn-primary{background:linear-gradient(135deg,#0066cc,#00b4ff);color:#fff;box-shadow:0 4px 20px rgba(0,180,255,0.3);}
 .btn-primary:hover{box-shadow:0 4px 30px rgba(0,180,255,0.5);transform:translateY(-1px);}
 .btn-ghost{background:transparent;border:1px solid rgba(0,180,255,0.3);color:#00b4ff;}
 .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;}
-
-/* AI面板 */
 .chat-box{background:rgba(0,15,35,0.8);border:1px solid rgba(0,180,255,0.15);border-radius:12px;padding:14px;min-height:200px;max-height:300px;overflow-y:auto;margin-bottom:12px;display:flex;flex-direction:column;gap:10px;}
 .msg{padding:8px 12px;border-radius:10px;font-size:13px;line-height:1.6;max-width:90%;}
 .msg.user{background:rgba(0,100,200,0.3);border:1px solid rgba(0,180,255,0.2);align-self:flex-end;color:#e0f0ff;}
@@ -72,33 +56,23 @@ nav a:hover{color:#00b4ff;}
 <body>
 <canvas id="bg"></canvas>
 <div class="wrapper">
-
 <header>
   <div class="logo">CWJ<span>Tools</span></div>
-  <nav>
-    <a href="#tools">工具</a>
-    <a href="#about">关于</a>
-  </nav>
+  <nav><a href="#tools">工具</a><a href="#about">关于</a></nav>
 </header>
-
 <div class="hero">
   <h1>CWJ <span class="glow">TOOLS</span></h1>
   <p>/ 科技感工具站 · 高效 · 安全 · 极简 /</p>
 </div>
-
 <div class="tabs">
-  <div class="tab active" onclick="filterTools('all')">全部</div>
-  <div class="tab" onclick="filterTools('util')">实用工具</div>
-  <div class="tab" onclick="filterTools('crypto')">加密安全</div>
-  <div class="tab" onclick="filterTools('dev')">开发工具</div>
-  <div class="tab" onclick="filterTools('ai')">AI 助手</div>
+  <div class="tab active" onclick="filterTools('all',event)">全部</div>
+  <div class="tab" onclick="filterTools('util',event)">实用工具</div>
+  <div class="tab" onclick="filterTools('crypto',event)">加密安全</div>
+  <div class="tab" onclick="filterTools('dev',event)">开发工具</div>
+  <div class="tab" onclick="filterTools('ai',event)">AI 助手</div>
 </div>
-
 <div class="grid" id="toolGrid"></div>
-
 </div>
-
-<!-- 工具面板 -->
 <div class="panel-overlay" id="overlay" onclick="closePanel(event)">
 <div class="panel" id="panel">
   <div class="panel-header">
@@ -107,11 +81,8 @@ nav a:hover{color:#00b4ff;}
   </div>
   <div id="panelBody"></div>
 </div>
-</div>
-
-<script>
-// ========== 工具数据 ==========
-const tools = [
+</div><script>
+const tools=[
   {id:'pwd',cat:'util',icon:'🔑',name:'密码生成',desc:'安全随机密码'},
   {id:'qr',cat:'util',icon:'◼',name:'二维码生成',desc:'文字转二维码'},
   {id:'color',cat:'util',icon:'🎨',name:'颜色转换',desc:'HEX/RGB/HSL'},
@@ -119,38 +90,36 @@ const tools = [
   {id:'hash',cat:'crypto',icon:'#',name:'Hash计算',desc:'MD5/SHA系列'},
   {id:'aes',cat:'crypto',icon:'🔒',name:'AES加密',desc:'加密解密文本'},
   {id:'b64',cat:'crypto',icon:'📦',name:'Base64',desc:'编码与解码'},
-  {id:'json',cat:'dev',icon:'{ }',name:'JSON格式化',desc:'美化/压缩JSON'},
+  {id:'json',cat:'dev',icon:'{}',name:'JSON格式化',desc:'美化/压缩JSON'},
   {id:'regex',cat:'dev',icon:'.*',name:'正则测试',desc:'实时匹配测试'},
   {id:'url',cat:'dev',icon:'🔗',name:'URL编解码',desc:'编码/解码URL'},
   {id:'ai',cat:'ai',icon:'✦',name:'AI对话',desc:'DeepSeek驱动'},
 ];
-</script>
-<script>
-// ========== 渲染工具卡片 ==========
+
 function renderTools(cat='all'){
   const grid=document.getElementById('toolGrid');
   grid.innerHTML='';
   tools.filter(t=>cat==='all'||t.cat===cat).forEach(t=>{
     const d=document.createElement('div');
     d.className='card';
-    d.innerHTML=`<div class="card-icon">${t.icon}</div><div class="card-name">${t.name}</div><div class="card-desc">${t.desc}</div>`;
+    d.innerHTML='<div class="card-icon">'+t.icon+'</div><div class="card-name">'+t.name+'</div><div class="card-desc">'+t.desc+'</div>';
     d.onclick=()=>openTool(t.id);
     grid.appendChild(d);
   });
 }
 
-function filterTools(cat){
+function filterTools(cat,e){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  event.target.classList.add('active');
+  if(e)e.target.classList.add('active');
   renderTools(cat);
 }
 
-// ========== 面板开关 ==========
 function openTool(id){
   const t=tools.find(x=>x.id===id);
   document.getElementById('panelTitle').textContent=t.icon+' '+t.name;
   document.getElementById('panelBody').innerHTML=getPanelHTML(id);
   document.getElementById('overlay').classList.add('show');
+  if(id==='ts')initTs();
   if(id==='ai')initChat();
 }
 
@@ -159,116 +128,23 @@ function closePanel(e){
     document.getElementById('overlay').classList.remove('show');
 }
 
-// ========== 各工具面板HTML ==========
 function getPanelHTML(id){
-  switch(id){
-    case 'pwd': return `
-      <div class="field"><label>长度</label><input type="range" id="pwdLen" min="8" max="32" value="16" oninput="genPwd()"><span id="pwdLenVal">16</span></div>
-      <div class="field"><label>选项</label>
-        <label><input type="checkbox" id="pwdUpper" checked> 大写</label>&nbsp;
-        <label><input type="checkbox" id="pwdNum" checked> 数字</label>&nbsp;
-        <label><input type="checkbox" id="pwdSym"> 符号</label>
-      </div>
-      <div class="result-box" id="pwdResult">点击生成</div>
-      <div class="btn-row" style="margin-top:12px">
-        <button class="btn btn-primary" onclick="genPwd()">生成</button>
-        <button class="btn btn-ghost" onclick="copyText('pwdResult')">复制</button>
-      </div>`;
-
-    case 'qr': return `
-      <div class="field"><label>输入文字或链接</label><textarea id="qrInput" placeholder="https://..."></textarea></div>
-      <div style="text-align:center;margin:10px 0"><canvas id="qrCanvas"></canvas></div>
-      <div class="btn-row">
-        <button class="btn btn-primary" onclick="genQR()">生成二维码</button>
-      </div>`;
-
-    case 'color': return `
-      <div class="field"><label>HEX</label><input id="hexIn" placeholder="#00b4ff" oninput="convertColor('hex')"></div>
-      <div class="field"><label>RGB</label><input id="rgbIn" placeholder="0, 180, 255" oninput="convertColor('rgb')"></div>
-      <div class="field"><label>HSL</label><input id="hslIn" placeholder="197, 100%, 50%"></div>
-      <div id="colorPreview" style="height:50px;border-radius:10px;margin-top:8px;border:1px solid rgba(0,180,255,0.2)"></div>`;
-
-    case 'ts': return `
-      <div class="field"><label>当前时间戳</label><div class="result-box" id="tsNow"></div></div>
-      <div class="field"><label>时间戳转日期</label><input id="tsInput" placeholder="1700000000"></div>
-      <div class="result-box" id="tsResult">-</div>
-      <div class="btn-row" style="margin-top:12px">
-        <button class="btn btn-primary" onclick="convertTs()">转换</button>
-        <button class="btn btn-ghost" onclick="copyText('tsResult')">复制</button>
-      </div>`;
-
-    case 'hash': return `
-      <div class="field"><label>输入文本</label><textarea id="hashInput" placeholder="输入内容..."></textarea></div>
-      <div class="field"><label>算法</label><select id="hashAlgo"><option value="SHA-1">SHA-1</option><option value="SHA-256" selected>SHA-256</option><option value="SHA-512">SHA-512</option></select></div>
-      <div class="result-box" id="hashResult">-</div>
-      <div class="btn-row" style="margin-top:12px">
-        <button class="btn btn-primary" onclick="calcHash()">计算</button>
-        <button class="btn btn-ghost" onclick="copyText('hashResult')">复制</button>
-      </div>`;
-
-    case 'aes': return `
-      <div class="field"><label>文本</label><textarea id="aesInput" placeholder="输入内容..."></textarea></div>
-      <div class="field"><label>密钥</label><input id="aesKey" placeholder="输入密钥"></div>
-      <div class="result-box" id="aesResult">-</div>
-      <div class="btn-row" style="margin-top:12px">
-        <button class="btn btn-primary" onclick="aesEncrypt()">加密</button>
-        <button class="btn btn-ghost" onclick="aesDecrypt()">解密</button>
-        <button class="btn btn-ghost" onclick="copyText('aesResult')">复制</button>
-      </div>`;
-
-    case 'b64': return `
-      <div class="field"><label>输入</label><textarea id="b64Input" placeholder="输入内容..."></textarea></div>
-      <div class="result-box" id="b64Result">-</div>
-      <div class="btn-row" style="margin-top:12px">
-        <button class="btn btn-primary" onclick="b64Encode()">编码</button>
-        <button class="btn btn-ghost" onclick="b64Decode()">解码</button>
-        <button class="btn btn-ghost" onclick="copyText('b64Result')">复制</button>
-      </div>`;
-
-    case 'json': return `
-      <div class="field"><label>JSON内容</label><textarea id="jsonInput" placeholder='{"key":"value"}' style="min-height:120px"></textarea></div>
-      <div class="result-box" id="jsonResult" style="white-space:pre;min-height:80px">-</div>
-      <div class="btn-row" style="margin-top:12px">
-        <button class="btn btn-primary" onclick="fmtJson()">格式化</button>
-        <button class="btn btn-ghost" onclick="minJson()">压缩</button>
-        <button class="btn btn-ghost" onclick="copyText('jsonResult')">复制</button>
-      </div>`;
-
-    case 'regex': return `
-      <div class="field"><label>正则表达式</label><input id="regexPat" placeholder="\\d+"></div>
-      <div class="field"><label>测试文本</label><textarea id="regexText" placeholder="输入测试内容..."></textarea></div>
-      <div class="result-box" id="regexResult">-</div>
-      <div class="btn-row" style="margin-top:12px">
-        <button class="btn btn-primary" onclick="testRegex()">测试</button>
-      </div>`;
-
-    case 'url': return `
-      <div class="field"><label>输入</label><textarea id="urlInput" placeholder="输入内容..."></textarea></div>
-      <div class="result-box" id="urlResult">-</div>
-      <div class="btn-row" style="margin-top:12px">
-        <button class="btn btn-primary" onclick="urlEncode()">编码</button>
-        <button class="btn btn-ghost" onclick="urlDecode()">解码</button>
-        <button class="btn btn-ghost" onclick="copyText('urlResult')">复制</button>
-      </div>`;
-
-    case 'ai': return `
-      <div class="chat-box" id="chatBox"></div>
-      <div class="field"><textarea id="aiInput" placeholder="输入问题..." style="min-height:60px"></textarea></div>
-      <div class="field"><label>API Key（存本地）</label><input id="aiKey" type="password" placeholder="sk-..."></div>
-      <div class="btn-row">
-        <button class="btn btn-primary" onclick="sendAI()">发送</button>
-        <button class="btn btn-ghost" onclick="saveKey()">保存Key</button>
-      </div>`;
-
-    default: return '<p>开发中...</p>';
-  }
+  if(id==='pwd')return '<div class="field"><label>长度 <span id="pwdLenVal">16</span></label><input type="range" id="pwdLen" min="8" max="32" value="16" oninput="document.getElementById(\'pwdLenVal\').textContent=this.value"></div><div class="field"><label><input type="checkbox" id="pwdUpper" checked> 大写 &nbsp;<input type="checkbox" id="pwdNum" checked> 数字 &nbsp;<input type="checkbox" id="pwdSym"> 符号</label></div><div class="result-box" id="pwdResult">点击生成</div><div class="btn-row" style="margin-top:12px"><button class="btn btn-primary" onclick="genPwd()">生成</button><button class="btn btn-ghost" onclick="copyText(\'pwdResult\')">复制</button></div>';
+  if(id==='qr')return '<div class="field"><label>输入文字或链接</label><textarea id="qrInput" placeholder="https://..."></textarea></div><div id="qrOut" style="text-align:center;margin:10px 0"></div><div class="btn-row"><button class="btn btn-primary" onclick="genQR()">生成二维码</button></div>';
+  if(id==='color')return '<div class="field"><label>HEX</label><input id="hexIn" placeholder="#00b4ff" oninput="convertColor(\'hex\')"></div><div class="field"><label>RGB</label><input id="rgbIn" placeholder="0, 180, 255" oninput="convertColor(\'rgb\')"></div><div class="field"><label>HSL</label><input id="hslIn" placeholder="197, 100%, 50%" readonly></div><div id="colorPreview" style="height:50px;border-radius:10px;margin-top:8px;border:1px solid rgba(0,180,255,0.2)"></div>';
+  if(id==='ts')return '<div class="field"><label>当前时间戳</label><div class="result-box" id="tsNow">-</div></div><div class="field"><label>时间戳转日期</label><input id="tsInput" placeholder="1700000000"></div><div class="result-box" id="tsResult">-</div><div class="btn-row" style="margin-top:12px"><button class="btn btn-primary" onclick="convertTs()">转换</button><button class="btn btn-ghost" onclick="copyText(\'tsResult\')">复制</button></div>';
+  if(id==='hash')return '<div class="field"><label>输入文本</label><textarea id="hashInput" placeholder="输入内容..."></textarea></div><div class="field"><label>算法</label><select id="hashAlgo"><option value="SHA-1">SHA-1</option><option value="SHA-256" selected>SHA-256</option><option value="SHA-512">SHA-512</option></select></div><div class="result-box" id="hashResult">-</div><div class="btn-row" style="margin-top:12px"><button class="btn btn-primary" onclick="calcHash()">计算</button><button class="btn btn-ghost" onclick="copyText(\'hashResult\')">复制</button></div>';
+  if(id==='aes')return '<div class="field"><label>文本</label><textarea id="aesInput" placeholder="输入内容..."></textarea></div><div class="field"><label>密钥</label><input id="aesKey" placeholder="输入密钥"></div><div class="result-box" id="aesResult">-</div><div class="btn-row" style="margin-top:12px"><button class="btn btn-primary" onclick="aesEncrypt()">加密</button><button class="btn btn-ghost" onclick="aesDecrypt()">解密</button><button class="btn btn-ghost" onclick="copyText(\'aesResult\')">复制</button></div>';
+  if(id==='b64')return '<div class="field"><label>输入</label><textarea id="b64Input" placeholder="输入内容..."></textarea></div><div class="result-box" id="b64Result">-</div><div class="btn-row" style="margin-top:12px"><button class="btn btn-primary" onclick="b64Encode()">编码</button><button class="btn btn-ghost" onclick="b64Decode()">解码</button><button class="btn btn-ghost" onclick="copyText(\'b64Result\')">复制</button></div>';
+  if(id==='json')return '<div class="field"><label>JSON内容</label><textarea id="jsonInput" placeholder=\'{"key":"value"}\' style="min-height:120px"></textarea></div><div class="result-box" id="jsonResult" style="white-space:pre;min-height:80px">-</div><div class="btn-row" style="margin-top:12px"><button class="btn btn-primary" onclick="fmtJson()">格式化</button><button class="btn btn-ghost" onclick="minJson()">压缩</button><button class="btn btn-ghost" onclick="copyText(\'jsonResult\')">复制</button></div>';
+  if(id==='regex')return '<div class="field"><label>正则表达式</label><input id="regexPat" placeholder="\\d+"></div><div class="field"><label>测试文本</label><textarea id="regexText" placeholder="输入测试内容..."></textarea></div><div class="result-box" id="regexResult">-</div><div class="btn-row" style="margin-top:12px"><button class="btn btn-primary" onclick="testRegex()">测试</button></div>';
+  if(id==='url')return '<div class="field"><label>输入</label><textarea id="urlInput" placeholder="输入内容..."></textarea></div><div class="result-box" id="urlResult">-</div><div class="btn-row" style="margin-top:12px"><button class="btn btn-primary" onclick="urlEncode()">编码</button><button class="btn btn-ghost" onclick="urlDecode()">解码</button><button class="btn btn-ghost" onclick="copyText(\'urlResult\')">复制</button></div>';
+  if(id==='ai')return '<div class="chat-box" id="chatBox"></div><div class="field"><textarea id="aiInput" placeholder="输入问题..." style="min-height:60px"></textarea></div><div class="field"><label>API Key（存本地）</label><input id="aiKey" type="password" placeholder="sk-..."></div><div class="btn-row"><button class="btn btn-primary" onclick="sendAI()">发送</button><button class="btn btn-ghost" onclick="saveKey()">保存Key</button></div>';
+  return '<p>开发中...</p>';
 }
-</script>
-<script>
-// ========== 密码生成 ==========
+
 function genPwd(){
   const len=document.getElementById('pwdLen').value;
-  document.getElementById('pwdLenVal').textContent=len;
   let chars='abcdefghijklmnopqrstuvwxyz';
   if(document.getElementById('pwdUpper').checked)chars+='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   if(document.getElementById('pwdNum').checked)chars+='0123456789';
@@ -278,73 +154,58 @@ function genPwd(){
   document.getElementById('pwdResult').textContent=pwd;
 }
 
-// ========== 二维码 ==========
 function genQR(){
   const text=document.getElementById('qrInput').value.trim();
   if(!text)return;
-  const script=document.createElement('script');
-  script.src='https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
-  script.onload=()=>{
-    const canvas=document.getElementById('qrCanvas');
-    canvas.innerHTML='';
-    new QRCode(canvas,{text,width:180,height:180,colorDark:'#00b4ff',colorLight:'#020b18'});
-  };
-  document.head.appendChild(script);
+  const out=document.getElementById('qrOut');
+  out.innerHTML='';
+  const s=document.createElement('script');
+  s.src='https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+  s.onload=()=>{new QRCode(out,{text,width:180,height:180,colorDark:'#00b4ff',colorLight:'#020b18'});};
+  document.head.appendChild(s);
 }
 
-// ========== 颜色转换 ==========
 function convertColor(from){
   try{
     let r,g,b;
     if(from==='hex'){
-      const hex=document.getElementById('hexIn').value.replace('#','');
-      r=parseInt(hex.slice(0,2),16);g=parseInt(hex.slice(2,4),16);b=parseInt(hex.slice(4,6),16);
-    } else {
-      const parts=document.getElementById('rgbIn').value.split(',').map(x=>parseInt(x.trim()));
-      r=parts[0];g=parts[1];b=parts[2];
+      const h=document.getElementById('hexIn').value.replace('#','');
+      r=parseInt(h.slice(0,2),16);g=parseInt(h.slice(2,4),16);b=parseInt(h.slice(4,6),16);
+    }else{
+      const p=document.getElementById('rgbIn').value.split(',').map(x=>parseInt(x.trim()));
+      r=p[0];g=p[1];b=p[2];
     }
-    const hex='#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('');
-    document.getElementById('hexIn').value=hex;
-    document.getElementById('rgbIn').value=`${r}, ${g}, ${b}`;
+    document.getElementById('hexIn').value='#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('');
+    document.getElementById('rgbIn').value=r+', '+g+', '+b;
     const rn=r/255,gn=g/255,bn=b/255;
     const max=Math.max(rn,gn,bn),min=Math.min(rn,gn,bn);
-    let h,s,l=(max+min)/2;
-    if(max===min){h=s=0;}else{
-      const d=max-min;s=l>0.5?d/(2-max-min):d/(max+min);
-      h=max===rn?(gn-bn)/d+(gn<bn?6:0):max===gn?(bn-rn)/d+2:(rn-gn)/d+4;
-      h=Math.round(h*60);
-    }
-    document.getElementById('hslIn').value=`${h}, ${Math.round(s*100)}%, ${Math.round(l*100)}%`;
-    document.getElementById('colorPreview').style.background=hex;
+    let h=0,s=0,l=(max+min)/2;
+    if(max!==min){const d=max-min;s=l>0.5?d/(2-max-min):d/(max+min);h=max===rn?(gn-bn)/d+(gn<bn?6:0):max===gn?(bn-rn)/d+2:(rn-gn)/d+4;h=Math.round(h*60);}
+    document.getElementById('hslIn').value=h+', '+Math.round(s*100)+'%, '+Math.round(l*100)+'%';
+    document.getElementById('colorPreview').style.background=document.getElementById('hexIn').value;
   }catch(e){}
 }
 
-// ========== 时间戳 ==========
+let tsTimer=null;
 function initTs(){
-  setInterval(()=>{
-    const el=document.getElementById('tsNow');
-    if(el)el.textContent=Math.floor(Date.now()/1000);
-  },1000);
+  if(tsTimer)clearInterval(tsTimer);
+  tsTimer=setInterval(()=>{const el=document.getElementById('tsNow');if(el)el.textContent=Math.floor(Date.now()/1000);else clearInterval(tsTimer);},1000);
 }
 function convertTs(){
   const v=document.getElementById('tsInput').value.trim();
-  const d=new Date(v.length===10?v*1000:parseInt(v));
+  const d=new Date(v.length<=10?v*1000:parseInt(v));
   document.getElementById('tsResult').textContent=isNaN(d)?'无效时间戳':d.toLocaleString('zh-CN');
 }
 
-// ========== Hash ==========
 async function calcHash(){
   const text=document.getElementById('hashInput').value;
   const algo=document.getElementById('hashAlgo').value;
   const buf=await crypto.subtle.digest(algo,new TextEncoder().encode(text));
-  const hex=Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-  document.getElementById('hashResult').textContent=hex;
+  document.getElementById('hashResult').textContent=Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
 
-// ========== AES ==========
 async function getKey(k){
-  const raw=new TextEncoder().encode(k.padEnd(32,'0').slice(0,32));
-  return crypto.subtle.importKey('raw',raw,{name:'AES-GCM'},false,['encrypt','decrypt']);
+  return crypto.subtle.importKey('raw',new TextEncoder().encode(k.padEnd(32,'0').slice(0,32)),{name:'AES-GCM'},false,['encrypt','decrypt']);
 }
 async function aesEncrypt(){
   try{
@@ -360,66 +221,22 @@ async function aesDecrypt(){
   try{
     const key=await getKey(document.getElementById('aesKey').value);
     const combined=Uint8Array.from(atob(document.getElementById('aesInput').value),c=>c.charCodeAt(0));
-    const iv=combined.slice(0,12),data=combined.slice(12);
-    const dec=await crypto.subtle.decrypt({name:'AES-GCM',iv},key,data);
+    const dec=await crypto.subtle.decrypt({name:'AES-GCM',iv:combined.slice(0,12)},key,combined.slice(12));
     document.getElementById('aesResult').textContent=new TextDecoder().decode(dec);
   }catch(e){document.getElementById('aesResult').textContent='错误：'+e.message;}
 }
 
-// ========== Base64 ==========
-function b64Encode(){
-  try{document.getElementById('b64Result').textContent=btoa(unescape(encodeURIComponent(document.getElementById('b64Input').value)));}
-  catch(e){document.getElementById('b64Result').textContent='错误';}
-}
-function b64Decode(){
-  try{document.getElementById('b64Result').textContent=decodeURIComponent(escape(atob(document.getElementById('b64Input').value)));}
-  catch(e){document.getElementById('b64Result').textContent='错误';}
-}
-
-// ========== JSON ==========
-function fmtJson(){
-  try{document.getElementById('jsonResult').textContent=JSON.stringify(JSON.parse(document.getElementById('jsonInput').value),null,2);}
-  catch(e){document.getElementById('jsonResult').textContent='JSON格式错误';}
-}
-function minJson(){
-  try{document.getElementById('jsonResult').textContent=JSON.stringify(JSON.parse(document.getElementById('jsonInput').value));}
-  catch(e){document.getElementById('jsonResult').textContent='JSON格式错误';}
-}
-
-// ========== 正则 ==========
-function testRegex(){
-  try{
-    const pat=document.getElementById('regexPat').value;
-    const text=document.getElementById('regexText').value;
-    const matches=text.match(new RegExp(pat,'g'));
-    document.getElementById('regexResult').textContent=matches?`匹配 ${matches.length} 处：${matches.join(', ')}`:'无匹配';
-  }catch(e){document.getElementById('regexResult').textContent='正则错误';}
-}
-
-// ========== URL ==========
+function b64Encode(){try{document.getElementById('b64Result').textContent=btoa(unescape(encodeURIComponent(document.getElementById('b64Input').value)));}catch(e){document.getElementById('b64Result').textContent='错误';}}
+function b64Decode(){try{document.getElementById('b64Result').textContent=decodeURIComponent(escape(atob(document.getElementById('b64Input').value)));}catch(e){document.getElementById('b64Result').textContent='错误';}}
+function fmtJson(){try{document.getElementById('jsonResult').textContent=JSON.stringify(JSON.parse(document.getElementById('jsonInput').value),null,2);}catch(e){document.getElementById('jsonResult').textContent='JSON格式错误';}}
+function minJson(){try{document.getElementById('jsonResult').textContent=JSON.stringify(JSON.parse(document.getElementById('jsonInput').value));}catch(e){document.getElementById('jsonResult').textContent='JSON格式错误';}}
+function testRegex(){try{const m=document.getElementById('regexText').value.match(new RegExp(document.getElementById('regexPat').value,'g'));document.getElementById('regexResult').textContent=m?'匹配'+m.length+'处：'+m.join(', '):'无匹配';}catch(e){document.getElementById('regexResult').textContent='正则错误';}}
 function urlEncode(){document.getElementById('urlResult').textContent=encodeURIComponent(document.getElementById('urlInput').value);}
-function urlDecode(){
-  try{document.getElementById('urlResult').textContent=decodeURIComponent(document.getElementById('urlInput').value);}
-  catch(e){document.getElementById('urlResult').textContent='解码错误';}
-}
+function urlDecode(){try{document.getElementById('urlResult').textContent=decodeURIComponent(document.getElementById('urlInput').value);}catch(e){document.getElementById('urlResult').textContent='解码错误';}}
+function copyText(id){navigator.clipboard.writeText(document.getElementById(id).textContent).then(()=>alert('已复制')).catch(()=>alert('复制失败'));}
 
-// ========== 复制 ==========
-function copyText(id){
-  navigator.clipboard.writeText(document.getElementById(id).textContent)
-    .then(()=>alert('已复制'))
-    .catch(()=>alert('复制失败'));
-}
-</script>
-<script>
-// ========== AI对话 ==========
-function saveKey(){
-  const k=document.getElementById('aiKey').value.trim();
-  if(k){localStorage.setItem('dsKey',k);alert('Key已保存');}
-}
-function initChat(){
-  const k=localStorage.getItem('dsKey');
-  if(k)document.getElementById('aiKey').value=k;
-}
+function saveKey(){const k=document.getElementById('aiKey').value.trim();if(k){localStorage.setItem('dsKey',k);alert('Key已保存');}}
+function initChat(){const k=localStorage.getItem('dsKey');if(k)document.getElementById('aiKey').value=k;}
 async function sendAI(){
   const input=document.getElementById('aiInput');
   const text=input.value.trim();
@@ -427,86 +244,39 @@ async function sendAI(){
   if(!text)return;
   if(!key){alert('请先输入API Key');return;}
   const box=document.getElementById('chatBox');
-  box.innerHTML+=`<div class="msg user">${text}</div>`;
-  box.innerHTML+=`<div class="msg thinking" id="thinking">AI思考中...</div>`;
-  input.value='';
-  box.scrollTop=box.scrollHeight;
+  box.innerHTML+='<div class="msg user">'+text+'</div><div class="msg thinking" id="thinking">AI思考中...</div>';
+  input.value='';box.scrollTop=box.scrollHeight;
   try{
-    const res=await fetch('https://api.deepseek.com/v1/chat/completions',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-      body:JSON.stringify({model:'deepseek-chat',messages:[{role:'user',content:text}],max_tokens:1000})
-    });
+    const res=await fetch('https://api.deepseek.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:JSON.stringify({model:'deepseek-chat',messages:[{role:'user',content:text}],max_tokens:1000})});
     const data=await res.json();
     document.getElementById('thinking').remove();
-    const reply=data.choices?.[0]?.message?.content||'无响应';
-    box.innerHTML+=`<div class="msg ai">${reply}</div>`;
+    box.innerHTML+='<div class="msg ai">'+(data.choices?.[0]?.message?.content||'无响应')+'</div>';
     box.scrollTop=box.scrollHeight;
-  }catch(e){
-    document.getElementById('thinking').remove();
-    box.innerHTML+=`<div class="msg ai">请求失败：${e.message}</div>`;
-  }
+  }catch(e){document.getElementById('thinking').remove();box.innerHTML+='<div class="msg ai">请求失败：'+e.message+'</div>';}
 }
 
-// ========== 粒子背景 ==========
 const canvas=document.getElementById('bg');
 const ctx=canvas.getContext('2d');
 let particles=[];
 function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
-resize();
-window.addEventListener('resize',resize);
-for(let i=0;i<80;i++){
-  particles.push({
-    x:Math.random()*window.innerWidth,
-    y:Math.random()*window.innerHeight,
-    vx:(Math.random()-.5)*.4,
-    vy:(Math.random()-.5)*.4,
-    r:Math.random()*1.5+.5,
-    a:Math.random()*.6+.2
-  });
-}
+resize();window.addEventListener('resize',resize);
+for(let i=0;i<80;i++)particles.push({x:Math.random()*window.innerWidth,y:Math.random()*window.innerHeight,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.5+.5,a:Math.random()*.6+.2});
 function drawBg(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  // 网格
-  ctx.strokeStyle='rgba(0,180,255,0.04)';
-  ctx.lineWidth=1;
-  for(let x=0;x<canvas.width;x+=40){
-    ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,canvas.height);ctx.stroke();
-  }
-  for(let y=0;y<canvas.height;y+=40){
-    ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(canvas.width,y);ctx.stroke();
-  }
-  // 粒子
+  ctx.strokeStyle='rgba(0,180,255,0.04)';ctx.lineWidth=1;
+  for(let x=0;x<canvas.width;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,canvas.height);ctx.stroke();}
+  for(let y=0;y<canvas.height;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(canvas.width,y);ctx.stroke();}
   particles.forEach(p=>{
     p.x+=p.vx;p.y+=p.vy;
-    if(p.x<0)p.x=canvas.width;
-    if(p.x>canvas.width)p.x=0;
-    if(p.y<0)p.y=canvas.height;
-    if(p.y>canvas.height)p.y=0;
-    ctx.beginPath();
-    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-    ctx.fillStyle=`rgba(0,180,255,${p.a})`;
-    ctx.fill();
+    if(p.x<0)p.x=canvas.width;if(p.x>canvas.width)p.x=0;
+    if(p.y<0)p.y=canvas.height;if(p.y>canvas.height)p.y=0;
+    ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(0,180,255,'+p.a+')';ctx.fill();
   });
-  // 连线
-  particles.forEach((p,i)=>{
-    particles.slice(i+1).forEach(q=>{
-      const d=Math.hypot(p.x-q.x,p.y-q.y);
-      if(d<120){
-        ctx.beginPath();
-        ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);
-        ctx.strokeStyle=`rgba(0,180,255,${.15*(1-d/120)})`;
-        ctx.lineWidth=.5;ctx.stroke();
-      }
-    });
-  });
+  particles.forEach((p,i)=>{particles.slice(i+1).forEach(q=>{const d=Math.hypot(p.x-q.x,p.y-q.y);if(d<120){ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.strokeStyle='rgba(0,180,255,'+(0.15*(1-d/120))+')';ctx.lineWidth=.5;ctx.stroke();}});});
   requestAnimationFrame(drawBg);
 }
 drawBg();
-
-// ========== 初始化 ==========
 renderTools();
-initTs();
 </script>
 </body>
 </html>
