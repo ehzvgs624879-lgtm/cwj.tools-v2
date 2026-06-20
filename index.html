@@ -33,7 +33,6 @@ nav a:hover{color:#00b4ff;}
 .panel-overlay.show{display:flex;opacity:1;}
 .panel{background:linear-gradient(135deg,rgba(2,20,45,0.98),rgba(0,10,30,0.98));border:1px solid rgba(0,180,255,0.3);border-radius:24px 24px 0 0;width:100%;max-width:600px;max-height:85vh;overflow-y:auto;padding:24px;box-shadow:0 -10px 60px rgba(0,180,255,0.15);transform:translateY(100%);transition:transform 0.3s ease;}
 .panel-overlay.show .panel{transform:translateY(0);}
-/* 补齐缺失的面板头部样式 */
 .panel-header{
   display:flex;
   align-items:center;
@@ -62,7 +61,6 @@ nav a:hover{color:#00b4ff;}
 .panel-close:hover{
   background:rgba(0,180,255,0.15);
 }
-/* 美化滚动条 */
 .panel::-webkit-scrollbar{width:4px}
 .panel::-webkit-scrollbar-thumb{background:#00b4ff;border-radius:2px}
 .field{margin-bottom:14px;}
@@ -81,7 +79,6 @@ nav a:hover{color:#00b4ff;}
 .msg.user{background:rgba(0,100,200,0.3);border:1px solid rgba(0,180,255,0.2);align-self:flex-end;color:#e0f0ff;}
 .msg.ai{background:rgba(0,30,60,0.6);border:1px solid rgba(0,180,255,0.1);align-self:flex-start;color:#7df0ff;}
 .msg.thinking{color:rgba(150,200,255,0.5);font-style:italic;}
-/* 轻提示样式 */
 .toast{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:rgba(0,180,255,0.9);color:#020b18;padding:8px 16px;border-radius:8px;font-size:13px;z-index:9999;opacity:0;transition:opacity 0.3s;}
 .toast.show{opacity:1;}
 </style>
@@ -130,14 +127,12 @@ const tools=[
   {id:'url',cat:'dev',icon:'🔗',name:'URL编解码',desc:'编码/解码URL'},
   {id:'ai',cat:'ai',icon:'✦',name:'AI对话',desc:'DeepSeek驱动'},
 ];
-// 全局变量
 let tsTimer=null;
-let qrLoaded=false; // 标记QR库是否已加载
-let isAiLoading=false; // AI请求锁，防止重复请求
-let colorDebounceTimer=null; // 颜色转换防抖
-let aiMessages = []; // AI对话上下文历史数组
+let qrLoaded=false;
+let isAiLoading=false;
+let colorDebounceTimer=null;
+let aiMessages = [];
 
-// 轻提示替代alert
 function showToast(msg){
   const toast=document.getElementById('toast');
   toast.textContent=msg;
@@ -148,7 +143,6 @@ function copyText(id){
   const txt=document.getElementById(id).textContent;
   navigator.clipboard.writeText(txt).then(()=>showToast('已复制')).catch(()=>showToast('复制失败'));
 }
-// 防抖函数
 function debounce(fn,delay=150){
   return (...args)=>{
     clearTimeout(colorDebounceTimer);
@@ -186,9 +180,7 @@ function openTool(id){
 function closePanel(e){
   if(!e||e.target===document.getElementById('overlay')){
     document.getElementById('overlay').classList.remove('show');
-    // 关闭面板销毁定时器
     if(tsTimer){clearInterval(tsTimer);tsTimer=null;}
-    // 重置AI请求锁+清空对话上下文
     isAiLoading=false;
     aiMessages = [];
   }
@@ -208,7 +200,6 @@ function getPanelHTML(id){
   if(id==='ai')return '<div class="chat-box" id="chatBox"></div><div class="field"><textarea id="aiInput" placeholder="输入问题..." style="min-height:60px"></textarea></div><div class="field"><label>API Key（存本地）</label><input id="aiKey" type="password" placeholder="sk-..."></div><div class="btn-row"><button class="btn btn-primary" onclick="sendAI()">发送</button><button class="btn btn-ghost" onclick="saveKey()">保存Key</button></div>';
   return '<p>开发中...</p>';
 }
-// 绑定防抖颜色转换
 const debouncedConvertColor=debounce(convertColor);
 
 function genPwd(){
@@ -227,7 +218,6 @@ function genQR(){
   if(!text)return;
   const out=document.getElementById('qrOut');
   out.innerHTML='';
-  // 仅首次加载QR库，防止重复注入
   if(!qrLoaded){
     const s=document.createElement('script');
     s.src='https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
@@ -289,7 +279,6 @@ async function calcHash(){
 }
 
 async function getKey(k){
-  // 密钥统一32位Uint8Array处理，加解密规则完全一致
   const rawKey=new TextEncoder().encode(k);
   const fixedKey=new Uint8Array(32);
   fixedKey.set(rawKey);
@@ -314,7 +303,6 @@ async function aesDecrypt(){
   }catch(e){showToast('解密失败，密钥或密文错误');}
 }
 
-// 标准Base64编解码，移除老旧unescape兼容写法
 function b64Encode(){
   try{
     const utf8=new TextEncoder().encode(document.getElementById('b64Input').value);
@@ -352,33 +340,27 @@ function urlDecode(){
 function saveKey(){const k=document.getElementById('aiKey').value.trim();if(k){localStorage.setItem('dsKey',k);showToast('Key已保存');}}
 function initChat(){const k=localStorage.getItem('dsKey');if(k)document.getElementById('aiKey').value=k;}
 async function sendAI(){
-  // 请求锁，禁止重复发送
   if(isAiLoading)return;
   const input=document.getElementById('aiInput');
   const text=input.value.trim();
-  const key=document.getElementById('aiKey').value.trim();
   if(!text)return;
-  if(!key){showToast('请先输入API Key');return;}
   const box=document.getElementById('chatBox');
-  // 存入用户消息上下文
   aiMessages.push({role:'user',content:text});
   box.innerHTML+='<div class="msg user">'+text+'</div><div class="msg thinking" id="thinking">AI思考中...</div>';
   input.value='';box.scrollTop=box.scrollHeight;
   isAiLoading=true;
   try{
-    const res=await fetch('https://api.deepseek.com/v1/chat/completions',{
+    const res = await fetch('https://dawn-king-2fdc.ehzvgs624879.workers.dev', {
       method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+      headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
-        model:'deepseek-chat',
-        messages:aiMessages, // 携带全部历史上下文
+        messages:aiMessages,
         max_tokens:1000
       })
     });
     const data=await res.json();
     document.getElementById('thinking')?.remove();
     const reply = data.choices?.[0]?.message?.content||'无响应';
-    // AI回复存入上下文
     aiMessages.push({role:'assistant',content:reply});
     box.innerHTML+='<div class="msg ai">'+reply+'</div>';
     box.scrollTop=box.scrollHeight;
@@ -407,7 +389,6 @@ function drawBg(){
     if(p.y<0)p.y=canvas.height;if(p.y>canvas.height)p.y=0;
     ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(0,180,255,'+p.a+')';ctx.fill();
   });
-  // 优化粒子连线：只循环后半部分，减少一半计算量
   for(let i=0;i<particles.length;i++){
     const p=particles[i];
     for(let j=i+1;j<particles.length;j++){
