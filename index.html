@@ -1,35 +1,56 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>CWJ Tools V3</title>
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>CWJ Tools V3.1</title>
 
 <link rel="stylesheet" href="style.css">
 
 </head>
 
+
 <body>
 
-<div class="toast" id="toast"></div>
+
+<div id="toast" class="toast"></div>
+
 
 <canvas id="bg"></canvas>
+
 
 
 <div class="wrapper">
 
 
+
 <header>
 
+
 <div class="logo">
+
 CWJ<span>Tools</span>
+
 </div>
 
 
+
 <nav>
-<a href="#tools">工具</a>
-<a href="#about">关于</a>
+
+<a href="#tools">
+工具
+</a>
+
+
+<a href="#about">
+关于
+</a>
+
+
 </nav>
 
 
@@ -37,29 +58,48 @@ CWJ<span>Tools</span>
 
 
 
+
+
 <section class="hero">
 
 
+
 <div class="hero-badge">
-✦ AI POWERED TOOL CENTER
+
+✦ AI POWER TOOL CENTER
+
 </div>
 
 
+
 <h1>
+
 CWJ
+
 <span class="glow">
+
 TOOLS
+
 </span>
+
+
 </h1>
 
 
+
+
 <p>
-智能工具中心 · 高效 · 安全 · 极简
+
+智能工具平台 · 安全 · 高效 · 极简
+
 </p>
 
 
 
+
+
 <div class="status-grid">
+
 
 
 <div class="status-card">
@@ -68,66 +108,95 @@ TOOLS
 ⚡
 </div>
 
+
 <div>
 
 <span>
 系统状态
 </span>
 
+
 <strong>
 ONLINE
 </strong>
 
-</div>
 
 </div>
+
+
+</div>
+
 
 
 
 <div class="status-card">
 
+
 <div class="status-icon">
+
 🛠
+
 </div>
+
 
 <div>
 
+
 <span>
-工具数量
+工具模块
 </span>
+
 
 <strong>
 11+
+
 </strong>
 
-</div>
 
 </div>
+
+
+</div>
+
+
 
 
 
 <div class="status-card">
 
+
 <div class="status-icon">
+
 🔒
+
 </div>
 
+
 <div>
+
 
 <span>
 安全模式
 </span>
 
+
 <strong>
 ACTIVE
+
 </strong>
 
-</div>
 
 </div>
 
 
 </div>
+
+
+
+</div>
+
+
+
 
 
 </section>
@@ -135,22 +204,35 @@ ACTIVE
 
 
 
+
+
+
 <section id="tools">
+
 
 
 <div class="section-title">
 
+
 <h2>
+
 工具中心
+
 </h2>
 
 
+
 <p>
-选择你的智能工具
+
+选择需要的工具
+
 </p>
 
 
+
 </div>
+
+
 
 
 
@@ -159,42 +241,62 @@ ACTIVE
 
 <div class="tab active"
 onclick="filterTools('all',event)">
+
 全部
+
 </div>
+
 
 
 <div class="tab"
 onclick="filterTools('util',event)">
+
 实用工具
+
 </div>
+
 
 
 <div class="tab"
 onclick="filterTools('crypto',event)">
+
 加密安全
+
 </div>
+
 
 
 <div class="tab"
 onclick="filterTools('dev',event)">
+
 开发工具
+
 </div>
+
 
 
 <div class="tab"
 onclick="filterTools('ai',event)">
-AI 助手
+
+AI助手
+
+</div>
+
+
+
 </div>
 
 
+
+
+
+<div id="toolGrid"
+class="grid">
+
 </div>
 
 
 
-
-<div class="grid" id="toolGrid">
-
-</div>
 
 
 </section>
@@ -202,27 +304,44 @@ AI 助手
 
 
 
-<section id="about" class="about">
+
+
+
+
+<section id="about"
+class="about">
+
 
 
 <div class="about-card">
 
+
 <h3>
+
 CWJ Tools
+
 </h3>
 
 
+
 <p>
-个人开发的现代化在线工具平台。
+
+个人开发的在线智能工具箱
+
 </p>
 
 
+
 <span>
-V3 Pro Edition
+
+V3.1 Pro Edition
+
 </span>
 
 
+
 </div>
+
 
 
 </section>
@@ -230,6 +349,8 @@ V3 Pro Edition
 
 
 
+
+
 </div>
 
 
@@ -237,21 +358,28 @@ V3 Pro Edition
 
 
 
-<div class="panel-overlay" id="overlay"
+
+
+<div id="overlay"
+class="panel-overlay"
 onclick="closePanel(event)">
 
 
 
-<div class="panel" id="panel">
+<div id="panel"
+class="panel">
 
 
 
 <div class="panel-header">
 
 
-<div class="panel-title" id="panelTitle">
+
+<div id="panelTitle"
+class="panel-title">
 
 </div>
+
 
 
 
@@ -264,7 +392,9 @@ onclick="closePanel()">
 
 
 
+
 </div>
+
 
 
 
@@ -277,7 +407,9 @@ onclick="closePanel()">
 </div>
 
 
+
 </div>
+
 
 
 
