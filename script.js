@@ -1,4 +1,3 @@
-// 工具配置解耦
 const tools=[
   {id:'pwd',cat:'util',icon:'🔑',name:'密码生成',desc:'安全随机密码'},
   {id:'qr',cat:'util',icon:'◼',name:'二维码生成',desc:'文字转二维码'},
@@ -20,30 +19,6 @@ let colorDebounceTimer=null;
 let aiMessages=[];
 let aiTypeTimer=null;
 let bgAnimId=null;
-// 标签拖拽变量
-let dragStartX=0, dragScrollLeft=0,isDragging=false;
-// 粒子鼠标坐标
-let mouseX=null,mouseY=null;
-
-// 本地存储封装
-const Storage={
-  get(k){try{return JSON.parse(localStorage.getItem(k))}catch{return null}},
-  set(k,v){localStorage.setItem(k,JSON.stringify(v))},
-  del(k){localStorage.removeItem(k)}
-}
-// 主题初始化
-(function initTheme(){
-  const savedTheme=Storage.get('cwj-theme')||'dark';
-  document.documentElement.setAttribute('data-theme',savedTheme);
-  const switchBtn=document.getElementById('themeSwitch');
-  switchBtn.textContent=savedTheme==='dark'?'☀':'🌙';
-  switchBtn.onclick=()=>{
-    const now=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
-    document.documentElement.setAttribute('data-theme',now);
-    switchBtn.textContent=now==='dark'?'☀':'🌙';
-    Storage.set('cwj-theme',now);
-  }
-})();
 
 function showToast(msg){
   const toast=document.getElementById('toast');
@@ -62,6 +37,7 @@ function debounce(fn,delay=150){
   };
 }
 
+// 修复：规避函数劫持时序undefined问题
 function renderTools(cat='all'){
   const grid=document.getElementById('toolGrid');
   grid.innerHTML='';
@@ -75,30 +51,12 @@ function renderTools(cat='all'){
   });
 }
 
-// 标签点击+拖拽绑定
-(function initTabDrag(){
-  const tabWrap=document.getElementById('tabWrap');
-  // 点击切换分类
-  document.querySelectorAll('.tab').forEach(tab=>{
-    tab.onclick=(e)=>{
-      document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-      e.target.classList.add('active');
-      filterTools(e.target.dataset.key);
-    }
-  })
-  // 鼠标拖拽
-  tabWrap.addEventListener('mousedown',e=>{isDragging=true;dragStartX=e.pageX;dragScrollLeft=tabWrap.scrollLeft;tabWrap.style.cursor='grabbing'});
-  tabWrap.addEventListener('mousemove',e=>{if(!isDragging)return;e.preventDefault();tabWrap.scrollLeft=dragScrollLeft-(e.pageX-dragStartX)});
-  window.addEventListener('mouseup',()=>{isDragging=false;tabWrap.style.cursor='grab'});
-  // 手机触摸滑动
-  tabWrap.addEventListener('touchstart',e=>{dragStartX=e.touches[0].pageX;dragScrollLeft=tabWrap.scrollLeft});
-  tabWrap.addEventListener('touchmove',e=>{tabWrap.scrollLeft=dragScrollLeft-(e.touches[0].pageX-dragStartX)});
-})();
-
-function filterTools(cat){
+function filterTools(cat,e){
   const grid=document.getElementById('toolGrid');
   grid.style.opacity=0;
   setTimeout(()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    if(e)e.target.classList.add('active');
     renderTools(cat);
     grid.style.opacity=1;
   },200);
@@ -109,20 +67,11 @@ function openTool(id){
   document.getElementById('panelTitle').textContent=t.icon+' '+t.name;
   document.getElementById('panelBody').innerHTML=getPanelHTML(id);
   document.getElementById('overlay').classList.add('show');
-  Storage.set('lastTool',id);
   if(id==='ts')initTs();
   if(id==='ai'){
     if(aiTypeTimer){clearInterval(aiTypeTimer);aiTypeTimer=null;}
-    aiMessages=Storage.get('cwj-chat')||[];
-    const box=document.getElementById('chatBox');
-    box.innerHTML='';
-    aiMessages.forEach(msg=>{
-      const d=document.createElement('div');
-      d.className=`msg ${msg.role}`;
-      d.textContent=msg.content;
-      box.appendChild(d);
-    })
-    box.scrollTop=box.scrollHeight;
+    aiMessages=[];
+    document.getElementById('chatBox').innerHTML='';
   }
 }
 
@@ -132,24 +81,16 @@ function closePanel(e){
     if(tsTimer){clearInterval(tsTimer);tsTimer=null;}
     if(aiTypeTimer){clearInterval(aiTypeTimer);aiTypeTimer=null;}
     isAiLoading=false;
+    aiMessages=[];
     const chatBox=document.getElementById('chatBox');
-    if(chatBox) chatBox.innerHTML='';
+    if(chatBox)chatBox.innerHTML='';
   }
 }
-
-// 全局快捷键ESC关闭弹窗、AI回车发送
-window.addEventListener('keydown',e=>{
-  if(e.key==='Escape')closePanel();
-  const aiInput=document.getElementById('aiInput');
-  if(document.activeElement===aiInput&&e.key==='Enter'&&!e.shiftKey){
-    e.preventDefault();sendAI();
-  }
-})
 
 function getPanelHTML(id){
   if(id==='pwd')return '<div class="field"><label>长度 <span id="pwdLenVal">16</span></label><input type="range" id="pwdLen" min="8" max="32" value="16" oninput="document.getElementById(\'pwdLenVal\').textContent=this.value"></div><div class="field"><label><input type="checkbox" id="pwdUpper" checked> 大写 &nbsp;<input type="checkbox" id="pwdNum" checked> 数字 &nbsp;<input type="checkbox" id="pwdSym"> 符号</label></div><div class="result-box" id="pwdResult">点击生成</div><div class="btn-row" style="margin-top:12px"><button class="btn btn-primary" onclick="genPwd()">生成</button><button class="btn btn-ghost" onclick="copyText(\'pwdResult\')">复制</button></div>';
   if(id==='qr')return '<div class="field"><label>输入文字或链接</label><textarea id="qrInput" placeholder="https://..."></textarea></div><div id="qrOut" style="text-align:center;margin:10px 0"></div><div class="btn-row"><button class="btn btn-primary" onclick="genQR()">生成二维码</button></div>';
-  if(id==='color')return '<div class="field"><label>HEX</label><input id="hexIn" placeholder="#00b4ff" oninput="debouncedConvertColor(\'hex\')"></div><div class="field"><label>RGB</label><input id="rgbIn" placeholder="0, 180, 255" oninput="debouncedConvertColor(\'rgb\')"></div><div class="field"><label>HSL</label><input id="hslIn" placeholder="197, 100%, 50%" readonly></div><div id="colorPreview" style="height:50px;border-radius:var(--radius-sm);margin-top:8px;border:1px solid var(--border-thin)"></div>';
+  if(id==='color')return '<div class="field"><label>HEX</label><input id="hexIn" placeholder="#00b4ff" oninput="debouncedConvertColor(\'hex\')"></div><div class="field"><label>RGB</label><input id="rgbIn" placeholder="0, 180, 255" oninput="debouncedConvertColor(\'rgb\')"></div><div class="field"><label>HSL</label><input id="hslIn" placeholder="197, 100%, 50%" readonly></div><div id="colorPreview" style="height:50px;border-radius:10px;margin-top:8px;border:1px solid rgba(0,180,255,0.2)"></div>';
   if(id==='ts')return '<div class="field"><label>当前时间戳</label><div class="result-box" id="tsNow">-</div></div><div class="field"><label>时间戳转日期</label><input id="tsInput" placeholder="1700000000"></div><div class="result-box" id="tsResult">-</div><div class="btn-row" style="margin-top:12px"><button class="btn btn-primary" onclick="convertTs()">转换</button><button class="btn btn-ghost" onclick="copyText(\'tsResult\')">复制</button></div>';
   if(id==='hash')return '<div class="field"><label>输入文本</label><textarea id="hashInput" placeholder="输入内容..."></textarea></div><div class="field"><label>算法</label><select id="hashAlgo"><option value="SHA-1">SHA-1</option><option value="SHA-256" selected>SHA-256</option><option value="SHA-512">SHA-512</option></select></div><div class="result-box" id="hashResult">-</div><div class="btn-row" style="margin-top:12px"><button class="btn btn-primary" onclick="calcHash()">计算</button><button class="btn btn-ghost" onclick="copyText(\'hashResult\')">复制</button></div>';
   if(id==='aes')return '<div class="field"><label>文本</label><textarea id="aesInput" placeholder="输入内容..."></textarea></div><div class="field"><label>密钥</label><input id="aesKey" placeholder="输入密钥，自动补齐32位"></div><div class="result-box" id="aesResult">-</div><div class="btn-row" style="margin-top:12px"><button class="btn btn-primary" onclick="aesEncrypt()">加密</button><button class="btn btn-ghost" onclick="aesDecrypt()">解密</button><button class="btn btn-ghost" onclick="copyText(\'aesResult\')">复制</button></div>';
@@ -157,7 +98,7 @@ function getPanelHTML(id){
   if(id==='json')return '<div class="field"><label>JSON内容</label><textarea id="jsonInput" placeholder=\'{"key":"value"}\' style="min-height:120px"></textarea></div><div class="result-box" id="jsonResult" style="white-space:pre;min-height:80px">-</div><div class="btn-row" style="margin-top:12px"><button class="btn btn-primary" onclick="fmtJson()">格式化</button><button class="btn btn-ghost" onclick="minJson()">压缩</button><button class="btn btn-ghost" onclick="copyText(\'jsonResult\')">复制</button></div>';
   if(id==='regex')return '<div class="field"><label>正则表达式</label><input id="regexPat" placeholder="\\d+"></div><div class="field"><label>测试文本</label><textarea id="regexText" placeholder="输入测试内容..."></textarea></div><div class="result-box" id="regexResult">-</div><div class="btn-row" style="margin-top:12px"><button class="btn btn-primary" onclick="testRegex()">测试</button></div>';
   if(id==='url')return '<div class="field"><label>输入</label><textarea id="urlInput" placeholder="输入内容..."></textarea></div><div class="result-box" id="urlResult">-</div><div class="btn-row" style="margin-top:12px"><button class="btn btn-primary" onclick="urlEncode()">编码</button><button class="btn btn-ghost" onclick="urlDecode()">解码</button><button class="btn btn-ghost" onclick="copyText(\'urlResult\')">复制</button></div>';
-  if(id==='ai')return '<div class="chat-box" id="chatBox"></div><div class="field"><textarea id="aiInput" placeholder="Enter发送 | Shift+Enter换行" style="min-height:60px"></textarea></div><div class="btn-row"><button class="btn btn-primary" onclick="sendAI()">发送</button></div>';
+  if(id==='ai')return '<div class="chat-box" id="chatBox"></div><div class="field"><textarea id="aiInput" placeholder="输入问题..." style="min-height:60px"></textarea></div><div class="btn-row"><button class="btn btn-primary" onclick="sendAI()">发送</button></div>';
   return '<p>开发中...</p>';
 }
 const debouncedConvertColor=debounce(convertColor);
@@ -262,7 +203,7 @@ async function aesDecrypt(){
   }catch(e){showToast('解密失败，密钥或密文错误');}
 }
 
-// 分块Base64防栈溢出
+// 分块Base64编码，解决超大文本栈溢出
 function b64Encode(){
   try{
     const utf8=new TextEncoder().encode(document.getElementById('b64Input').value);
@@ -288,7 +229,7 @@ function minJson(){
   try{document.getElementById('jsonResult').textContent=JSON.stringify(JSON.parse(document.getElementById('jsonInput').value));}catch(e){showToast('JSON格式错误');}
 }
 
-// 正则超时防DoS
+// 正则增加超时防护，抵御灾难性回溯DoS攻击
 function testRegex(){
   try{
     const pattern=document.getElementById('regexPat').value;
@@ -319,7 +260,6 @@ async function sendAI(){
   if(!text)return;
   const box=document.getElementById('chatBox');
   aiMessages.push({role:'user',content:text});
-  Storage.set('cwj-chat',aiMessages);
   box.innerHTML+='<div class="msg user">'+text+'</div><div class="msg thinking" id="thinking">AI思考中...</div>';
   input.value='';box.scrollTop=box.scrollHeight;
   isAiLoading=true;
@@ -341,7 +281,6 @@ async function sendAI(){
       if(charIndex>=fullReply.length){
         clearInterval(aiTypeTimer);aiTypeTimer=null;
         aiMessages.push({role:'assistant',content:fullReply});
-        Storage.set('cwj-chat',aiMessages);
         return;
       }
       aiMsgDom.textContent+=fullReply[charIndex];
@@ -357,36 +296,19 @@ async function sendAI(){
   }
 }
 
-// 粒子：网格分桶+鼠标引力场
+// 粒子网格分桶优化+切后台暂停动画
 const canvas=document.getElementById('bg');
 const ctx=canvas.getContext('2d');
 let particles=[];
 const PARTICLE_COUNT=80;
 const CONNECT_DIST=120;
 const CELL_SIZE=CONNECT_DIST;
-const ATTRACT_RADIUS=180;
 
 function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
 resize();
 window.addEventListener('resize',resize);
-// 鼠标位置监听
-canvas.addEventListener('mousemove',e=>{
-  const rect=canvas.getBoundingClientRect();
-  mouseX=e.clientX-rect.left;mouseY=e.clientY-rect.top
-})
-canvas.addEventListener('mouseleave',()=>{mouseX=null;mouseY=null})
-
 for(let i=0;i<PARTICLE_COUNT;i++){
-  particles.push({
-    x:Math.random()*window.innerWidth,
-    y:Math.random()*window.innerHeight,
-    vx:(Math.random()-.5)*.4,
-    vy:(Math.random()-.5)*.4,
-    r:Math.random()*1.5+.5,
-    a:Math.random()*.6+.2,
-    baseVx:(Math.random()-.5)*.4,
-    baseVy:(Math.random()-.5)*.4
-  });
+  particles.push({x:Math.random()*window.innerWidth,y:Math.random()*window.innerHeight,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.5+.5,a:Math.random()*.6+.2});
 }
 
 function drawBg(){
@@ -399,19 +321,6 @@ function drawBg(){
   const len=particles.length;
   for(let i=0;i<len;i++){
     const p=particles[i];
-    // 鼠标引力逻辑
-    if(mouseX!==null&&mouseY!==null){
-      const dx=mouseX-p.x, dy=mouseY-p.y;
-      const dist=Math.hypot(dx,dy);
-      if(dist<ATTRACT_RADIUS){
-        const force=(ATTRACT_RADIUS-dist)/ATTRACT_RADIUS*0.015;
-        p.vx+=dx/dist*force;
-        p.vy+=dy/dist*force;
-      }
-    }
-    // 速度阻尼回归原始速度
-    p.vx += (p.baseVx - p.vx)*0.02;
-    p.vy += (p.baseVy - p.vy)*0.02;
     p.x+=p.vx;p.y+=p.vy;
     if(p.x<0)p.x=W;if(p.x>W)p.x=0;
     if(p.y<0)p.y=H;if(p.y>H)p.y=0;
@@ -419,7 +328,7 @@ function drawBg(){
     ctx.fillStyle='rgba(0,180,255,'+p.a+')';ctx.fill();
   }
 
-  // 网格分桶连线
+  // 网格分桶降低计算复杂度
   const cols=Math.ceil(W/CELL_SIZE)+1;
   const rows=Math.ceil(H/CELL_SIZE)+1;
   const grid=new Array(cols*rows).fill(null).map(()=>[]);
@@ -434,6 +343,7 @@ function drawBg(){
     for(let cx=0;cx<cols;cx++){
       const cell=grid[cy*cols+cx];
       if(!cell.length)continue;
+      // 遍历周边格子
       for(let dy=-1;dy<=1;dy++){
         for(let dx=-1;dx<=1;dx++){
           if(dx===0&&dy===0)continue;
@@ -454,6 +364,7 @@ function drawBg(){
           }
         }
       }
+      // 同格子内粒子连线
       for(let a=0;a<cell.length;a++){
         for(let b=a+1;b<cell.length;b++){
           const pi=particles[cell[a]],pj=particles[cell[b]];
@@ -470,7 +381,7 @@ function drawBg(){
   bgAnimId=requestAnimationFrame(drawBg);
 }
 
-// 切后台暂停动画
+// 页面后台休眠暂停动画，省电降负载
 document.addEventListener('visibilitychange',()=>{
   if(document.hidden){if(bgAnimId){cancelAnimationFrame(bgAnimId);bgAnimId=null;}}
   else{if(!bgAnimId)drawBg();}
@@ -479,5 +390,23 @@ document.addEventListener('visibilitychange',()=>{
 drawBg();
 renderTools();
 
-// 导航滚动收缩逻辑
-const headerDom=document.getElementById('mainHeader');
+// 导航栏滚动毛玻璃渐变
+const headerDom=document.querySelector('header');
+window.addEventListener('scroll',()=>{
+  const scrollY=window.scrollY;
+  if(scrollY>15){headerDom.style.background='rgba(2,11,24,0.92)';headerDom.style.backdropFilter='blur(16px)';}
+  else{headerDom.style.background='rgba(2,11,24,0.8)';headerDom.style.backdropFilter='blur(10px)';}
+});
+
+// 移动端面板下拉手势关闭
+const panel=document.getElementById('panel');
+let touchStartY=0,moveY=0;
+panel.addEventListener('touchstart',e=>{touchStartY=e.touches[0].clientY;});
+panel.addEventListener('touchmove',e=>{
+  moveY=e.touches[0].clientY-touchStartY;
+  if(moveY>0&&panel.scrollTop===0)panel.style.transform=`translateY(${moveY}px)`;
+});
+panel.addEventListener('touchend',()=>{
+  if(moveY>80)closePanel();
+  panel.style.transform='';moveY=0;
+});
