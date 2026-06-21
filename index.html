@@ -3,40 +3,289 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CWJ Tools</title>
+
+<title>CWJ Tools V3</title>
+
 <link rel="stylesheet" href="style.css">
+
 </head>
+
 <body>
+
 <div class="toast" id="toast"></div>
+
 <canvas id="bg"></canvas>
+
+
 <div class="wrapper">
+
+
 <header>
-  <div class="logo">CWJ<span>Tools</span></div>
-  <nav><a href="#tools">工具</a><a href="#about">关于</a></nav>
-</header>
-<div class="hero">
-  <h1>CWJ <span class="glow">TOOLS</span></h1>
-  <p>/ 科技感工具站 · 高效 · 安全 · 极简 /</p>
-</div>
-<div class="tabs">
-  <div class="tab active" onclick="filterTools('all',event)">全部</div>
-  <div class="tab" onclick="filterTools('util',event)">实用工具</div>
-  <div class="tab" onclick="filterTools('crypto',event)">加密安全</div>
-  <div class="tab" onclick="filterTools('dev',event)">开发工具</div>
-  <div class="tab" onclick="filterTools('ai',event)">AI 助手</div>
-</div>
-<div class="grid" id="toolGrid"></div>
-</div>
-<div class="panel-overlay" id="overlay" onclick="closePanel(event)">
-<div class="panel" id="panel">
-  <div class="panel-header">
-    <div class="panel-title" id="panelTitle"></div>
-    <button class="panel-close" onclick="closePanel()">✕</button>
-  </div>
-  <div id="panelBody"></div>
-</div>
+
+<div class="logo">
+CWJ<span>Tools</span>
 </div>
 
+
+<nav>
+<a href="#tools">工具</a>
+<a href="#about">关于</a>
+</nav>
+
+
+</header>
+
+
+
+<section class="hero">
+
+
+<div class="hero-badge">
+✦ AI POWERED TOOL CENTER
+</div>
+
+
+<h1>
+CWJ
+<span class="glow">
+TOOLS
+</span>
+</h1>
+
+
+<p>
+智能工具中心 · 高效 · 安全 · 极简
+</p>
+
+
+
+<div class="status-grid">
+
+
+<div class="status-card">
+
+<div class="status-icon">
+⚡
+</div>
+
+<div>
+
+<span>
+系统状态
+</span>
+
+<strong>
+ONLINE
+</strong>
+
+</div>
+
+</div>
+
+
+
+<div class="status-card">
+
+<div class="status-icon">
+🛠
+</div>
+
+<div>
+
+<span>
+工具数量
+</span>
+
+<strong>
+11+
+</strong>
+
+</div>
+
+</div>
+
+
+
+<div class="status-card">
+
+<div class="status-icon">
+🔒
+</div>
+
+<div>
+
+<span>
+安全模式
+</span>
+
+<strong>
+ACTIVE
+</strong>
+
+</div>
+
+</div>
+
+
+</div>
+
+
+</section>
+
+
+
+
+<section id="tools">
+
+
+<div class="section-title">
+
+<h2>
+工具中心
+</h2>
+
+
+<p>
+选择你的智能工具
+</p>
+
+
+</div>
+
+
+
+<div class="tabs">
+
+
+<div class="tab active"
+onclick="filterTools('all',event)">
+全部
+</div>
+
+
+<div class="tab"
+onclick="filterTools('util',event)">
+实用工具
+</div>
+
+
+<div class="tab"
+onclick="filterTools('crypto',event)">
+加密安全
+</div>
+
+
+<div class="tab"
+onclick="filterTools('dev',event)">
+开发工具
+</div>
+
+
+<div class="tab"
+onclick="filterTools('ai',event)">
+AI 助手
+</div>
+
+
+</div>
+
+
+
+
+<div class="grid" id="toolGrid">
+
+</div>
+
+
+</section>
+
+
+
+
+<section id="about" class="about">
+
+
+<div class="about-card">
+
+<h3>
+CWJ Tools
+</h3>
+
+
+<p>
+个人开发的现代化在线工具平台。
+</p>
+
+
+<span>
+V3 Pro Edition
+</span>
+
+
+</div>
+
+
+</section>
+
+
+
+
+</div>
+
+
+
+
+
+
+<div class="panel-overlay" id="overlay"
+onclick="closePanel(event)">
+
+
+
+<div class="panel" id="panel">
+
+
+
+<div class="panel-header">
+
+
+<div class="panel-title" id="panelTitle">
+
+</div>
+
+
+
+<button class="panel-close"
+onclick="closePanel()">
+
+✕
+
+</button>
+
+
+
+</div>
+
+
+
+<div id="panelBody">
+
+</div>
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+
 <script src="script.js"></script>
+
+
 </body>
+
 </html>
