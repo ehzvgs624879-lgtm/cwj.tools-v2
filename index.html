@@ -167,7 +167,7 @@ function filterTools(cat,e){
   if(e)e.target.classList.add('active');
   renderTools(cat);
 }
-
+ 
 function openTool(id){
   const t=tools.find(x=>x.id===id);
   document.getElementById('panelTitle').textContent=t.icon+' '+t.name;
