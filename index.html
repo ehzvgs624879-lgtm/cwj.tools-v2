@@ -31,7 +31,7 @@ nav a:hover{color:#00b4ff;}
 .card-desc{font-size:11px;color:rgba(150,200,255,0.5);margin-top:4px;}
 .panel-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);opacity:0;transition:opacity 0.3s ease;}
 .panel-overlay.show{display:flex;opacity:1;}
-.panel{background:linear-gradient(135deg,rgba(2,20,45,0.98),rgba(0,10,30,0.98));border:1px solid rgba(0,180,255,0.3);border-radius:24px 24px 0 0;width:100%;max-width:600px;max-height:85vh;overflow-y:auto;padding:24px;box-shadow:0 -10px 60px rgba(0,180,255,0.15);transform:translateY(100%);transition:transform 0.3s ease;}
+.panel{background:linear-gradient(135deg,rgba(2,20,45,0.98),rgba(0,10,30,0.98));border:1px solid rgba(0,180,255,0.3);border-radius:clamp(16px,4vw,24px) clamp(16px,4vw,24px) 0 0;width:100%;max-width:600px;max-height:85vh;overflow-y:auto;padding:24px;box-shadow:0 -10px 60px rgba(0,180,255,0.15);transform:translateY(100%);transition:transform 0.3s ease;}
 .panel-overlay.show .panel{transform:translateY(0);}
 .panel-header{
   display:flex;
@@ -125,10 +125,12 @@ const tools=[
   {id:'json',cat:'dev',icon:'{}',name:'JSON格式化',desc:'美化/压缩JSON'},
   {id:'regex',cat:'dev',icon:'.*',name:'正则测试',desc:'实时匹配测试'},
   {id:'url',cat:'dev',icon:'🔗',name:'URL编解码',desc:'编码/解码URL'},
-  {id:'ai',cat:'ai',icon:'✦',name:'AI对话',desc:'DeepSeek驱动'},
+  // 修复1：卡片描述修改为通用AI对话，匹配后端Cloudflare Llama
+  {id:'ai',cat:'ai',icon:'✦',name:'AI对话',desc:'云端大模型对话'},
 ];
 let tsTimer=null;
 let qrLoaded=false;
+let qrInstance = null; // 二维码实例防叠加
 let isAiLoading=false;
 let colorDebounceTimer=null;
 let aiMessages = [];
@@ -174,7 +176,11 @@ function openTool(id){
   document.getElementById('panelBody').innerHTML=getPanelHTML(id);
   document.getElementById('overlay').classList.add('show');
   if(id==='ts')initTs();
-  if(id==='ai')initChat();
+  if(id==='ai'){
+    // 修复3：打开AI面板强制清空消息+聊天DOM，彻底解决历史残留
+    aiMessages = [];
+    document.getElementById('chatBox').innerHTML = '';
+  }
 }
 
 function closePanel(e){
@@ -183,6 +189,8 @@ function closePanel(e){
     if(tsTimer){clearInterval(tsTimer);tsTimer=null;}
     isAiLoading=false;
     aiMessages = [];
+    const chatBox = document.getElementById('chatBox');
+    if(chatBox) chatBox.innerHTML = '';
   }
 }
 
@@ -197,7 +205,8 @@ function getPanelHTML(id){
   if(id==='json')return '<div class="field"><label>JSON内容</label><textarea id="jsonInput" placeholder=\'{"key":"value"}\' style="min-height:120px"></textarea></div><div class="result-box" id="jsonResult" style="white-space:pre;min-height:80px">-</div><div class="btn-row" style="margin-top:12px"><button class="btn btn-primary" onclick="fmtJson()">格式化</button><button class="btn btn-ghost" onclick="minJson()">压缩</button><button class="btn btn-ghost" onclick="copyText(\'jsonResult\')">复制</button></div>';
   if(id==='regex')return '<div class="field"><label>正则表达式</label><input id="regexPat" placeholder="\\d+"></div><div class="field"><label>测试文本</label><textarea id="regexText" placeholder="输入测试内容..."></textarea></div><div class="result-box" id="regexResult">-</div><div class="btn-row" style="margin-top:12px"><button class="btn btn-primary" onclick="testRegex()">测试</button></div>';
   if(id==='url')return '<div class="field"><label>输入</label><textarea id="urlInput" placeholder="输入内容..."></textarea></div><div class="result-box" id="urlResult">-</div><div class="btn-row" style="margin-top:12px"><button class="btn btn-primary" onclick="urlEncode()">编码</button><button class="btn btn-ghost" onclick="urlDecode()">解码</button><button class="btn btn-ghost" onclick="copyText(\'urlResult\')">复制</button></div>';
-  if(id==='ai')return '<div class="chat-box" id="chatBox"></div><div class="field"><textarea id="aiInput" placeholder="输入问题..." style="min-height:60px"></textarea></div><div class="field"><label>API Key（存本地）</label><input id="aiKey" type="password" placeholder="sk-..."></div><div class="btn-row"><button class="btn btn-primary" onclick="sendAI()">发送</button><button class="btn btn-ghost" onclick="saveKey()">保存Key</button></div>';
+  // 修复2：移除Key输入框、保存按钮，精简AI面板HTML
+  if(id==='ai')return '<div class="chat-box" id="chatBox"></div><div class="field"><textarea id="aiInput" placeholder="输入问题..." style="min-height:60px"></textarea></div><div class="btn-row"><button class="btn btn-primary" onclick="sendAI()">发送</button></div>';
   return '<p>开发中...</p>';
 }
 const debouncedConvertColor=debounce(convertColor);
@@ -218,16 +227,17 @@ function genQR(){
   if(!text)return;
   const out=document.getElementById('qrOut');
   out.innerHTML='';
+  qrInstance = null;
   if(!qrLoaded){
     const s=document.createElement('script');
     s.src='https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
     s.onload=()=>{
       qrLoaded=true;
-      new QRCode(out,{text,width:180,height:180,colorDark:'#00b4ff',colorLight:'#020b18'});
+      qrInstance = new QRCode(out,{text,width:180,height:180,colorDark:'#00b4ff',colorLight:'#020b18'});
     };
     document.head.appendChild(s);
   }else{
-    new QRCode(out,{text,width:180,height:180,colorDark:'#00b4ff',colorLight:'#020b18'});
+    qrInstance = new QRCode(out,{text,width:180,height:180,colorDark:'#00b4ff',colorLight:'#020b18'});
   }
 }
 
@@ -236,11 +246,13 @@ function convertColor(from){
     let r,g,b;
     if(from==='hex'){
       const h=document.getElementById('hexIn').value.replace('#','');
-      if(h.length!==6)return;
+      if(!/^[0-9a-fA-F]{6}$/.test(h)) return;
       r=parseInt(h.slice(0,2),16);g=parseInt(h.slice(2,4),16);b=parseInt(h.slice(4,6),16);
     }else{
-      const p=document.getElementById('rgbIn').value.split(',').map(x=>parseInt(x.trim()));
-      if(p.length<3)return;
+      const val = document.getElementById('rgbIn').value;
+      if(!/^\d{1,3},\s*\d{1,3},\s*\d{1,3}$/.test(val)) return;
+      const p=val.split(',').map(x=>parseInt(x.trim()));
+      if(p.some(n=>n>255||n<0)) return;
       r=p[0];g=p[1];b=p[2];
     }
     document.getElementById('hexIn').value='#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('');
@@ -278,11 +290,11 @@ async function calcHash(){
   }catch(e){showToast('哈希计算失败')}
 }
 
+// AES密钥修复：SHA256哈希固定32位密钥，避免短密钥碰撞
 async function getKey(k){
-  const rawKey=new TextEncoder().encode(k);
-  const fixedKey=new Uint8Array(32);
-  fixedKey.set(rawKey);
-  return crypto.subtle.importKey('raw',fixedKey,{name:'AES-GCM'},false,['encrypt','decrypt']);
+  const encoder = new TextEncoder();
+  const keyBuf = await crypto.subtle.digest("SHA-256", encoder.encode(k));
+  return crypto.subtle.importKey('raw',keyBuf,{name:'AES-GCM'},false,['encrypt','decrypt']);
 }
 async function aesEncrypt(){
   try{
@@ -337,8 +349,7 @@ function urlDecode(){
   try{document.getElementById('urlResult').textContent=decodeURIComponent(document.getElementById('urlInput').value);}catch(e){showToast('解码错误');}
 }
 
-function saveKey(){const k=document.getElementById('aiKey').value.trim();if(k){localStorage.setItem('dsKey',k);showToast('Key已保存');}}
-function initChat(){const k=localStorage.getItem('dsKey');if(k)document.getElementById('aiKey').value=k;}
+// 移除废弃的saveKey、initChat函数，后端统一鉴权无需本地Key
 async function sendAI(){
   if(isAiLoading)return;
   const input=document.getElementById('aiInput');
