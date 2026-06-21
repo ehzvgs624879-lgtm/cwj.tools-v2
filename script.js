@@ -1,4 +1,4 @@
-// 工具配置抽离，后续新增只改这里
+// 工具配置解耦
 const tools=[
   {id:'pwd',cat:'util',icon:'🔑',name:'密码生成',desc:'安全随机密码'},
   {id:'qr',cat:'util',icon:'◼',name:'二维码生成',desc:'文字转二维码'},
@@ -20,27 +20,30 @@ let colorDebounceTimer=null;
 let aiMessages=[];
 let aiTypeTimer=null;
 let bgAnimId=null;
-// 触屏滑动分类变量
+// 标签拖拽变量
 let dragStartX=0, dragScrollLeft=0,isDragging=false;
-// 粒子鼠标引力
+// 粒子鼠标坐标
 let mouseX=null,mouseY=null;
 
-// 本地存储工具
+// 本地存储封装
 const Storage={
   get(k){try{return JSON.parse(localStorage.getItem(k))}catch{return null}},
   set(k,v){localStorage.setItem(k,JSON.stringify(v))},
   del(k){localStorage.removeItem(k)}
 }
-// 初始化主题
-const savedTheme=Storage.get('cwj-theme')||'dark';
-document.documentElement.setAttribute('data-theme',savedTheme);
-document.getElementById('themeSwitch').textContent=savedTheme==='dark'?'☀':'🌙';
-document.getElementById('themeSwitch').onclick=()=>{
-  const now=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
-  document.documentElement.setAttribute('data-theme',now);
-  document.getElementById('themeSwitch').textContent=now==='dark'?'☀':'🌙';
-  Storage.set('cwj-theme',now);
-}
+// 主题初始化
+(function initTheme(){
+  const savedTheme=Storage.get('cwj-theme')||'dark';
+  document.documentElement.setAttribute('data-theme',savedTheme);
+  const switchBtn=document.getElementById('themeSwitch');
+  switchBtn.textContent=savedTheme==='dark'?'☀':'🌙';
+  switchBtn.onclick=()=>{
+    const now=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',now);
+    switchBtn.textContent=now==='dark'?'☀':'🌙';
+    Storage.set('cwj-theme',now);
+  }
+})();
 
 function showToast(msg){
   const toast=document.getElementById('toast');
@@ -71,21 +74,26 @@ function renderTools(cat='all'){
     grid.appendChild(d);
   });
 }
-// 绑定标签点击+触屏横向拖拽
-const tabWrap=document.getElementById('tabWrap');
-document.querySelectorAll('.tab').forEach(tab=>{
-  tab.onclick=(e)=>{
-    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-    e.target.classList.add('active');
-    filterTools(e.target.dataset.key);
-  }
-})
-tabWrap.addEventListener('mousedown',e=>{isDragging=true;dragStartX=e.pageX;dragScrollLeft=tabWrap.scrollLeft;tabWrap.style.cursor='grabbing'});
-tabWrap.addEventListener('mousemove',e=>{if(!isDragging)return;e.preventDefault();tabWrap.scrollLeft=dragScrollLeft-(e.pageX-dragStartX)});
-window.addEventListener('mouseup',()=>{isDragging=false;tabWrap.style.cursor='grab'});
-// 移动端触摸
-tabWrap.addEventListener('touchstart',e=>{dragStartX=e.touches[0].pageX;dragScrollLeft=tabWrap.scrollLeft});
-tabWrap.addEventListener('touchmove',e=>{tabWrap.scrollLeft=dragScrollLeft-(e.touches[0].pageX-dragStartX)});
+
+// 标签点击+拖拽绑定
+(function initTabDrag(){
+  const tabWrap=document.getElementById('tabWrap');
+  // 点击切换分类
+  document.querySelectorAll('.tab').forEach(tab=>{
+    tab.onclick=(e)=>{
+      document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+      e.target.classList.add('active');
+      filterTools(e.target.dataset.key);
+    }
+  })
+  // 鼠标拖拽
+  tabWrap.addEventListener('mousedown',e=>{isDragging=true;dragStartX=e.pageX;dragScrollLeft=tabWrap.scrollLeft;tabWrap.style.cursor='grabbing'});
+  tabWrap.addEventListener('mousemove',e=>{if(!isDragging)return;e.preventDefault();tabWrap.scrollLeft=dragScrollLeft-(e.pageX-dragStartX)});
+  window.addEventListener('mouseup',()=>{isDragging=false;tabWrap.style.cursor='grab'});
+  // 手机触摸滑动
+  tabWrap.addEventListener('touchstart',e=>{dragStartX=e.touches[0].pageX;dragScrollLeft=tabWrap.scrollLeft});
+  tabWrap.addEventListener('touchmove',e=>{tabWrap.scrollLeft=dragScrollLeft-(e.touches[0].pageX-dragStartX)});
+})();
 
 function filterTools(cat){
   const grid=document.getElementById('toolGrid');
@@ -128,10 +136,10 @@ function closePanel(e){
     if(chatBox) chatBox.innerHTML='';
   }
 }
-// ESC关闭弹窗
+
+// 全局快捷键ESC关闭弹窗、AI回车发送
 window.addEventListener('keydown',e=>{
   if(e.key==='Escape')closePanel();
-  // AI输入框回车发送，shift+回车换行
   const aiInput=document.getElementById('aiInput');
   if(document.activeElement===aiInput&&e.key==='Enter'&&!e.shiftKey){
     e.preventDefault();sendAI();
@@ -356,13 +364,16 @@ let particles=[];
 const PARTICLE_COUNT=80;
 const CONNECT_DIST=120;
 const CELL_SIZE=CONNECT_DIST;
-const ATTRACT_RADIUS=180; // 鼠标引力范围
+const ATTRACT_RADIUS=180;
 
 function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
 resize();
 window.addEventListener('resize',resize);
-// 监听鼠标位置
-canvas.addEventListener('mousemove',e=>{const rect=canvas.getBoundingClientRect();mouseX=e.clientX-rect.left;mouseY=e.clientY-rect.top})
+// 鼠标位置监听
+canvas.addEventListener('mousemove',e=>{
+  const rect=canvas.getBoundingClientRect();
+  mouseX=e.clientX-rect.left;mouseY=e.clientY-rect.top
+})
 canvas.addEventListener('mouseleave',()=>{mouseX=null;mouseY=null})
 
 for(let i=0;i<PARTICLE_COUNT;i++){
@@ -388,7 +399,7 @@ function drawBg(){
   const len=particles.length;
   for(let i=0;i<len;i++){
     const p=particles[i];
-    // 鼠标引力计算
+    // 鼠标引力逻辑
     if(mouseX!==null&&mouseY!==null){
       const dx=mouseX-p.x, dy=mouseY-p.y;
       const dist=Math.hypot(dx,dy);
@@ -398,7 +409,7 @@ function drawBg(){
         p.vy+=dy/dist*force;
       }
     }
-    // 速度阻尼回归基础速度
+    // 速度阻尼回归原始速度
     p.vx += (p.baseVx - p.vx)*0.02;
     p.vy += (p.baseVy - p.vy)*0.02;
     p.x+=p.vx;p.y+=p.vy;
@@ -459,5 +470,14 @@ function drawBg(){
   bgAnimId=requestAnimationFrame(drawBg);
 }
 
+// 切后台暂停动画
 document.addEventListener('visibilitychange',()=>{
-  if(document.h
+  if(document.hidden){if(bgAnimId){cancelAnimationFrame(bgAnimId);bgAnimId=null;}}
+  else{if(!bgAnimId)drawBg();}
+});
+
+drawBg();
+renderTools();
+
+// 导航滚动收缩逻辑
+const headerDom=document.getElementById('mainHeader');
