@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="dark">
+<html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,24 +8,22 @@
 </head>
 <body>
 <div class="toast" id="toast"></div>
-<!-- 主题切换按钮 -->
-<div class="theme-switch" id="themeSwitch" title="切换明暗主题">☀</div>
 <canvas id="bg"></canvas>
 <div class="wrapper">
-<header id="mainHeader">
+<header>
   <div class="logo">CWJ<span>Tools</span></div>
   <nav><a href="#tools">工具</a><a href="#about">关于</a></nav>
 </header>
 <div class="hero">
   <h1>CWJ <span class="glow">TOOLS</span></h1>
-  <p>/ 科技SaaS工具箱 · 高效 · 安全 · 极简 /</p>
+  <p>/ cwj自主研发 · 高效 · 安全 · 极简 /</p>
 </div>
-<div class="tabs" id="tabWrap">
-  <div class="tab active" data-key="all">全部</div>
-  <div class="tab" data-key="util">实用工具</div>
-  <div class="tab" data-key="crypto">加密安全</div>
-  <div class="tab" data-key="dev">开发工具</div>
-  <div class="tab" data-key="ai">AI 助手</div>
+<div class="tabs">
+  <div class="tab active" onclick="filterTools('all',event)">全部</div>
+  <div class="tab" onclick="filterTools('util',event)">实用工具</div>
+  <div class="tab" onclick="filterTools('crypto',event)">加密安全</div>
+  <div class="tab" onclick="filterTools('dev',event)">开发工具</div>
+  <div class="tab" onclick="filterTools('ai',event)">AI 助手</div>
 </div>
 <div class="grid" id="toolGrid"></div>
 </div>
@@ -38,6 +36,7 @@
   <div id="panelBody"></div>
 </div>
 </div>
+
 <script src="script.js"></script>
 </body>
 </html>
