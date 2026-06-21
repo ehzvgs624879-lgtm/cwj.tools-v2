@@ -1,25 +1,28 @@
 const tools=[
-{id:'pwd',cat:'util',icon:'🔑',name:'密码生成',desc:'安全随机密码'},
-{id:'qr',cat:'util',icon:'▣',name:'二维码生成',desc:'文字转二维码'},
-{id:'color',cat:'util',icon:'🎨',name:'颜色转换',desc:'HEX/RGB/HSL'},
-{id:'ts',cat:'util',icon:'🕒',name:'时间戳',desc:'时间互转'},
-{id:'hash',cat:'crypto',icon:'#',name:'Hash计算',desc:'SHA系列'},
-{id:'aes',cat:'crypto',icon:'🔒',name:'AES加密',desc:'安全加密'},
-{id:'b64',cat:'crypto',icon:'📦',name:'Base64',desc:'编码解码'},
-{id:'json',cat:'dev',icon:'{}',name:'JSON工具',desc:'格式化压缩'},
-{id:'regex',cat:'dev',icon:'.*',name:'正则测试',desc:'实时匹配'},
-{id:'url',cat:'dev',icon:'🔗',name:'URL工具',desc:'编码解码'},
-{id:'ai',cat:'ai',icon:'✦',name:'AI助手',desc:'智能对话'}
+{id:"pwd",cat:"util",icon:"🔑",name:"密码生成",desc:"安全随机密码"},
+{id:"qr",cat:"util",icon:"◼",name:"二维码生成",desc:"文字转二维码"},
+{id:"color",cat:"util",icon:"🎨",name:"颜色转换",desc:"HEX/RGB/HSL"},
+{id:"ts",cat:"util",icon:"🕐",name:"时间戳",desc:"时间互转"},
+{id:"hash",cat:"crypto",icon:"#",name:"Hash计算",desc:"SHA系列"},
+{id:"aes",cat:"crypto",icon:"🔒",name:"AES加密",desc:"文本加密解密"},
+{id:"b64",cat:"crypto",icon:"📦",name:"Base64",desc:"编码解码"},
+{id:"json",cat:"dev",icon:"{}",name:"JSON格式化",desc:"美化压缩"},
+{id:"regex",cat:"dev",icon:".*",name:"正则测试",desc:"匹配测试"},
+{id:"url",cat:"dev",icon:"🔗",name:"URL工具",desc:"编码解码"},
+{id:"ai",cat:"ai",icon:"✦",name:"AI助手",desc:"智能对话"}
 ];
 
 
-let aiMessages=
-JSON.parse(localStorage.getItem("cwj_ai_history")||"[]");
-
-
+let tsTimer=null;
+let qrLoaded=false;
+let qrInstance=null;
 let isAiLoading=false;
 
-let tsTimer=null;
+
+let aiMessages=
+JSON.parse(
+localStorage.getItem("cwj_ai_history")||"[]"
+);
 
 
 
@@ -30,6 +33,7 @@ const t=document.getElementById("toast");
 t.textContent=msg;
 
 t.classList.add("show");
+
 
 setTimeout(()=>{
 
@@ -46,10 +50,12 @@ t.classList.remove("show");
 function renderTools(cat="all"){
 
 
-const grid=document.getElementById("toolGrid");
+const grid=
+document.getElementById("toolGrid");
 
 
 grid.innerHTML="";
+
 
 
 tools
@@ -57,17 +63,13 @@ tools
 .forEach((t,i)=>{
 
 
-const card=document.createElement("div");
+const div=document.createElement("div");
 
 
-card.className="card";
+div.className="card";
 
 
-card.style.animationDelay=
-`${i*50}ms`;
-
-
-card.innerHTML=`
+div.innerHTML=`
 
 <div class="card-icon">
 ${t.icon}
@@ -84,10 +86,17 @@ ${t.desc}
 `;
 
 
-card.onclick=()=>openTool(t.id);
+
+div.style.animationDelay=
+`${i*60}ms`;
 
 
-grid.appendChild(card);
+
+div.onclick=()=>openTool(t.id);
+
+
+
+grid.appendChild(div);
 
 
 
@@ -109,8 +118,10 @@ x.classList.remove("active")
 );
 
 
+
 if(e)
 e.target.classList.add("active");
+
 
 
 renderTools(cat);
@@ -125,14 +136,14 @@ renderTools(cat);
 function openTool(id){
 
 
-const tool=
-tools.find(t=>t.id===id);
+const t=
+tools.find(x=>x.id===id);
 
 
 
 document.getElementById("panelTitle")
 .textContent=
-tool.icon+" "+tool.name;
+t.icon+" "+t.name;
 
 
 
@@ -142,8 +153,7 @@ getPanelHTML(id);
 
 
 
-document
-.getElementById("overlay")
+document.getElementById("overlay")
 .classList.add("show");
 
 
@@ -152,10 +162,8 @@ if(id==="ts")
 initTs();
 
 
-
 if(id==="ai")
-loadAIHistory();
-
+loadAI();
 
 
 }
@@ -166,13 +174,16 @@ loadAIHistory();
 function closePanel(e){
 
 
-if(!e ||
-e.target===document.getElementById("overlay")){
+if(
+!e ||
+e.target===document.getElementById("overlay")
+){
 
 
 document
 .getElementById("overlay")
 .classList.remove("show");
+
 
 
 if(tsTimer)
@@ -192,35 +203,99 @@ clearInterval(tsTimer);
 function getPanelHTML(id){
 
 
+if(id==="pwd")
+
+return `
+
+<div class="field">
+
+<label>
+长度
+</label>
+
+<input id="pwdLen"
+type="range"
+min="8"
+max="32"
+value="16">
+
+</div>
+
+
+<div class="result-box"
+id="pwdResult">
+
+点击生成
+
+</div>
+
+
+<button class="btn btn-primary"
+onclick="genPwd()">
+
+生成
+
+</button>
+
+`;
+
+
+
+
+
+if(id==="qr")
+
+return `
+
+<textarea id="qrInput"
+placeholder="输入文字或链接">
+
+</textarea>
+
+
+<div id="qrOut"></div>
+
+
+<button class="btn btn-primary"
+onclick="genQR()">
+
+生成二维码
+
+</button>
+
+`;
+
+
+
+
 
 if(id==="ai")
 
 return `
 
+<div id="chatBox"
+class="chat-box">
 
-<div class="chat-box" id="chatBox"></div>
+</div>
 
 
 <textarea
 id="aiInput"
-placeholder="输入问题..."
-></textarea>
+placeholder="输入问题">
+
+</textarea>
 
 
-<div class="btn-row">
-
-<button
-class="btn btn-primary"
+<button class="btn btn-primary"
 onclick="sendAI()">
 
 发送
 
 </button>
 
-
-</div>
-
 `;
+
+
 
 
 
@@ -228,52 +303,13 @@ return `
 
 <div class="result-box">
 
-功能加载中...
+工具加载中...
 
 </div>
 
 `;
 
-
-
 }
-
-
-
-
-
-function loadAIHistory(){
-
-
-const box=
-document.getElementById("chatBox");
-
-
-if(!box)return;
-
-
-box.innerHTML="";
-
-
-aiMessages.forEach(m=>{
-
-
-box.innerHTML+=`
-
-<div class="msg ${m.role}">
-
-${m.content}
-
-</div>
-
-`;
-
-
-});
-
-
-}
-
 
 
 
@@ -287,11 +323,11 @@ const input=
 document.getElementById("aiInput");
 
 
-const text=
-input.value.trim();
+const text=input.value.trim();
 
 
 if(!text)return;
+
 
 
 const box=
@@ -308,15 +344,6 @@ content:text
 });
 
 
-localStorage.setItem(
-
-"cwj_ai_history",
-
-JSON.stringify(aiMessages)
-
-);
-
-
 
 box.innerHTML+=`
 
@@ -326,21 +353,14 @@ ${text}
 
 </div>
 
-
-<div class="msg thinking">
-
-AI 思考中...
-
-</div>
-
 `;
 
 
 
 input.value="";
 
-
 isAiLoading=true;
+
 
 
 try{
@@ -351,18 +371,19 @@ await fetch(
 "https://api.cwj-tools.xyz/",
 {
 
+
 method:"POST",
 
 headers:{
 
-"Content-Type":"application/json"
+"Content-Type":
+
+"application/json"
 
 },
 
 
-body:
-
-JSON.stringify({
+body:JSON.stringify({
 
 messages:aiMessages,
 
@@ -374,21 +395,16 @@ max_tokens:1000
 });
 
 
+
 const data=
 await res.json();
-
-
-
-document
-.querySelector(".thinking")
-?.remove();
 
 
 
 const reply=
 data.choices?.[0]?.message?.content
 ||
-"暂无回复";
+"无回复";
 
 
 
@@ -399,7 +415,6 @@ role:"assistant",
 content:reply
 
 });
-
 
 
 localStorage.setItem(
@@ -424,23 +439,10 @@ ${reply}
 
 
 
-box.scrollTop=
-box.scrollHeight;
-
-
-
 }catch(e){
 
 
-box.innerHTML+=`
-
-<div class="msg ai">
-
-请求失败
-
-</div>
-
-`;
+showToast("AI连接失败");
 
 
 }
@@ -450,36 +452,153 @@ isAiLoading=false;
 
 
 }
+function loadAI(){
+
+const box=document.getElementById("chatBox");
+
+if(!box)return;
+
+
+box.innerHTML="";
+
+
+aiMessages.forEach(m=>{
+
+box.innerHTML+=`
+
+<div class="msg ${m.role}">
+
+${m.content}
+
+</div>
+
+`;
+
+});
+
+
+}
+
+
+
+
+
 function genPwd(){
 
+
 const len=
-document.getElementById("pwdLen")?.value || 16;
+document.getElementById("pwdLen").value;
 
 
 let chars=
 "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
 
-let result="";
+let out="";
 
 
 for(let i=0;i<len;i++){
 
-result+=
-chars[Math.floor(Math.random()*chars.length)];
+out+=chars[
+Math.floor(Math.random()*chars.length)
+];
 
 }
 
 
-const box=
-document.getElementById("pwdResult");
 
-
-if(box)
-box.textContent=result;
+document.getElementById("pwdResult")
+.textContent=out;
 
 
 }
+
+
+
+
+
+function genQR(){
+
+
+const text=
+document.getElementById("qrInput").value.trim();
+
+
+if(!text)return;
+
+
+
+const out=
+document.getElementById("qrOut");
+
+
+out.innerHTML="";
+
+
+
+if(!qrLoaded){
+
+
+const s=document.createElement("script");
+
+
+s.src=
+"https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js";
+
+
+
+s.onload=()=>{
+
+
+qrLoaded=true;
+
+
+new QRCode(
+out,
+{
+
+text:text,
+
+width:180,
+
+height:180
+
+}
+
+);
+
+
+};
+
+
+
+document.head.appendChild(s);
+
+
+
+}else{
+
+
+new QRCode(
+out,
+{
+
+text:text,
+
+width:180,
+
+height:180
+
+}
+
+);
+
+
+}
+
+
+}
+
 
 
 
@@ -487,8 +606,10 @@ box.textContent=result;
 
 function initTs(){
 
+
 if(tsTimer)
 clearInterval(tsTimer);
+
 
 
 tsTimer=setInterval(()=>{
@@ -504,7 +625,9 @@ el.textContent=
 Math.floor(Date.now()/1000);
 
 
+
 },1000);
+
 
 }
 
@@ -515,18 +638,19 @@ Math.floor(Date.now()/1000);
 function convertTs(){
 
 
-const input=
+const v=
 document.getElementById("tsInput").value;
-
-
-const date=
-new Date(Number(input)*1000);
 
 
 
 document.getElementById("tsResult")
 .textContent=
-date.toLocaleString();
+
+new Date(
+Number(v)*1000
+)
+.toLocaleString();
+
 
 
 }
@@ -540,6 +664,7 @@ async function calcHash(){
 
 const text=
 document.getElementById("hashInput").value;
+
 
 
 const algo=
@@ -565,6 +690,7 @@ document.getElementById("hashResult")
 
 Array.from(
 new Uint8Array(buf)
+
 )
 
 .map(
@@ -580,23 +706,30 @@ b=>b.toString(16).padStart(2,"0")
 
 
 
+
+
 function b64Encode(){
 
 
 try{
 
 
-const text=
-document.getElementById("b64Input").value;
-
-
 document.getElementById("b64Result")
 .textContent=
 
+
 btoa(
+
 unescape(
-encodeURIComponent(text)
+
+encodeURIComponent(
+
+document.getElementById("b64Input").value
+
 )
+
+)
+
 );
 
 
@@ -619,17 +752,21 @@ function b64Decode(){
 try{
 
 
-const text=
-document.getElementById("b64Input").value;
-
-
 document.getElementById("b64Result")
 .textContent=
 
 decodeURIComponent(
+
 escape(
-atob(text)
+
+atob(
+
+document.getElementById("b64Input").value
+
 )
+
+)
+
 );
 
 
@@ -655,17 +792,24 @@ try{
 
 const obj=
 JSON.parse(
+
 document.getElementById("jsonInput").value
+
 );
+
 
 
 document.getElementById("jsonResult")
 .textContent=
 
 JSON.stringify(
+
 obj,
+
 null,
+
 2
+
 );
 
 
@@ -678,6 +822,42 @@ showToast("JSON错误");
 
 
 }
+
+
+
+
+
+function minJson(){
+
+
+try{
+
+
+document.getElementById("jsonResult")
+.textContent=
+
+JSON.stringify(
+
+JSON.parse(
+
+document.getElementById("jsonInput").value
+
+)
+
+);
+
+
+
+}catch{
+
+showToast("JSON错误");
+
+}
+
+
+}
+
+
 
 
 
@@ -696,8 +876,6 @@ document.getElementById("urlInput").value
 
 
 }
-
-
 
 
 
@@ -723,7 +901,8 @@ document.getElementById("urlInput").value
 
 
 
-// ===== 背景粒子系统 =====
+// ===== 背景粒子 =====
+
 
 
 const canvas=
@@ -734,31 +913,33 @@ const ctx=
 canvas.getContext("2d");
 
 
+
 let particles=[];
 
 
 
 function resize(){
 
-canvas.width=
-innerWidth;
+canvas.width=innerWidth;
 
-
-canvas.height=
-innerHeight;
+canvas.height=innerHeight;
 
 }
-
 
 
 resize();
 
 
-window.onresize=resize;
+window.addEventListener(
+"resize",
+resize
+);
 
 
 
-for(let i=0;i<70;i++){
+
+
+for(let i=0;i<80;i++){
 
 
 particles.push({
@@ -777,6 +958,7 @@ r:Math.random()*2+1
 
 
 }
+
 
 
 
@@ -812,6 +994,7 @@ if(
 p.x<0||
 p.x>canvas.width
 )
+
 p.vx*=-1;
 
 
@@ -820,6 +1003,7 @@ if(
 p.y<0||
 p.y>canvas.height
 )
+
 p.vy*=-1;
 
 
@@ -842,18 +1026,15 @@ Math.PI*2
 );
 
 
-
 ctx.fillStyle=
+
 "rgba(0,180,255,.7)";
 
 
 ctx.fill();
 
 
-
 });
-
-
 
 
 
@@ -868,66 +1049,4 @@ drawBg();
 
 
 
-
-
-// 初始化
-
-
 renderTools();
-
-
-
-
-
-// 手机面板滑动关闭
-
-
-let startY=0;
-
-
-const panel=
-document.getElementById("panel");
-
-
-if(panel){
-
-
-panel.addEventListener(
-
-"touchstart",
-
-e=>{
-
-startY=
-e.touches[0].clientY;
-
-}
-
-);
-
-
-
-panel.addEventListener(
-
-"touchend",
-
-e=>{
-
-
-let end=
-e.changedTouches[0].clientY;
-
-
-if(end-startY>100){
-
-closePanel();
-
-}
-
-
-}
-
-);
-
-
-  }
