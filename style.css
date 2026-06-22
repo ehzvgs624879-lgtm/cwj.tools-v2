@@ -567,3 +567,62 @@ color:var(--text-1);
 transform:scale(.95);
 
 }
+/* ===== 统一顶部和工具列表风格 ===== */
+
+/* 1. 让 hero-banner 更低调，与 section 标题统一 */
+.hero-banner {
+  margin: 16px 16px 0;          /* 缩小上边距 */
+  padding: 12px 16px;           /* 缩小内边距 */
+  background: transparent;      /* 去掉半透明渐变背景 */
+  border: none;                 /* 去掉边框 */
+  border-radius: 0;             /* 直角，与下方列表对齐 */
+  gap: 12px;
+}
+
+/* 2. 调整 hero 内部文字，与 section-title 风格一致 */
+.hero-title {
+  font-size: 18px;              /* 略小于原 22px */
+  font-weight: 600;             /* 与 section-title 相同 */
+  color: var(--text-1);
+  font-family: 'Space Grotesk', sans-serif;
+}
+.hero-sub {
+  font-size: 12px;
+  color: var(--text-3);         /* 使用更淡的灰色，与列表描述一致 */
+  margin-top: 2px;
+}
+.hero-logo {
+  width: 36px;                  /* 缩小大C图标 */
+  height: 36px;
+  font-size: 18px;
+  border-radius: 12px;          /* 保持圆角，但缩小 */
+}
+
+/* 3. quick-grid 改为与工具列表相同的卡片风格 */
+.quick-grid {
+  padding: 12px 16px;           /* 与 section 的 padding 一致 */
+  gap: 10px;
+}
+.quick-card {
+  height: 72px;                 /* 降低高度，更像工具行 */
+  background: var(--surface);   /* 与 tool-list 背景相同 */
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md); /* 14px，与 tool-list 一致 */
+  flex-direction: row;          /* 改为水平布局，图标在左，文字在右 */
+  justify-content: flex-start;
+  padding: 0 14px;
+  gap: 12px;
+  transition: background 0.15s;
+}
+.quick-card div {
+  font-size: 20px;              /* 图标大小调整 */
+}
+.quick-card span {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-1);
+}
+.quick-card:active {
+  background: var(--surface-2); /* 点击反馈与 tool-row 一致 */
+  transform: none;              /* 取消缩放，改成背景变化 */
+}
