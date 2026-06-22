@@ -431,7 +431,7 @@ body{
 ::-webkit-scrollbar-track{background:transparent;}
 ::selection{background:rgba(0,212,232,.2);}
 
-/* ===== 顶部统一改造 ===== */
+/* ===== 顶部统一改造（修复与下方列表不匹配） ===== */
 .hero-banner {
   margin: 16px 16px 0;
   padding: 12px 16px;
@@ -440,12 +440,10 @@ body{
   border-radius: 0;
   gap: 12px;
 }
-
 .hero-title {
   font-size: 18px;
   font-weight: 600;
   color: var(--text-1);
-  font-family: 'Space Grotesk', sans-serif;
 }
 .hero-sub {
   font-size: 12px;
@@ -487,7 +485,7 @@ body{
   transform: none;
 }
 
-/* 让最近使用卡片也统一下风格（可改可不改，这里保持原有竖向，但调整高度和圆角与quick-card一致） */
+/* 让“最近使用”卡片也统一风格 */
 .recent-card {
   border-radius: var(--radius-md);
   height: 72px;
