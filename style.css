@@ -32,18 +32,15 @@ body{
   -webkit-font-smoothing:antialiased;
 }
 
-/* 动态背景 */
-.bg-glow {
-  position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: radial-gradient(circle at 80% 20%, rgba(0, 212, 232, 0.08), transparent 40%),
-              radial-gradient(circle at 20% 80%, rgba(168, 85, 247, 0.06), transparent 40%);
-  z-index: -1;
-  pointer-events: none;
+/* ===== App Shell ===== */
+.app{
+  display:flex;
+  flex-direction:column;
+  height:100vh;
+  height:100dvh;
 }
 
-.app{display:flex;flex-direction:column;height:100vh;height:100dvh;}
-
+/* ===== Top Bar ===== */
 .top-bar{
   height:var(--top-h);
   display:flex;
@@ -64,9 +61,7 @@ body{
   font-family:'Space Grotesk',system-ui,sans-serif;
   font-weight:700;font-size:15px;color:#fff;
   flex-shrink:0;
-  transition:transform 0.6s var(--spring);
 }
-.logo-mark:hover{transform:rotate(180deg) scale(1.1);}
 .logo-text{
   font-family:'Space Grotesk',system-ui,sans-serif;
   font-size:17px;font-weight:500;color:var(--text-1);
@@ -80,6 +75,7 @@ body{
 }
 .menu-btn:active{color:var(--text-1);}
 
+/* ===== Main Content ===== */
 .main-content{flex:1;overflow:hidden;position:relative;}
 
 .page{
@@ -94,6 +90,7 @@ body{
 .page::-webkit-scrollbar{display:none;}
 .page.active{display:block;}
 
+/* ===== Section ===== */
 .section{padding:20px 16px 0;}
 .section-header{
   display:flex;align-items:center;
@@ -106,12 +103,7 @@ body{
   letter-spacing:.2px;
 }
 
-/* 动画定义 */
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(15px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
+/* ===== Recent Tools ===== */
 .recent-scroll{
   display:flex;gap:12px;
   overflow-x:auto;
@@ -119,7 +111,10 @@ body{
   scrollbar-width:none;
 }
 .recent-scroll::-webkit-scrollbar{display:none;}
-
+.recent-empty{
+  font-size:13px;color:var(--text-3);
+  padding:14px 0;
+}
 .recent-card{
   flex-shrink:0;
   width:130px;height:78px;
@@ -129,10 +124,6 @@ body{
   display:flex;flex-direction:column;
   justify-content:space-between;
   transition:transform .18s var(--ease),opacity .18s;
-  background:var(--surface);
-  border:1px solid var(--border);
-  opacity:0;
-  animation:fadeInUp 0.5s var(--ease) forwards;
 }
 .recent-card:active{transform:scale(0.95);opacity:.85;}
 .recent-card-icon{font-size:22px;line-height:1;}
@@ -143,6 +134,7 @@ body{
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 
+/* ===== Tool List Rows ===== */
 .tool-list{
   background:var(--surface);
   border-radius:var(--radius-md);
@@ -155,13 +147,10 @@ body{
   padding:12px 16px;
   cursor:pointer;
   border-bottom:1px solid var(--border);
-  transition:all .2s var(--ease);
-  opacity:0;
-  animation:fadeInUp 0.5s var(--ease) forwards;
+  transition:background .15s;
 }
 .tool-row:last-child{border-bottom:none;}
-.tool-row:hover{background:var(--surface-2);border-color:var(--border-2);}
-.tool-row:active{background:var(--surface-3);}
+.tool-row:active{background:var(--surface-2);}
 
 .tool-row-icon{
   width:42px;height:42px;
@@ -180,6 +169,7 @@ body{
 .tool-row-desc{font-size:12px;color:var(--text-2);}
 .tool-row-arrow{color:var(--text-3);flex-shrink:0;}
 
+/* ===== Search ===== */
 .search-wrap{
   padding:12px 16px 10px;
   position:sticky;top:0;
@@ -195,7 +185,7 @@ body{
   padding:10px 14px;
   transition:border-color .2s;
 }
-.search-bar:focus-within{border-color:var(--accent);}
+.search-bar:focus-within{border-color:var(--border-2);}
 .search-bar svg{color:var(--text-3);flex-shrink:0;}
 .search-bar input{
   flex:1;background:none;border:none;outline:none;
@@ -209,7 +199,12 @@ body{
   transition:color .15s;
 }
 .search-clear:active{color:var(--text-1);}
+.search-empty{
+  text-align:center;padding:40px 16px;
+  color:var(--text-3);font-size:14px;
+}
 
+/* ===== Settings ===== */
 .settings-card{
   background:var(--surface);
   border-radius:var(--radius-md);
@@ -228,6 +223,7 @@ body{
 .settings-row.clickable:active{background:var(--surface-2);}
 .settings-value{color:var(--text-2);font-size:14px;}
 
+/* ===== Bottom Nav ===== */
 .bottom-nav{
   position:fixed;bottom:0;left:0;right:0;
   height:var(--nav-h);
@@ -248,6 +244,7 @@ body{
 .nav-item span{font-size:10px;font-weight:500;letter-spacing:.3px;}
 .nav-item.active{color:var(--accent);}
 
+/* ===== Toast ===== */
 .toast{
   position:fixed;top:68px;left:50%;
   transform:translateX(-50%) translateY(-10px);
@@ -263,6 +260,7 @@ body{
 }
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
+/* ===== Panel ===== */
 .panel-overlay{
   position:fixed;inset:0;
   background:rgba(0,0,0,.72);
@@ -427,6 +425,7 @@ body{
 .http-code-name{font-size:13px;font-weight:600;color:var(--text-1);margin-bottom:3px;}
 .http-code-desc{font-size:11px;color:var(--text-2);line-height:1.5;}
 
+/* ===== Scrollbar (global) ===== */
 ::-webkit-scrollbar{width:4px;}
 ::-webkit-scrollbar-thumb{background:var(--border-2);border-radius:2px;}
 ::-webkit-scrollbar-track{background:transparent;}
