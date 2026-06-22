@@ -425,197 +425,57 @@ body{
 .http-code-name{font-size:13px;font-weight:600;color:var(--text-1);margin-bottom:3px;}
 .http-code-desc{font-size:11px;color:var(--text-2);line-height:1.5;}
 
-/* ===== Scrollbar (global) ===== */
+/* ===== Scrollbar ===== */
 ::-webkit-scrollbar{width:4px;}
 ::-webkit-scrollbar-thumb{background:var(--border-2);border-radius:2px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::selection{background:rgba(0,212,232,.2);}
-/* ===== V3 Hero Banner ===== */
 
-.hero-banner{
-
-margin:20px 16px 0;
-
-padding:18px;
-
-display:flex;
-
-align-items:center;
-
-gap:14px;
-
-border-radius:22px;
-
-background:
-linear-gradient(
-135deg,
-rgba(0,212,232,.16),
-rgba(168,85,247,.12)
-);
-
-border:1px solid var(--border);
-
-}
-
-
-.hero-logo{
-
-width:48px;
-
-height:48px;
-
-border-radius:16px;
-
-display:flex;
-
-align-items:center;
-
-justify-content:center;
-
-font-size:24px;
-
-font-weight:700;
-
-background:
-linear-gradient(
-135deg,
-#00d4e8,
-#a855f7
-);
-
-color:white;
-
-}
-
-
-.hero-title{
-
-font-size:22px;
-
-font-weight:700;
-
-font-family:'Space Grotesk';
-
-}
-
-
-.hero-sub{
-
-margin-top:5px;
-
-font-size:12px;
-
-color:var(--text-2);
-
-}
-.quick-grid{
-
-display:grid;
-
-grid-template-columns:repeat(3,1fr);
-
-gap:10px;
-
-padding:16px;
-
-}
-
-
-.quick-card{
-
-height:90px;
-
-background:var(--surface);
-
-border:1px solid var(--border);
-
-border-radius:18px;
-
-display:flex;
-
-flex-direction:column;
-
-justify-content:center;
-
-align-items:center;
-
-gap:8px;
-
-transition:.2s;
-
-}
-
-
-.quick-card div{
-
-font-size:26px;
-
-}
-
-
-.quick-card span{
-
-font-size:12px;
-
-color:var(--text-1);
-
-}
-
-
-.quick-card:active{
-
-transform:scale(.95);
-
-}
-/* ===== 统一顶部和工具列表风格 ===== */
-
-/* 1. 让 hero-banner 更低调，与 section 标题统一 */
+/* ===== 顶部统一改造 ===== */
 .hero-banner {
-  margin: 16px 16px 0;          /* 缩小上边距 */
-  padding: 12px 16px;           /* 缩小内边距 */
-  background: transparent;      /* 去掉半透明渐变背景 */
-  border: none;                 /* 去掉边框 */
-  border-radius: 0;             /* 直角，与下方列表对齐 */
+  margin: 16px 16px 0;
+  padding: 12px 16px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
   gap: 12px;
 }
 
-/* 2. 调整 hero 内部文字，与 section-title 风格一致 */
 .hero-title {
-  font-size: 18px;              /* 略小于原 22px */
-  font-weight: 600;             /* 与 section-title 相同 */
+  font-size: 18px;
+  font-weight: 600;
   color: var(--text-1);
   font-family: 'Space Grotesk', sans-serif;
 }
 .hero-sub {
   font-size: 12px;
-  color: var(--text-3);         /* 使用更淡的灰色，与列表描述一致 */
+  color: var(--text-3);
   margin-top: 2px;
 }
 .hero-logo {
-  width: 36px;                  /* 缩小大C图标 */
+  width: 36px;
   height: 36px;
   font-size: 18px;
-  border-radius: 12px;          /* 保持圆角，但缩小 */
+  border-radius: 12px;
 }
 
-/* 3. quick-grid 改为与工具列表相同的卡片风格 */
 .quick-grid {
-  padding: 12px 16px;           /* 与 section 的 padding 一致 */
+  padding: 12px 16px;
   gap: 10px;
 }
 .quick-card {
-  height: 72px;                 /* 降低高度，更像工具行 */
-  background: var(--surface);   /* 与 tool-list 背景相同 */
+  height: 56px;
+  background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-md); /* 14px，与 tool-list 一致 */
-  flex-direction: row;          /* 改为水平布局，图标在左，文字在右 */
+  border-radius: var(--radius-md);
+  flex-direction: row;
   justify-content: flex-start;
   padding: 0 14px;
   gap: 12px;
   transition: background 0.15s;
 }
 .quick-card div {
-  font-size: 20px;              /* 图标大小调整 */
+  font-size: 20px;
 }
 .quick-card span {
   font-size: 14px;
@@ -623,6 +483,32 @@ transform:scale(.95);
   color: var(--text-1);
 }
 .quick-card:active {
-  background: var(--surface-2); /* 点击反馈与 tool-row 一致 */
-  transform: none;              /* 取消缩放，改成背景变化 */
+  background: var(--surface-2);
+  transform: none;
+}
+
+/* 让最近使用卡片也统一下风格（可改可不改，这里保持原有竖向，但调整高度和圆角与quick-card一致） */
+.recent-card {
+  border-radius: var(--radius-md);
+  height: 72px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 10px 14px;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+  flex-direction: column;
+}
+.recent-card-icon {
+  font-size: 20px;
+}
+.recent-card-name {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-2);
+}
+.recent-card:active {
+  background: var(--surface-2);
+  transform: scale(0.95);
 }
