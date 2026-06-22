@@ -30,15 +30,61 @@
 
   <main class="main-content">
 
-    <div class="page active" id="page-home">
-      <div class="section">
-        <div class="section-header">
-          <span class="section-title">最近使用</span>
-        </div>
-        <div class="recent-scroll" id="recentList"></div>
-      </div>
-      <div id="homeSections"></div>
-    </div>
+    <div class="hero-card">
+
+  <div class="hero-title">
+    CWJ Tools
+  </div>
+
+  <div class="hero-desc">
+    你的智能工具中心
+  </div>
+
+  <div class="hero-tags">
+    <span>⚡ AI Ready</span>
+    <span>🔒 Secure</span>
+    <span>🛠 13 Tools</span>
+  </div>
+
+</div>
+
+
+<div class="quick-grid">
+
+  <div class="quick-card" onclick="openTool('ai')">
+    <div>✦</div>
+    <span>AI助手</span>
+  </div>
+
+
+  <div class="quick-card" onclick="showPage('tools')">
+    <div>▦</div>
+    <span>全部工具</span>
+  </div>
+
+
+  <div class="quick-card" onclick="openTool('ip')">
+    <div>🌐</div>
+    <span>网络工具</span>
+  </div>
+
+</div>
+
+
+<div class="section">
+
+  <div class="section-header">
+    <span class="section-title">
+      最近使用
+    </span>
+  </div>
+
+  <div class="recent-scroll" id="recentList"></div>
+
+</div>
+
+
+<div id="homeSections"></div>
 
     <div class="page" id="page-tools">
       <div class="search-wrap">
