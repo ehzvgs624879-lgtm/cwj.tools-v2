@@ -48,7 +48,7 @@ while True:
     messages.append({"role": "user", "content": user_input})
 
     try:
-        response = client.chat.completions.create(model="llama-3.3-70b-versatile", messages=messages, tools=tools)
+        response = client.chat.completions.create(model="deepseek-r1-distill-llama-70b", messages=messages, tools=tools)
         msg = response.choices[0].message
         messages.append(msg)
 
@@ -61,7 +61,7 @@ while True:
                 
                 messages.append({"role": "tool", "tool_call_id": tool.id, "content": res})
             
-            response = client.chat.completions.create(model="llama-3.3-70b-versatile", messages=messages)
+            response = client.chat.completions.create(model="deepseek-r1-distill-llama-70b", messages=messages)
             msg = response.choices[0].message
             messages.append(msg)
 
