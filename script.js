@@ -12,6 +12,7 @@ const tools = [
   {id:'ai',      cat:'ai',     icon:'✦',  name:'AI对话',     desc:'云端大模型对话',  grad:'linear-gradient(135deg,#667eea,#764ba2)'},
   {id:'ip',      cat:'net',    icon:'🌐', name:'IP查询',     desc:'查询IP详细信息',  grad:'linear-gradient(135deg,#11998e,#38ef7d)'},
   {id:'httpcode',cat:'net',    icon:'📡', name:'HTTP状态码', desc:'状态码速查手册',  grad:'linear-gradient(135deg,#f7971e,#ffd200)'},
+  {id:'speedtest',cat:'net',   icon:'⚡', name:'网速测试',   desc:'测试网络下载速度', grad:'linear-gradient(135deg,#00f2fe,#4facfe)'},
 ];
 
 const CAT_LABELS = {
@@ -33,6 +34,8 @@ let aiTypeTimer = null;
 let regexWorker = null;
 let isIpLoading = false;
 let colorDebounceTimer = null;
+let isSpeedTesting = false;
+let speedAbortController = null;
 
 function showToast(msg) {
   const t = document.getElementById('toast');
@@ -210,8 +213,10 @@ function closePanel(e) {
     if (tsTimer) { clearInterval(tsTimer); tsTimer = null; }
     if (aiTypeTimer) { clearInterval(aiTypeTimer); aiTypeTimer = null; }
     if (aiAbortController) { aiAbortController.abort(); aiAbortController = null; }
+    if (speedAbortController) { speedAbortController.abort(); speedAbortController = null; }
     isAiLoading = false;
     isIpLoading = false;
+    isSpeedTesting = false;
     aiMessages = [];
     if (regexWorker) { regexWorker.terminate(); regexWorker = null; }
     const chatBox = document.getElementById('chatBox');
@@ -233,6 +238,7 @@ function getPanelHTML(id) {
   if (id==='ai') return `<div class="chat-box" id="chatBox"></div><div class="field"><textarea id="aiInput" placeholder="输入问题..." style="min-height:60px"></textarea></div><div class="btn-row"><button class="btn btn-primary" onclick="sendAI()">发送</button></div>`;
   if (id==='ip') return `<div class="field"><label>IP 地址（留空查询本机）</label><input id="ipInput" placeholder="如：1.1.1.1（留空查本机）" onkeydown="if(event.key==='Enter')ipQuery()"></div><div class="btn-row" style="margin-bottom:14px"><button class="btn btn-primary" onclick="ipQuery()">查询</button><button class="btn btn-ghost" onclick="document.getElementById('ipInput').value='';ipQuery()">查本机</button></div><div id="ipResult" class="ip-result-box" style="display:none"></div>`;
   if (id==='httpcode') return `<div class="field"><input id="httpSearchInput" placeholder="输入状态码或关键词，如：404" oninput="filterHttpCodes(this.value)"></div><div id="httpCodeList" class="http-code-list"></div>`;
+  if (id==='speedtest') return `<div class="speedtest-container"><div class="speedtest-gauge"><div class="speedtest-speed" id="speedVal">0.0</div><div class="speedtest-unit">Mbps</div></div><div class="speedtest-progress-bar"><div class="speedtest-progress-fill" id="speedProgress" style="width: 0%"></div></div><div class="speedtest-meta"><div class="speedtest-meta-item"><span class="label">延迟 (Ping)</span><span class="val" id="speedPing">-</span></div><div class="speedtest-meta-item"><span class="label">已下载</span><span class="val" id="speedLoaded">0.0 MB</span></div></div><div class="speedtest-status" id="speedStatus">点击“开始测试”开始</div><div class="btn-row" style="margin-top:20px; justify-content: center;"><button class="btn btn-primary" id="speedBtn" onclick="runSpeedTest()">开始测试</button></div></div>`;
   return '<p style="color:rgba(255,255,255,.35);text-align:center;padding:30px">开发中...</p>';
 }
 
@@ -575,6 +581,149 @@ if (panel) {
     if (moveY>80) closePanel();
     panel.style.transform=''; moveY=0;
   });
+}
+
+async function runSpeedTest() {
+  if (isSpeedTesting) {
+    if (speedAbortController) speedAbortController.abort();
+    resetSpeedUI();
+    return;
+  }
+
+  isSpeedTesting = true;
+  const btn = document.getElementById('speedBtn');
+  const gauge = document.querySelector('.speedtest-gauge');
+  const status = document.getElementById('speedStatus');
+  const speedVal = document.getElementById('speedVal');
+  const progressFill = document.getElementById('speedProgress');
+  const pingVal = document.getElementById('speedPing');
+  const loadedVal = document.getElementById('speedLoaded');
+
+  if (btn) {
+    btn.textContent = '停止测试';
+    btn.classList.remove('btn-primary');
+    btn.classList.add('btn-ghost');
+  }
+  if (gauge) gauge.classList.add('running');
+  if (status) status.textContent = '正在测试延迟 (Ping)...';
+
+  speedAbortController = new AbortController();
+
+  try {
+    let pings = [];
+    for (let i = 0; i < 3; i++) {
+      if (speedAbortController.signal.aborted) throw new Error('Aborted');
+      let pStart = Date.now();
+      await fetch('./index.html?cb=' + pStart, { method: 'HEAD', signal: speedAbortController.signal });
+      pings.push(Date.now() - pStart);
+      if (pingVal) pingVal.textContent = Math.round(pings.reduce((a,b)=>a+b,0)/pings.length) + ' ms';
+      await new Promise(r => setTimeout(r, 100));
+    }
+
+    if (status) status.textContent = '正在连接下载服务器...';
+
+    const fileUrl = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+    
+    let totalBytesLoaded = 0;
+    let startTime = Date.now();
+    let speedSamples = [];
+
+    const maxRuns = 3;
+    for (let run = 0; run < maxRuns; run++) {
+      if (speedAbortController.signal.aborted) throw new Error('Aborted');
+      if (status) status.textContent = `正在测试下载速度 (第 ${run + 1}/${maxRuns} 轮)...`;
+
+      const response = await fetch(fileUrl + '?cb=' + Date.now() + '_' + run, {
+        signal: speedAbortController.signal
+      });
+
+      if (!response.ok) throw new Error('Fetch failed');
+
+      const reader = response.body.getReader();
+      const contentLength = +response.headers.get('Content-Length') || 590000;
+      let runBytesLoaded = 0;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        runBytesLoaded += value.length;
+        totalBytesLoaded += value.length;
+
+        let elapsed = (Date.now() - startTime) / 1000;
+        if (elapsed > 0) {
+          let currentSpeedMbps = (totalBytesLoaded * 8) / (elapsed * 1000 * 1000);
+          speedSamples.push(currentSpeedMbps);
+          
+          let displaySpeed = currentSpeedMbps;
+          if (speedSamples.length > 5) {
+            const lastSamples = speedSamples.slice(-5);
+            displaySpeed = lastSamples.reduce((a,b)=>a+b,0) / lastSamples.length;
+          }
+
+          if (speedVal) speedVal.textContent = displaySpeed.toFixed(1);
+          if (loadedVal) loadedVal.textContent = (totalBytesLoaded / (1024 * 1024)).toFixed(2) + ' MB';
+          
+          let runProgress = (runBytesLoaded / contentLength) * 100;
+          let overallProgress = ((run * 100) + runProgress) / maxRuns;
+          if (progressFill) progressFill.style.width = Math.min(overallProgress, 100) + '%';
+        }
+      }
+    }
+
+    let elapsed = (Date.now() - startTime) / 1000;
+    let finalSpeedMbps = (totalBytesLoaded * 8) / (elapsed * 1000 * 1000);
+    if (speedVal) speedVal.textContent = finalSpeedMbps.toFixed(1);
+    if (status) status.textContent = '测试完成！';
+    if (progressFill) progressFill.style.width = '100%';
+    showToast('网速测试完成');
+
+  } catch (err) {
+    if (err.name === 'AbortError' || err.message === 'Aborted') {
+      if (status) status.textContent = '测试已停止';
+      showToast('测试已停止');
+    } else {
+      if (status) status.textContent = '测试出错: ' + err.message;
+      showToast('测试出错');
+      console.error(err);
+    }
+  } finally {
+    isSpeedTesting = false;
+    speedAbortController = null;
+    if (btn) {
+      btn.textContent = '重新测试';
+      btn.classList.add('btn-primary');
+      btn.classList.remove('btn-ghost');
+    }
+    if (gauge) gauge.classList.remove('running');
+  }
+}
+
+function resetSpeedUI() {
+  isSpeedTesting = false;
+  if (speedAbortController) {
+    speedAbortController.abort();
+    speedAbortController = null;
+  }
+  const speedVal = document.getElementById('speedVal');
+  const progressFill = document.getElementById('speedProgress');
+  const pingVal = document.getElementById('speedPing');
+  const loadedVal = document.getElementById('speedLoaded');
+  const status = document.getElementById('speedStatus');
+  const btn = document.getElementById('speedBtn');
+  const gauge = document.querySelector('.speedtest-gauge');
+
+  if (speedVal) speedVal.textContent = '0.0';
+  if (progressFill) progressFill.style.width = '0%';
+  if (pingVal) pingVal.textContent = '-';
+  if (loadedVal) loadedVal.textContent = '0.0 MB';
+  if (status) status.textContent = '点击“开始测试”开始';
+  if (btn) {
+    btn.textContent = '开始测试';
+    btn.classList.add('btn-primary');
+    btn.classList.remove('btn-ghost');
+  }
+  if (gauge) gauge.classList.remove('running');
 }
 
 const toolCountEl = document.getElementById('toolCount');
