@@ -729,3 +729,25 @@ function resetSpeedUI() {
 const toolCountEl = document.getElementById('toolCount');
 if (toolCountEl) toolCountEl.textContent = tools.length + ' 个';
 renderHome();
+
+
+// ========== 主题切换 ==========
+const THEME_KEY = 'cwj_tools_theme';
+function initTheme() {
+  const saved = localStorage.getItem(THEME_KEY) || 'dark';
+  applyTheme(saved);
+  const btn = document.getElementById('themeToggle');
+  if (btn) btn.textContent = saved === 'light' ? '🌙' : '☀️';
+}
+function applyTheme(mode) {
+  document.documentElement.setAttribute('data-theme', mode);
+  localStorage.setItem(THEME_KEY, mode);
+}
+function toggleTheme() {
+  const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+  const next = cur === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+  const btn = document.getElementById('themeToggle');
+  if (btn) btn.textContent = next === 'light' ? '🌙' : '☀️';
+}
+initTheme();
