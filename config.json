@@ -1,0 +1,29 @@
+{
+    "active_profile": "glm",
+    "profiles": {
+        "zhipu-air": {
+            "name": "zhipu-air",
+            "provider": "zhipu",
+            "model": "glm-4-air",
+            "base_url": "https://open.bigmodel.cn/api/paas/v4",
+            "api_key": "f60f481a9bfc407ebbe451c61fb9beb5.q73G2NTIryZUbcED",
+            "model_name": "智谱 GLM-4-Air"
+        },
+        "default": {
+            "name": "zhipu-air",
+            "provider": "zhipu",
+            "model": "glm-4-air",
+            "base_url": "https://open.bigmodel.cn/api/paas/v4",
+            "api_key": "f60f481a9bfc407ebbe451c61fb9beb5.q73G2NTIryZUbcED",
+            "model_name": "智谱 GLM-4-Air"
+        },
+        "glm": {
+            "name": "glm",
+            "provider": "zhipu",
+            "model": "glm-4.5-air",
+            "base_url": "https://open.bigmodel.cn/api/paas/v4",
+            "api_key": "f60f481a9bfc407ebbe451c61fb9beb5.q73G2NTIryZUbcED",
+            "model_name": "GLM-4.5-Air"
+        }
+    }
+}

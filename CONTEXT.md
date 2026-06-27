@@ -17,3 +17,8 @@
 - .bottom-nav - 底部导航
 - .panel - 弹出面板
 - .top-bar - 顶部栏
+
+
+## 🤖 Agent 运行强制规则
+1. **工作目录锁定**：永远在 `/data/data/com.termux/files/home/cwj.tools-v2` 下操作，严禁自行猜测或省略 `com.` 前缀。
+2. **工具降级**：如果调用自定义文件读取工具失败或警告，立即改用原生的 `cat` 或 `grep` 命令去读取文件。
