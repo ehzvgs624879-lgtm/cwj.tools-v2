@@ -1,0 +1,71 @@
+from api import call_llm, parse_response
+import tools
+import json
+
+# =========================
+# 1. LLM决策（让AI决定做什么）
+# =========================
+def llm_decide(task):
+    res = call_llm([
+        {"role":"system",
+         "content":"你是AI agent，只输出JSON：{action, input}。action=read/write/cmd/patch/none"},
+        {"role":"user","content":task}
+    ])
+
+    return parse_response(res)
+
+
+# =========================
+# 2. 执行器（根据AI决定执行工具）
+# =========================
+def execute(plan):
+    try:
+        data = json.loads(plan)
+    except:
+        return "JSON解析失败"
+
+    action = data.get("action")
+    inp = data.get("input")
+
+    if action == "read":
+        return tools.read_file(inp)
+
+    if action == "write":
+        return tools.write_file(inp["path"], inp["content"])
+
+    if action == "cmd":
+        return tools.run_cmd(inp)
+
+    if action == "patch":
+        return tools.apply_patch(inp["path"], inp["old"], inp["new"])
+
+    return "NO_ACTION"
+
+
+# =========================
+# 3. Runtime循环（核心升级点）
+# =========================
+def runtime_loop():
+    print("=== CODEx RUNTIME STARTED ===")
+
+    while True:
+        task = input("\n> ")
+
+        if task in ["exit","quit"]:
+            break
+
+        # 1. AI思考
+        plan = llm_decide(task)
+        print("\nPLAN:", plan)
+
+        # 2. 执行工具
+        result = execute(plan)
+        print("\nRESULT:", result)
+
+
+# =========================
+# 启动入口
+# =========================
+if __name__ == "__main__":
+    runtime_loop()
+
