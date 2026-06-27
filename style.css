@@ -3,36 +3,7 @@
 :root {
   /* Enhanced Color Palette */
   --bg:        #0a0a0f;
-  --bg-gradient: linear-gradient(180deg, #0a0a0f 0%, #12121a 100%);
   --surface:   #141421;
   --surface-2: #1a1a2e;
   --surface-3: #222238;
-  --border:    rgba(255, 255, 255, 0.1);
-  --text:      #ffffff;
-  --text-2:    rgba(255, 255, 255, 0.8);
-  --text-3:    rgba(255, 255, 255, 0.6);
-  --accent:    #6366f1;
-  --accent-2:  #8b5cf6;
-  --success:   #10b981;
-  --warning:   #f59e0b;
-  --error:     #ef4444;
-  --primary:   #3b82f6;
-  --secondary: #64748b;
-}
-
-body {
-  background: var(--bg-gradient);
-  color: var(--text);
-  font-family: 'Inter', sans-serif;
-  margin: 0;
-  padding: 0;
-  min-height: 100vh;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-}
+  --border:    rgba(255
