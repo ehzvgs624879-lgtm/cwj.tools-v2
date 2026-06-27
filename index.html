@@ -30,7 +30,14 @@
     width: 36px !important;
     height: 36px !important;
     font-size: 18px !important;
-    border-radius: 12px !important;
+    font-weight: 700 !important;
+    color: #fff !important;
+    border-radius: 50% !important;
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
   }
 
   .quick-grid {
@@ -85,6 +92,12 @@
     background: #1e1e2a !important;
     transform: scale(0.95) !important;
   }
+  .theme-toggle input:checked + span:first-of-type {
+    background: #3b82f6 !important;
+  }
+  .theme-toggle input:checked + span + span {
+    transform: translateX(20px) !important;
+  }
 </style>
 
 </head>
@@ -124,23 +137,6 @@
     <div class="hero-sub">
       智能工具中心 
     </div>
-  </div>
-
-      </div><div class="quick-grid">
-
-  <div class="quick-card" onclick="openTool('ai')">
-    <div>✦</div>
-    <span>AI助手</span>
-  </div>
-
-  <div class="quick-card" onclick="showPage('tools')">
-    <div>▦</div>
-    <span>全部工具</span>
-  </div>
-
-  <div class="quick-card" onclick="openTool('ip')">
-    <div>🌐</div>
-    <span>网络工具</span>
   </div>
 
       </div>
@@ -212,6 +208,21 @@
           </div>
         </div>
       </div>
+      <div class="section">
+        <div class="section-header">
+          <span class="section-title">外观</span>
+        </div>
+        <div class="settings-card">
+          <div class="settings-row">
+            <span>浅色模式</span>
+            <label class="theme-toggle" style="position:relative;display:inline-block;width:44px;height:24px;cursor:pointer;">
+              <input type="checkbox" id="lightModeToggle" onchange="toggleLightMode(this.checked)" style="opacity:0;width:0;height:0;">
+              <span style="position:absolute;inset:0;background:#333;border-radius:24px;transition:0.2s;"></span>
+              <span style="position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:0.2s;"></span>
+            </label>
+          </div>
+        </div>
+      </div>
     </div>
 
   </main>
@@ -255,6 +266,26 @@
   </div>
 </div>
 
+<script>
+function toggleLightMode(checked) {
+  if (checked) {
+    document.body.classList.add('light-mode');
+  } else {
+    document.body.classList.remove('light-mode');
+  }
+  localStorage.setItem('lightMode', checked ? '1' : '0');
+}
+(function() {
+  var saved = localStorage.getItem('lightMode');
+  if (saved === '1') {
+    document.body.classList.add('light-mode');
+    window.addEventListener('DOMContentLoaded', function() {
+      var t = document.getElementById('lightModeToggle');
+      if (t) t.checked = true;
+    });
+  }
+})();
+</script>
 <script src="script.js"></script>
 </body>
 </html>
