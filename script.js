@@ -238,7 +238,7 @@ function getPanelHTML(id) {
   if (id==='ai') return `<div class="chat-box" id="chatBox"></div><div class="field"><textarea id="aiInput" placeholder="输入问题..." style="min-height:60px"></textarea></div><div class="btn-row"><button class="btn btn-primary" onclick="sendAI()">发送</button></div>`;
   if (id==='ip') return `<div class="field"><label>IP 地址（留空查询本机）</label><input id="ipInput" placeholder="如：1.1.1.1（留空查本机）" onkeydown="if(event.key==='Enter')ipQuery()"></div><div class="btn-row" style="margin-bottom:14px"><button class="btn btn-primary" onclick="ipQuery()">查询</button><button class="btn btn-ghost" onclick="document.getElementById('ipInput').value='';ipQuery()">查本机</button></div><div id="ipResult" class="ip-result-box" style="display:none"></div>`;
   if (id==='httpcode') return `<div class="field"><input id="httpSearchInput" placeholder="输入状态码或关键词，如：404" oninput="filterHttpCodes(this.value)"></div><div id="httpCodeList" class="http-code-list"></div>`;
-  if (id==='speedtest') return `<div class="speedtest-container"><div class="speedtest-gauge"><div class="speedtest-speed" id="speedVal">0.0</div><div class="speedtest-unit">Mbps</div></div><div class="speedtest-progress-bar"><div class="speedtest-progress-fill" id="speedProgress" style="width: 0%"></div></div><div class="speedtest-meta"><div class="speedtest-meta-item"><span class="label">延迟 (Ping)</span><span class="val" id="speedPing">-</span></div><div class="speedtest-meta-item"><span class="label">已下载</span><span class="val" id="speedLoaded">0.0 MB</span></div></div><div class="speedtest-status" id="speedStatus">点击“进行中测试”进行中</div><div class="btn-row" style="margin-top:20px; justify-content: center;"><button class="btn btn-primary" id="speedBtn" onclick="runSpeedTest()">进行中测试</button></div></div>`;
+  if (id==='speedtest') return `<div class="speedtest-container"><div class="speedtest-gauge"><div class="speedtest-speed" id="speedVal">0.0</div><div class="speedtest-unit">Mbps</div></div><div class="speedtest-progress-bar"><div class="speedtest-progress-fill" id="speedProgress" style="width: 0%"></div></div><div class="speedtest-meta"><div class="speedtest-meta-item"><span class="label">延迟 (Ping)</span><span class="val" id="speedPing">-</span></div><div class="speedtest-meta-item"><span class="label">已下载</span><span class="val" id="speedLoaded">0.0 MB</span></div></div><div class="speedtest-status" id="speedStatus">点击“开始测试”开始</div><div class="btn-row" style="margin-top:20px; justify-content: center;"><button class="btn btn-primary" id="speedBtn" onclick="runSpeedTest()">开始测试</button></div></div>`;
   return '<p style="color:rgba(255,255,255,.35);text-align:center;padding:30px">开发中...</p>';
 }
 
@@ -717,9 +717,9 @@ function resetSpeedUI() {
   if (progressFill) progressFill.style.width = '0%';
   if (pingVal) pingVal.textContent = '-';
   if (loadedVal) loadedVal.textContent = '0.0 MB';
-  if (status) status.textContent = '点击“进行中测试”开始';
+  if (status) status.textContent = '点击“开始测试”开始';
   if (btn) {
-    btn.textContent = '进行中测试';
+    btn.textContent = '开始测试';
     btn.classList.add('btn-primary');
     btn.classList.remove('btn-ghost');
   }
@@ -729,25 +729,3 @@ function resetSpeedUI() {
 const toolCountEl = document.getElementById('toolCount');
 if (toolCountEl) toolCountEl.textContent = tools.length + ' 个';
 renderHome();
-
-
-// ========== 主题切换 ==========
-const THEME_KEY = 'cwj_tools_theme';
-function initTheme() {
-  const saved = localStorage.getItem(THEME_KEY) || 'dark';
-  applyTheme(saved);
-  const btn = document.getElementById('themeToggle');
-  if (btn) btn.textContent = saved === 'light' ? '🌙' : '☀️';
-}
-function applyTheme(mode) {
-  document.documentElement.setAttribute('data-theme', mode);
-  localStorage.setItem(THEME_KEY, mode);
-}
-function toggleTheme() {
-  const cur = document.documentElement.getAttribute('data-theme') || 'dark';
-  const next = cur === 'dark' ? 'light' : 'dark';
-  applyTheme(next);
-  const btn = document.getElementById('themeToggle');
-  if (btn) btn.textContent = next === 'light' ? '🌙' : '☀️';
-}
-initTheme();
