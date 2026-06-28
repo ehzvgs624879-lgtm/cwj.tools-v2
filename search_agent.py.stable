@@ -623,7 +623,8 @@ def main():
         except Exception as e:
             spinner.stop()
             print(c(f"\n  ✗ 报错: {e}", "red"))
-            history.clear(); conversation_messages.clear()
+            # 不清空history，把错误加入对话让LLM自己决策
+            history.append({"role":"user","content":f"上一步出现错误：{e}\n请分析原因并决定如何继续或修复。"})
 
 if __name__ == "__main__":
     main()
