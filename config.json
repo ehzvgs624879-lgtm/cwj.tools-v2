@@ -1,5 +1,5 @@
 {
-    "active_profile": "default",
+    "active_profile": "deepseek",
     "profiles": {
         "zhipu-air": {
             "name": "zhipu-air",
@@ -24,6 +24,14 @@
             "base_url": "https://open.bigmodel.cn/api/paas/v4",
             "api_key": "f60f481a9bfc407ebbe451c61fb9beb5.q73G2NTIryZUbcED",
             "model_name": "GLM-4.5-Air"
+        },
+        "deepseek": {
+            "name": "deepseek",
+            "provider": "deepseek",
+            "model": "deepseek-chat",
+            "base_url": "https://api.deepseek.com/v1",
+            "api_key": "sk-a0a9913aee124a5dbe7abdc60d9e57cd",
+            "model_name": "DeepSeek"
         }
     }
 }
