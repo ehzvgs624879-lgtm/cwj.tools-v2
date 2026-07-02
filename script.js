@@ -96,7 +96,7 @@ function createToolRow(t) {
   const row = document.createElement('div');
   row.className = 'tool-row';
   row.innerHTML = `
-    <div class="tool-row-icon" style="background:${t.grad}">${t.icon}</div>
+    <div class="tool-row-icon" style="background: ${t.grad}; color: white;">${t.icon}</div>
     <div class="tool-row-info">
       <div class="tool-row-name">${t.name}</div>
       <div class="tool-row-desc">${t.desc}</div>

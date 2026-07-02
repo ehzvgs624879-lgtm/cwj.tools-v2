@@ -148,6 +148,8 @@ body{
   cursor:pointer;
   border-bottom:1px solid var(--border);
   transition:background .15s;
+  position:relative;
+  z-index:1;
 }
 .tool-row:last-child{border-bottom:none;}
 .tool-row:active{background:var(--surface-2);}
@@ -158,7 +160,7 @@ body{
   display:flex;align-items:center;justify-content:center;
   font-size:19px;flex-shrink:0;
   font-family:'Inter',system-ui,sans-serif;
-  font-weight:700;color:#fff;
+  font-weight:700;
   letter-spacing:-.5px;
 }
 .tool-row-info{flex:1;min-width:0;}
@@ -176,6 +178,7 @@ body{
   background:var(--bg);
   z-index:5;
   border-bottom:1px solid var(--border);
+  pointer-events: auto;
 }
 .search-bar{
   display:flex;align-items:center;gap:10px;
@@ -197,6 +200,11 @@ body{
   color:var(--text-3);cursor:pointer;
   font-size:14px;padding:0;
   transition:color .15s;
+  height:20px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
 }
 .search-clear:active{color:var(--text-1);}
 .search-empty{
@@ -222,6 +230,11 @@ body{
 .settings-row.clickable{cursor:pointer;}
 .settings-row.clickable:active{background:var(--surface-2);}
 .settings-value{color:var(--text-2);font-size:14px;}
+
+/* ===== Search Clear Button ===== */
+.search-wrap .search-bar{
+  position:relative;
+}
 
 /* ===== Bottom Nav ===== */
 .bottom-nav{
@@ -299,19 +312,23 @@ body{
   display:flex;align-items:center;
   justify-content:space-between;
   padding:16px 0 18px;
+  position:relative;
+  z-index:1;
 }
 .panel-title{
   font-family:'Space Grotesk',system-ui,sans-serif;
   font-size:18px;font-weight:600;color:var(--text-1);
 }
 .panel-close{
-  width:30px;height:30px;border-radius:50%;
+  width:32px;height:32px;border-radius:50%;
   border:1px solid var(--border-2);
   background:var(--surface-2);
-  color:var(--text-2);font-size:14px;
+  color:var(--text-2);font-size:16px;
   cursor:pointer;display:flex;
   align-items:center;justify-content:center;
   transition:all .2s;
+  position:relative;
+  z-index:1;
 }
 .panel-close:active{background:var(--surface-3);color:var(--text-1);}
 
