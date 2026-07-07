@@ -2,244 +2,199 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>CWJ Tools — 智能工具中心</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CWJ Tools</title>
+
+<!-- Inter font -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+<!-- Motion One -->
+<script src="https://unpkg.com/motion@latest/dist/motion.js"></script>
+
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="toast" id="toast"></div>
 
-<div class="app">
+<!-- App Layout -->
+<div id="app-layout">
 
-  <header class="top-bar">
-    <div class="top-bar-logo">
-      <div class="logo-mark">C</div>
-      <span class="logo-text">CWJ<strong>.tools</strong></span>
-    </div>
-    <button class="menu-btn" onclick="showPage('settings')" aria-label="菜单">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <line x1="3" y1="6" x2="21" y2="6"/>
-        <line x1="3" y1="12" x2="21" y2="12"/>
-        <line x1="3" y1="18" x2="21" y2="18"/>
-      </svg>
-    </button>
-  </header>
-
-  <main class="main-content">
-
-    <!-- ===== HOME PAGE ===== -->
-    <div class="page active" id="page-home">
-
-      <!-- Hero Section -->
-      <section class="hero-section">
-        <div class="hero-bg">
-          <div class="hero-bg-glow"></div>
-          <div class="hero-bg-grid"></div>
-          <div class="hero-particles">
-            <div class="hero-particle"></div>
-            <div class="hero-particle"></div>
-            <div class="hero-particle"></div>
-            <div class="hero-particle"></div>
-            <div class="hero-particle"></div>
-            <div class="hero-particle"></div>
-          </div>
-        </div>
-
-        <div class="hero-badge">
-          <span class="hero-badge-dot"></span>
-          v2.5 — 全新设计
-        </div>
-
-        <div class="hero-content">
-          <h1 class="hero-title">
-            智能工具<br>
-            <span class="hero-title-gradient">触手可及</span>
-          </h1>
-          <p class="hero-subtitle">
-            密码管理 · 加密安全 · 开发助手 · AI 对话
-            <br>一站式工具集，助你高效工作
-          </p>
-        </div>
-
-        <div class="hero-actions">
-          <button class="btn-cta btn-cta-primary" onclick="showPage('tools')">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <rect x="3" y="3" width="7" height="7" rx="1"/>
-              <rect x="14" y="3" width="7" height="7" rx="1"/>
-              <rect x="14" y="14" width="7" height="7" rx="1"/>
-              <rect x="3" y="14" width="7" height="7" rx="1"/>
-            </svg>
-            浏览全部工具
-          </button>
-          <button class="btn-cta btn-cta-secondary" onclick="openAiFullScreen()">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 2a2 2 0 0 1 2 2c0 .96-.68 1.76-1.6 1.94L13 8h3a3 3 0 0 1 3 3v1.26a2 2 0 1 1-2 0V11a1 1 0 0 0-1-1h-3l-.6 2.06A2 2 0 0 1 12 16a2 2 0 0 1-1.4-3.44l-.5-1.7A2 2 0 0 1 8 9H5a1 1 0 0 0-1 1v1.26a2 2 0 1 1-2 0V11a3 3 0 0 1 3-3h3l.6-2.06A2 2 0 0 1 12 2z"/>
-            </svg>
-            AI 对话
-          </button>
-        </div>
-      </section>
-
-      <!-- Recent Tools -->
-      <section class="recent-section" id="recentSection">
-        <div class="recent-header">
-          <span class="recent-title">最近使用</span>
-          <button class="recent-clear" onclick="clearRecent()">清除记录</button>
-        </div>
-        <div class="recent-scroll" id="recentList"></div>
-      </section>
-
-      <!-- Tool Grid Sections (rendered by JS) -->
-      <div id="homeSections"></div>
-
-      <div class="home-tool-count" id="toolCount"></div>
+  <!-- Sidebar -->
+  <aside id="sidebar">
+    <div id="sidebar-brand">
+      <i data-lucide="zap" stroke-width="2"></i>
+      <span>CWJ Tools</span>
     </div>
 
-    <!-- ===== TOOLS PAGE ===== -->
-    <div class="page" id="page-tools">
-      <div class="search-wrap">
-        <div class="search-bar">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <circle cx="11" cy="11" r="8"/>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-          </svg>
-          <input id="searchInput" placeholder="搜索工具..." oninput="searchTools(this.value)">
-          <button class="search-clear" id="searchClear" onclick="clearSearch()" style="display:none">✕</button>
-        </div>
-      </div>
-      <div id="searchResultsWrap" style="display:none">
-        <div class="section">
-          <div class="tool-list" id="searchResultsList"></div>
-        </div>
-      </div>
-      <div id="allToolsList"></div>
-    </div>
+    <nav id="sidebar-nav">
+      <button class="nav-item active" data-page="home">
+        <i data-lucide="home" stroke-width="1.5"></i>
+        <span>首页</span>
+      </button>
+      <button class="nav-item" data-page="tools">
+        <i data-lucide="wrench" stroke-width="1.5"></i>
+        <span>工具</span>
+      </button>
+      <button class="nav-item" data-page="chat">
+        <i data-lucide="message-square" stroke-width="1.5"></i>
+        <span>AI 对话</span>
+      </button>
+      <button class="nav-item" data-page="settings">
+        <i data-lucide="settings" stroke-width="1.5"></i>
+        <span>设置</span>
+      </button>
+    </nav>
 
-    <!-- ===== SETTINGS PAGE ===== -->
-    <div class="page" id="page-settings">
-      <div class="section">
-        <div class="section-header">
-          <span class="section-title">关于</span>
-        </div>
-        <div class="settings-card">
-          <div class="settings-row">
-            <span>应用名称</span>
-            <span class="settings-value">CWJ Tools</span>
-          </div>
-          <div class="settings-row">
-            <span>版本</span>
-            <span class="settings-value">v2.5</span>
-          </div>
-          <div class="settings-row">
-            <span>作者</span>
-            <span class="settings-value">CWJ</span>
-          </div>
-          <div class="settings-row">
-            <span>工具总数</span>
-            <span class="settings-value" id="settingsToolCount">-</span>
-          </div>
+    <div id="sidebar-footer">
+      <kbd class="badge" id="kbd-hint">⌘K</kbd>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main id="main-content">
+
+    <!-- ============ HOME PAGE ============ -->
+    <section class="page active" id="page-home">
+      <div id="home-hero">
+        <h1>实用工具集</h1>
+        <p>简洁高效的在线工具，涵盖加密、编码、格式转换等常用功能。</p>
+      </div>
+
+      <div id="quick-actions"></div>
+
+      <div id="home-recent">
+        <div class="section-label">最近使用</div>
+        <ul class="recent-list" id="recent-list"></ul>
+        <div class="empty-state" id="recent-empty">
+          <i data-lucide="clock" stroke-width="1.5"></i>
+          <p>还没有使用过任何工具</p>
         </div>
       </div>
-      <div class="section">
-        <div class="section-header">
-          <span class="section-title">数据管理</span>
+    </section>
+
+    <!-- ============ TOOLS PAGE ============ -->
+    <section class="page" id="page-tools">
+      <h1 class="page-title">工具</h1>
+      <p class="page-subtitle">搜索或浏览全部 {{toolCount}} 个工具</p>
+
+      <div id="tools-search-wrapper">
+        <i data-lucide="search" stroke-width="1.5" id="tools-search-icon"></i>
+        <input type="text" class="input" id="tools-search" placeholder="搜索工具…" autocomplete="off">
+      </div>
+
+      <div id="tools-grid"></div>
+      <div class="empty-state" id="tools-empty" style="display:none">
+        <i data-lucide="search-x" stroke-width="1.5"></i>
+        <p>没有匹配的工具</p>
+      </div>
+
+      <!-- Tool Detail View (hidden by default) -->
+      <div id="tool-detail">
+        <button id="tool-back">
+          <i data-lucide="arrow-left" stroke-width="1.5"></i>
+          返回工具列表
+        </button>
+        <h2 id="tool-detail-title"></h2>
+        <p id="tool-detail-desc"></p>
+        <div id="tool-detail-body"></div>
+      </div>
+    </section>
+
+    <!-- ============ AI CHAT PAGE ============ -->
+    <section class="page" id="page-chat">
+      <div id="chat-header">
+        <div id="chat-header-title">
+          <i data-lucide="message-square" stroke-width="1.5"></i>
+          AI 对话
         </div>
-        <div class="settings-card">
-          <div class="settings-row clickable" onclick="clearRecent()">
-            <span>清除最近使用记录</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2">
-              <polyline points="3,6 5,6 21,6"/>
-              <path d="M19,6l-1,14H6L5,6"/>
-              <path d="M10,11v6"/><path d="M14,11v6"/>
-              <path d="M8,6V4a1,1,0,0,1,1-1h6a1,1,0,0,1,1,1v2"/>
-            </svg>
+        <select id="chat-model-select" class="input" style="width:auto; padding-right:28px">
+          <!-- Populated by JS -->
+        </select>
+      </div>
+
+      <div id="chat-messages"></div>
+
+      <div id="chat-loading">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+
+      <div id="chat-input-area">
+        <input type="text" class="input" id="chat-input" placeholder="输入消息… (Enter 发送, Shift+Enter 换行)" autocomplete="off">
+        <button id="chat-send-btn" title="发送">
+          <i data-lucide="send" stroke-width="2"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- ============ SETTINGS PAGE ============ -->
+    <section class="page" id="page-settings">
+      <h1 class="page-title">设置</h1>
+      <p class="page-subtitle">管理应用数据与查看信息</p>
+
+      <div class="settings-section">
+        <div class="settings-section-title">关于</div>
+        <div class="settings-item">
+          <div class="settings-item-info">
+            <h4>CWJ Tools V2</h4>
+            <p>简洁高效的在线工具集</p>
+          </div>
+        </div>
+        <div class="settings-item">
+          <div class="settings-item-info">
+            <h4>版本</h4>
+            <p>2.1.0</p>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- ===== AI PAGE ===== -->
-    <div class="page" id="page-ai">
-      <div class="ai-fullscreen">
-        <div class="ai-fullscreen-header">
-          <div class="ai-header-left">
-            <div class="ai-header-icon">✦</div>
-            <span class="ai-fullscreen-title">AI 对话</span>
+      <div class="settings-section">
+        <div class="settings-section-title">数据管理</div>
+        <div class="settings-item">
+          <div class="settings-item-info">
+            <h4>清除聊天记录</h4>
+            <p>删除所有 AI 对话历史</p>
           </div>
-          <div class="ai-header-actions">
-            <button class="ai-header-btn" onclick="clearAiHistory()" title="清空对话" aria-label="清空对话">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="3,6 5,6 21,6"/>
-                <path d="M19,6l-1,14H6L5,6"/>
-                <path d="M10,11v6"/><path d="M14,11v6"/>
-                <path d="M8,6V4a1,1,0,0,1,1-1h6a1,1,0,0,1,1,1v2"/>
-              </svg>
-            </button>
+          <button class="btn btn-danger btn-sm" id="btn-clear-chat">清除</button>
+        </div>
+        <div class="settings-item">
+          <div class="settings-item-info">
+            <h4>清除最近使用</h4>
+            <p>清空工具使用记录</p>
           </div>
+          <button class="btn btn-danger btn-sm" id="btn-clear-recent">清除</button>
         </div>
-        <div class="ai-fullscreen-chat" id="aiChatBox">
-          <!-- Welcome state rendered by JS -->
-        </div>
-        <div class="ai-fullscreen-input" id="aiInputArea">
-          <textarea id="aiFullInput" placeholder="输入问题..." rows="1" aria-label="输入消息"></textarea>
-          <button class="btn-send" id="aiSendBtn" onclick="sendAiFull()" aria-label="发送">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="22" y1="2" x2="11" y2="13"/>
-              <polygon points="22,2 15,22 11,13 2,9"/>
-            </svg>
-          </button>
+        <div class="settings-item">
+          <div class="settings-item-info">
+            <h4>清除全部数据</h4>
+            <p>重置所有本地存储数据</p>
+          </div>
+          <button class="btn btn-danger btn-sm" id="btn-clear-all">全部清除</button>
         </div>
       </div>
-    </div>
+    </section>
 
   </main>
-
-  <nav class="bottom-nav">
-    <button class="nav-item active" id="nav-home" onclick="showPage('home')">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-        <polyline points="9,22 9,12 15,12 15,22"/>
-      </svg>
-      <span>首页</span>
-    </button>
-    <button class="nav-item" id="nav-ai" onclick="openAiFullScreen()">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M12 2a2 2 0 0 1 2 2c0 .96-.68 1.76-1.6 1.94L13 8h3a3 3 0 0 1 3 3v1.26a2 2 0 1 1-2 0V11a1 1 0 0 0-1-1h-3l-.6 2.06A2 2 0 0 1 12 16a2 2 0 0 1-1.4-3.44l-.5-1.7A2 2 0 0 1 8 9H5a1 1 0 0 0-1 1v1.26a2 2 0 1 1-2 0V11a3 3 0 0 1 3-3h3l.6-2.06A2 2 0 0 1 12 2z"/>
-        <path d="M5 19a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
-        <path d="M19 19a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
-      </svg>
-      <span>AI对话</span>
-    </button>
-    <button class="nav-item" id="nav-tools" onclick="showPage('tools')">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <rect x="3" y="3" width="7" height="7" rx="1"/>
-        <rect x="14" y="3" width="7" height="7" rx="1"/>
-        <rect x="14" y="14" width="7" height="7" rx="1"/>
-        <rect x="3" y="14" width="7" height="7" rx="1"/>
-      </svg>
-      <span>全部工具</span>
-    </button>
-    <button class="nav-item" id="nav-settings" onclick="showPage('settings')">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="12" cy="12" r="3"/>
-        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-      </svg>
-      <span>设置</span>
-    </button>
-  </nav>
-
 </div>
 
-<div class="panel-overlay" id="overlay" onclick="closePanel(event)">
-  <div class="panel" id="panel">
-    <div class="panel-drag"></div>
-    <div class="panel-header">
-      <div class="panel-title" id="panelTitle"></div>
-      <button class="panel-close" onclick="closePanel()">✕</button>
+<!-- Command Palette Overlay -->
+<div id="command-palette-overlay">
+  <div id="command-palette">
+    <div id="command-palette-input-wrapper">
+      <i data-lucide="search" stroke-width="1.5"></i>
+      <input type="text" id="command-palette-input" placeholder="搜索工具或页面…" autocomplete="off">
     </div>
-    <div id="panelBody"></div>
+    <div id="command-palette-results"></div>
   </div>
 </div>
+
+<!-- Toast -->
+<div id="toast"></div>
 
 <script src="script.js"></script>
 </body>
