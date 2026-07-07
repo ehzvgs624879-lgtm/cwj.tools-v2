@@ -76,6 +76,7 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  touch-action: manipulation;
 }
 
 body {
@@ -175,7 +176,7 @@ input, textarea, select {
   font-size: 13px;
   font-weight: 500;
   color: var(--text-secondary);
-  transition: all var(--dur-fast) var(--ease-out);
+  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
   position: relative;
 }
 
@@ -307,16 +308,13 @@ h3 { font-size: 15px; }
   border-radius: var(--radius-md);
   padding: var(--space-lg);
   box-shadow: var(--shadow-xs);
-  transition: all var(--dur-normal) var(--ease-out);
+  transition: border-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
+  touch-action: manipulation;
 }
 
 .card:hover {
   border-color: var(--border-raised);
   box-shadow: var(--shadow-sm);
-}
-
-.card:active {
-  transform: scale(0.985);
 }
 
 /* ── Buttons ──────────────────────────────────────────────────── */
@@ -330,7 +328,7 @@ h3 { font-size: 15px; }
   font-size: 13px;
   font-weight: 500;
   letter-spacing: -0.01em;
-  transition: all var(--dur-fast) var(--ease-out);
+  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
   white-space: nowrap;
   user-select: none;
 }
@@ -495,7 +493,8 @@ select.input {
   font-size: 13px;
   font-weight: 500;
   color: var(--text-primary);
-  transition: all var(--dur-fast) var(--ease-out);
+  transition: border-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
+  touch-action: manipulation;
 }
 
 .quick-action:hover {
@@ -628,18 +627,15 @@ select.input {
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-xs);
   cursor: pointer;
-  transition: all var(--dur-normal) var(--ease-out);
+  transition: border-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
   text-align: left;
   width: 100%;
+  touch-action: manipulation;
 }
 
 .tool-card:hover {
   border-color: var(--border-raised);
   box-shadow: var(--shadow-sm);
-}
-
-.tool-card:active {
-  transform: scale(0.985);
 }
 
 .tool-card-icon {
@@ -703,7 +699,7 @@ select.input {
   padding: var(--space-xs) var(--space-sm);
   border-radius: var(--radius-sm);
   margin-bottom: var(--space-lg);
-  transition: all var(--dur-fast) var(--ease-out);
+  transition: color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
 }
 
 #tool-back:hover {
@@ -975,7 +971,7 @@ select.input {
   background: var(--accent);
   border-radius: var(--radius-sm);
   color: #fff;
-  transition: all var(--dur-fast) var(--ease-out);
+  transition: background var(--dur-fast) var(--ease-out);
 }
 
 #chat-send-btn:hover {
@@ -1170,7 +1166,7 @@ select.input {
   pointer-events: none;
   opacity: 0;
   transform: translateY(4px);
-  transition: all var(--dur-normal) var(--ease-out);
+  transition: opacity var(--dur-normal) var(--ease-out), transform var(--dur-normal) var(--ease-out);
 }
 
 #toast.show {

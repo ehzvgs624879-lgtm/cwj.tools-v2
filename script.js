@@ -8,6 +8,7 @@
 let currentPage = 'home';
 let currentTool = null;
 let isTransitioning = false;
+let toolDetailOpenTime = 0;
 
 // ── Lucide Icons Init ──────────────────────────────────────────
 function initLucide() {
@@ -143,6 +144,7 @@ function renderToolGrid(filter) {
 document.addEventListener('click', function(e) {
   const card = e.target.closest('.tool-card');
   if (card) {
+    e.stopPropagation();
     const tool = TOOLS.find(function(t) { return t.id === card.dataset.tool; });
     if (tool) openToolDetail(tool);
   }
@@ -160,6 +162,7 @@ document.addEventListener('input', function(e) {
 
 function openToolDetail(tool) {
   currentTool = tool;
+  toolDetailOpenTime = Date.now();
   recordToolUse(tool);
 
   document.getElementById('tools-grid').style.display = 'none';
@@ -171,17 +174,10 @@ function openToolDetail(tool) {
   document.getElementById('tool-detail-desc').textContent = tool.desc;
   document.getElementById('tool-detail-body').innerHTML = '';
   detail.classList.add('active');
+  detail.style.animation = 'pageIn 200ms cubic-bezier(0.16,1,0.3,1) forwards';
 
   tool.render();
   initLucide();
-
-  detail.style.opacity = '0';
-  detail.style.transform = 'translateY(4px)';
-  requestAnimationFrame(function() {
-    detail.style.transition = 'opacity 200ms cubic-bezier(0.16,1,0.3,1), transform 200ms cubic-bezier(0.16,1,0.3,1)';
-    detail.style.opacity = '1';
-    detail.style.transform = 'translateY(0)';
-  });
 }
 
 function hideToolDetail() {
@@ -193,7 +189,9 @@ function hideToolDetail() {
 }
 
 document.addEventListener('click', function(e) {
-  if (e.target.closest('#tool-back')) hideToolDetail();
+  if (e.target.closest('#tool-back')) {
+    if (Date.now() - toolDetailOpenTime > 400) hideToolDetail();
+  }
 });
 
 // ================================================================
