@@ -54,3 +54,8 @@ test_*.txt
 all_test.txt
 result.txt
 sum_result.txt
+# 防止未来再冒出类似的散装测试/备份文件
+*_test.txt
+*.broken
+*.stable
+*.working

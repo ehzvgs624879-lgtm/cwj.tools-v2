@@ -196,9 +196,8 @@ function openTool(id) {
   document.getElementById('overlay').classList.add('show');
   if (id === 'ts') initTs();
   if (id === 'ai') {
-    if (aiTypeTimer) { clearInterval(aiTypeTimer); aiTypeTimer = null; }
-    aiMessages = [];
-    document.getElementById('chatBox').innerHTML = '';
+    openAiFullScreen();
+    return;
   }
   if (id === 'httpcode') renderHttpCodes();
   setTimeout(() => {
@@ -217,7 +216,6 @@ function closePanel(e) {
     isAiLoading = false;
     isIpLoading = false;
     isSpeedTesting = false;
-    aiMessages = [];
     if (regexWorker) { regexWorker.terminate(); regexWorker = null; }
     const chatBox = document.getElementById('chatBox');
     if (chatBox) chatBox.innerHTML = '';
@@ -422,6 +420,155 @@ function urlDecode() {
   catch(e) { showToast('解码错误'); }
 }
 
+/* ===== AI 全屏对话 + localStorage 持久化 ===== */
+const AI_STORAGE_KEY = 'cwj_ai_messages';
+
+function loadAiMessages() {
+  try {
+    const saved = localStorage.getItem(AI_STORAGE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed)) return parsed;
+    }
+  } catch {}
+  return [];
+}
+
+function saveAiMessages(msgs) {
+  try { localStorage.setItem(AI_STORAGE_KEY, JSON.stringify(msgs)); } catch {}
+}
+
+function renderAiMessages(msgs, box) {
+  if (!box) return;
+  if (!msgs.length) {
+    box.innerHTML = '<div class="ai-welcome"><div class="ai-welcome-icon">✦</div><div class="ai-welcome-text">开始和 AI 对话吧<br>输入问题，发送即可</div></div>';
+    return;
+  }
+  box.innerHTML = msgs.map(m =>
+    m.role === 'user'
+      ? '<div class="msg user">' + escapeHtml(m.content) + '</div>'
+      : '<div class="msg ai">' + escapeHtml(m.content) + '</div>'
+  ).join('');
+  box.scrollTop = box.scrollHeight;
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function openAiFullScreen() {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const aiNav = document.getElementById('nav-ai');
+  const aiPage = document.getElementById('page-ai');
+  if (aiNav) aiNav.classList.add('active');
+  if (aiPage) aiPage.classList.add('active');
+
+  if (aiTypeTimer) { clearInterval(aiTypeTimer); aiTypeTimer = null; }
+
+  aiMessages = loadAiMessages();
+  const box = document.getElementById('aiChatBox');
+  if (box) renderAiMessages(aiMessages, box);
+
+  setTimeout(() => {
+    const input = document.getElementById('aiFullInput');
+    if (input) input.focus();
+  }, 300);
+}
+
+function handleAiKeydown(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendAiFull();
+  }
+}
+
+async function sendAiFull() {
+  if (isAiLoading) return;
+  const input = document.getElementById('aiFullInput');
+  const text = input.value.trim();
+  if (!text) return;
+
+  const box = document.getElementById('aiChatBox');
+
+  aiMessages.push({role: 'user', content: text});
+  saveAiMessages(aiMessages);
+
+  // Remove welcome if present
+  const welcome = box.querySelector('.ai-welcome');
+  if (welcome) box.innerHTML = '';
+
+  box.innerHTML += '<div class="msg user">' + escapeHtml(text) + '</div>';
+  box.innerHTML += '<div class="msg thinking" id="aiThinking">AI思考中...</div>';
+  input.value = '';
+  box.scrollTop = box.scrollHeight;
+
+  isAiLoading = true;
+  if (aiTypeTimer) { clearInterval(aiTypeTimer); aiTypeTimer = null; }
+  aiAbortController = new AbortController();
+
+  try {
+    const res = await fetch('https://api.cwj-tools.xyz/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: aiMessages, max_tokens: 1000 }),
+      signal: aiAbortController.signal
+    });
+    const data = await res.json();
+    document.getElementById('aiThinking')?.remove();
+
+    // Check we're still on the AI page
+    if (!document.getElementById('page-ai').classList.contains('active')) return;
+
+    const fullReply = data.choices?.[0]?.message?.content || '无响应';
+    const aiMsgDom = document.createElement('div');
+    aiMsgDom.className = 'msg ai';
+    box.appendChild(aiMsgDom);
+
+    let idx = 0;
+    aiTypeTimer = setInterval(() => {
+      if (idx >= fullReply.length) {
+        clearInterval(aiTypeTimer);
+        aiTypeTimer = null;
+        aiMessages.push({ role: 'assistant', content: fullReply });
+        saveAiMessages(aiMessages);
+        return;
+      }
+      // Type out char by char, but escape at each step is too heavy — use direct text
+      aiMsgDom.textContent += fullReply[idx];
+      box.scrollTop = box.scrollHeight;
+      idx++;
+    }, 25);
+  } catch (e) {
+    if (e.name === 'AbortError') return;
+    document.getElementById('aiThinking')?.remove();
+    const b = document.getElementById('aiChatBox');
+    if (b && document.getElementById('page-ai').classList.contains('active')) {
+      b.innerHTML += '<div class="msg error">请求失败：' + escapeHtml(e.message) + '</div>';
+    }
+    if (aiTypeTimer) { clearInterval(aiTypeTimer); aiTypeTimer = null; }
+  } finally {
+    isAiLoading = false;
+    aiAbortController = null;
+  }
+}
+
+function clearAiHistory() {
+  if (aiMessages.length === 0 && !document.getElementById('aiChatBox')?.querySelector('.msg')) {
+    showToast('暂无对话记录');
+    return;
+  }
+  if (!confirm('确定清空所有对话记录？')) return;
+  aiMessages = [];
+  localStorage.removeItem(AI_STORAGE_KEY);
+  const box = document.getElementById('aiChatBox');
+  if (box) renderAiMessages([], box);
+  showToast('已清空对话');
+}
+
+// Also wire the in-panel AI if it's ever opened via the tool list
 async function sendAI() {
   if (isAiLoading) return;
   const input = document.getElementById('aiInput');
