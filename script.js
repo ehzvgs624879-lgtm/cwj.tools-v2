@@ -1701,4 +1701,11 @@ var _watchDog = setInterval(function() {
   _w('WATCHDOG: tool-detail.active=' + dActive + ' display=' + dDisplay + ' currentTool=' + (currentTool?currentTool.id:'null') + ' currentPage=' + currentPage + ' isTrans=' + isTransitioning + ' ovLen=' + (document.getElementById('debug-overlay')?document.getElementById('debug-overlay').innerHTML.length:'no-ov'));
 }, 500);
 
+// ── Defense-in-depth: prevent multi-touch from suppressing clicks ──
+document.addEventListener('touchstart', function(e) {
+  if (e.touches.length > 1) {
+    e.preventDefault();
+  }
+}, { passive: false });
+
 document.addEventListener('DOMContentLoaded', initApp);
