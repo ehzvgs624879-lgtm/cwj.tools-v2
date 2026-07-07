@@ -3,97 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>CWJ Tools</title>
+<title>CWJ Tools — 智能工具中心</title>
 <link rel="stylesheet" href="style.css">
-
-<!-- ===== 内联样式（保留你喜欢的版本） ===== -->
-<style>
-  .hero-banner {
-    margin: 16px 16px 0 !important;
-    padding: 12px 16px !important;
-    background: transparent !important;
-    border: none !important;
-    border-radius: 0 !important;
-    gap: 12px !important;
-  }
-  .hero-title {
-    font-size: 18px !important;
-    font-weight: 600 !important;
-    color: #f0f0f5 !important;
-  }
-  .hero-sub {
-    font-size: 12px !important;
-    color: rgba(240,240,245,0.3) !important;
-    margin-top: 2px !important;
-  }
-  .hero-logo {
-    width: 36px !important;
-    height: 36px !important;
-    font-size: 18px !important;
-    font-weight: 700 !important;
-    color: #fff !important;
-    border-radius: 50% !important;
-    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%) !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    flex-shrink: 0 !important;
-  }
-
-  .quick-grid {
-    padding: 12px 16px !important;
-    gap: 10px !important;
-  }
-  .quick-card {
-    height: 56px !important;
-    background: #16161f !important;
-    border: 1px solid rgba(255,255,255,0.06) !important;
-    border-radius: 14px !important;
-    flex-direction: row !important;
-    justify-content: flex-start !important;
-    padding: 0 14px !important;
-    gap: 12px !important;
-    transition: background 0.15s !important;
-  }
-  .quick-card div {
-    font-size: 20px !important;
-  }
-  .quick-card span {
-    font-size: 14px !important;
-    font-weight: 500 !important;
-    color: #f0f0f5 !important;
-  }
-  .quick-card:active {
-    background: #1e1e2a !important;
-    transform: none !important;
-  }
-
-  .recent-card {
-    border-radius: 14px !important;
-    height: 72px !important;
-    background: #16161f !important;
-    border: 1px solid rgba(255,255,255,0.06) !important;
-    padding: 10px 14px !important;
-    justify-content: center !important;
-    align-items: center !important;
-    text-align: center !important;
-    gap: 4px !important;
-    flex-direction: column !important;
-  }
-  .recent-card-icon {
-    font-size: 20px !important;
-  }
-  .recent-card-name {
-    font-size: 11px !important;
-    font-weight: 500 !important;
-    color: rgba(240,240,245,0.55) !important;
-  }
-  .recent-card:active {
-    background: #1e1e2a !important;
-    transform: scale(0.95) !important;
-  }
-</style>
-
 </head>
 <body>
 <div class="toast" id="toast"></div>
@@ -105,7 +16,7 @@
       <div class="logo-mark">C</div>
       <span class="logo-text">CWJ<strong>.tools</strong></span>
     </div>
-    <button class="menu-btn" onclick="showPage('settings')">
+    <button class="menu-btn" onclick="showPage('settings')" aria-label="菜单">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <line x1="3" y1="6" x2="21" y2="6"/>
         <line x1="3" y1="12" x2="21" y2="12"/>
@@ -116,33 +27,75 @@
 
   <main class="main-content">
 
+    <!-- ===== HOME PAGE ===== -->
     <div class="page active" id="page-home">
-      <div class="hero-banner">
 
-  <div class="hero-logo">
-    C
-  </div>
+      <!-- Hero Section -->
+      <section class="hero-section">
+        <div class="hero-bg">
+          <div class="hero-bg-glow"></div>
+          <div class="hero-bg-grid"></div>
+          <div class="hero-particles">
+            <div class="hero-particle"></div>
+            <div class="hero-particle"></div>
+            <div class="hero-particle"></div>
+            <div class="hero-particle"></div>
+            <div class="hero-particle"></div>
+            <div class="hero-particle"></div>
+          </div>
+        </div>
 
-  <div>
-    <div class="hero-title">
-      CWJ Tools
-    </div>
+        <div class="hero-badge">
+          <span class="hero-badge-dot"></span>
+          v2.5 — 全新设计
+        </div>
 
-    <div class="hero-sub">
-      智能工具中心 
-    </div>
-  </div>
+        <div class="hero-content">
+          <h1 class="hero-title">
+            智能工具<br>
+            <span class="hero-title-gradient">触手可及</span>
+          </h1>
+          <p class="hero-subtitle">
+            密码管理 · 加密安全 · 开发助手 · AI 对话
+            <br>一站式工具集，助你高效工作
+          </p>
+        </div>
 
-      </div>
-      <div class="section">
-        <div class="section-header">
-          <span class="section-title">最近使用</span>
+        <div class="hero-actions">
+          <button class="btn-cta btn-cta-primary" onclick="showPage('tools')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <rect x="3" y="3" width="7" height="7" rx="1"/>
+              <rect x="14" y="3" width="7" height="7" rx="1"/>
+              <rect x="14" y="14" width="7" height="7" rx="1"/>
+              <rect x="3" y="14" width="7" height="7" rx="1"/>
+            </svg>
+            浏览全部工具
+          </button>
+          <button class="btn-cta btn-cta-secondary" onclick="openAiFullScreen()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2a2 2 0 0 1 2 2c0 .96-.68 1.76-1.6 1.94L13 8h3a3 3 0 0 1 3 3v1.26a2 2 0 1 1-2 0V11a1 1 0 0 0-1-1h-3l-.6 2.06A2 2 0 0 1 12 16a2 2 0 0 1-1.4-3.44l-.5-1.7A2 2 0 0 1 8 9H5a1 1 0 0 0-1 1v1.26a2 2 0 1 1-2 0V11a3 3 0 0 1 3-3h3l.6-2.06A2 2 0 0 1 12 2z"/>
+            </svg>
+            AI 对话
+          </button>
+        </div>
+      </section>
+
+      <!-- Recent Tools -->
+      <section class="recent-section" id="recentSection">
+        <div class="recent-header">
+          <span class="recent-title">最近使用</span>
+          <button class="recent-clear" onclick="clearRecent()">清除记录</button>
         </div>
         <div class="recent-scroll" id="recentList"></div>
-      </div>
+      </section>
+
+      <!-- Tool Grid Sections (rendered by JS) -->
       <div id="homeSections"></div>
+
+      <div class="home-tool-count" id="toolCount"></div>
     </div>
 
+    <!-- ===== TOOLS PAGE ===== -->
     <div class="page" id="page-tools">
       <div class="search-wrap">
         <div class="search-bar">
@@ -162,6 +115,7 @@
       <div id="allToolsList"></div>
     </div>
 
+    <!-- ===== SETTINGS PAGE ===== -->
     <div class="page" id="page-settings">
       <div class="section">
         <div class="section-header">
@@ -174,7 +128,7 @@
           </div>
           <div class="settings-row">
             <span>版本</span>
-            <span class="settings-value">v2.0</span>
+            <span class="settings-value">v2.5</span>
           </div>
           <div class="settings-row">
             <span>作者</span>
@@ -182,7 +136,7 @@
           </div>
           <div class="settings-row">
             <span>工具总数</span>
-            <span class="settings-value" id="toolCount">-</span>
+            <span class="settings-value" id="settingsToolCount">-</span>
           </div>
         </div>
       </div>
@@ -204,16 +158,36 @@
       </div>
     </div>
 
+    <!-- ===== AI PAGE ===== -->
     <div class="page" id="page-ai">
       <div class="ai-fullscreen">
         <div class="ai-fullscreen-header">
-          <span class="ai-fullscreen-title">✦ AI对话</span>
-          <button class="ai-fullscreen-clear" id="aiClearBtn" onclick="clearAiHistory()" title="清空对话">🗑</button>
+          <div class="ai-header-left">
+            <div class="ai-header-icon">✦</div>
+            <span class="ai-fullscreen-title">AI 对话</span>
+          </div>
+          <div class="ai-header-actions">
+            <button class="ai-header-btn" onclick="clearAiHistory()" title="清空对话" aria-label="清空对话">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3,6 5,6 21,6"/>
+                <path d="M19,6l-1,14H6L5,6"/>
+                <path d="M10,11v6"/><path d="M14,11v6"/>
+                <path d="M8,6V4a1,1,0,0,1,1-1h6a1,1,0,0,1,1,1v2"/>
+              </svg>
+            </button>
+          </div>
         </div>
-        <div class="ai-fullscreen-chat" id="aiChatBox"></div>
-        <div class="ai-fullscreen-input">
-          <textarea id="aiFullInput" placeholder="输入问题..." onkeydown="handleAiKeydown(event)"></textarea>
-          <button class="btn btn-primary" onclick="sendAiFull()">发送</button>
+        <div class="ai-fullscreen-chat" id="aiChatBox">
+          <!-- Welcome state rendered by JS -->
+        </div>
+        <div class="ai-fullscreen-input" id="aiInputArea">
+          <textarea id="aiFullInput" placeholder="输入问题..." rows="1" aria-label="输入消息"></textarea>
+          <button class="btn-send" id="aiSendBtn" onclick="sendAiFull()" aria-label="发送">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"/>
+              <polygon points="22,2 15,22 11,13 2,9"/>
+            </svg>
+          </button>
         </div>
       </div>
     </div>

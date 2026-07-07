@@ -86,6 +86,7 @@ function renderRecent() {
     const card = document.createElement('div');
     card.className = 'recent-card';
     card.style.background = t.grad;
+    card.style.border = '1px solid rgba(255,255,255,0.08)';
     card.innerHTML = `<div class="recent-card-icon">${t.icon}</div><div class="recent-card-name">${t.name}</div>`;
     card.onclick = () => openTool(t.id);
     el.appendChild(card);
@@ -108,6 +109,19 @@ function createToolRow(t) {
   return row;
 }
 
+function createToolCard(t) {
+  const card = document.createElement('div');
+  card.className = 'tool-grid-card';
+  card.setAttribute('data-cat', t.cat);
+  card.style.animationDelay = (tools.indexOf(t) * 0.05) + 's';
+  card.innerHTML = `
+    <div class="tool-grid-card-icon" style="background: ${t.grad};">${t.icon}</div>
+    <div class="tool-grid-card-name">${t.name}</div>
+  `;
+  card.onclick = () => openTool(t.id);
+  return card;
+}
+
 function renderHome() {
   renderRecent();
   const container = document.getElementById('homeSections');
@@ -117,12 +131,12 @@ function renderHome() {
     const catTools = tools.filter(t => t.cat === cat);
     if (!catTools.length) return;
     const sec = document.createElement('div');
-    sec.className = 'section';
-    sec.innerHTML = `<div class="section-header"><span class="section-title">${label}</span></div>`;
-    const list = document.createElement('div');
-    list.className = 'tool-list';
-    catTools.forEach(t => list.appendChild(createToolRow(t)));
-    sec.appendChild(list);
+    sec.className = 'tool-grid-section';
+    sec.innerHTML = `<div class="tool-grid-header"><span class="tool-grid-title">${label}</span></div>`;
+    const grid = document.createElement('div');
+    grid.className = 'tool-grid';
+    catTools.forEach(t => grid.appendChild(createToolCard(t)));
+    sec.appendChild(grid);
     container.appendChild(sec);
   });
 }
@@ -423,6 +437,97 @@ function urlDecode() {
 /* ===== AI 全屏对话 + localStorage 持久化 ===== */
 const AI_STORAGE_KEY = 'cwj_ai_messages';
 
+// ===== Lightweight Markdown Renderer =====
+function renderMarkdown(text) {
+  // Escape HTML first
+  const esc = escapeHtml(text);
+  // Code blocks (``` ... ```) — must come before inline code
+  let html = esc.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => {
+    const lines = code.split('\n');
+    // Trim leading empty line if present
+    if (lines[0].trim() === '') lines.shift();
+    const trimmed = lines.join('\n');
+    // Basic syntax highlight (keywords, strings, numbers, comments)
+    const highlighted = escapeHtml(trimmed)
+      .replace(/\b(function|const|let|var|return|if|else|for|while|class|import|export|from|async|await|try|catch|throw|new|this|typeof|instanceof|in|of|def|print|import|true|false|null|undefined)\b/g, '<span class="hl-kw">$1</span>')
+      .replace(/("[^"]*")|('[^']*')|(`[^`]*`)/g, '<span class="hl-str">$1</span>')
+      .replace(/\b(\d+\.?\d*)\b/g, '<span class="hl-num">$1</span>')
+      .replace(/\/\/.*$/gm, '<span class="hl-com">$&</span>');
+    const langLabel = lang ? `<div class="code-lang">${escapeHtml(lang)}</div>` : '';
+    return `<pre><div class="code-header">${langLabel}<button class="code-copy-btn" onclick="copyCodeBlock(this)" title="复制代码">✔ 复制</button></div><code>${highlighted}</code></pre>`;
+  });
+  // Inline code
+  html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+  // Images (before links)
+  html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" style="max-width:100%;border-radius:8px;margin:8px 0;">');
+  // Links
+  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+  // Blockquotes
+  html = html.replace(/^\s*&gt;\s(.+)$/gm, '<blockquote>$1</blockquote>');
+  // Horizontal rules
+  html = html.replace(/^\s*[-*_]{3,}\s*$/gm, '<hr>');
+  // Tables
+  html = html.replace(/\n([^\n]+)\|([^\n]+)\n([-:|\s]+)\|([-:|\s]+)\n(([^\n]+\|[^\n]+\n?)*)/g, (match) => {
+    const lines = match.trim().split('\n');
+    if (lines.length < 2) return match;
+    const headers = lines[0].split('|').map(c => c.trim()).filter(Boolean);
+    const rows = lines.slice(2).filter(l => l.includes('|') && !/^[-:|\s]+$/.test(l));
+    let table = '<table><thead><tr>';
+    headers.forEach(h => { table += `<th>${h}</th>`; });
+    table += '</tr></thead><tbody>';
+    rows.forEach(row => {
+      const cols = row.split('|').map(c => c.trim()).filter(Boolean);
+      if (cols.length) {
+        table += '<tr>';
+        cols.forEach(c => { table += `<td>${c}</td>`; });
+        table += '</tr>';
+      }
+    });
+    table += '</tbody></table>';
+    return '\n' + table;
+  });
+  // Headings
+  html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+  html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+  // Unordered lists
+  html = html.replace(/^\s*[-*+]\s(.+)$/gm, '<li>$1</li>');
+  html = html.replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>');
+  // Ordered lists
+  html = html.replace(/^\s*\d+\.\s(.+)$/gm, '<li>$1</li>');
+  // Wrap consecutive <li> in <ol> if preceded by a number pattern
+  html = html.replace(/(<li>.*<\/li>\n?)+/g, (m) => {
+    if (m.match(/<\/li>\n<li>/)) return '<ol>' + m + '</ol>';
+    return '<ul>' + m + '</ul>';
+  });
+  // Bold / italic
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  // Paragraphs — wrap remaining text blocks
+  html = html.replace(/\n\n/g, '</p><p>');
+  html = '<p>' + html + '</p>';
+  // Clean up nested/empty paragraphs
+  html = html.replace(/<p><\/p>/g, '');
+  html = html.replace(/<p>\s*<\/p>/g, '');
+  html = html.replace(/<p>([\s\S]*?)<\/(?:ul|ol|table|pre|blockquote|h[1-4]|hr)>/g, '$1</$2>');
+  html = html.replace(/<(?:ul|ol|table|pre|blockquote|h[1-4]|hr)>\s*<\/p>/g, '');
+  return html;
+}
+
+function copyCodeBlock(btn) {
+  const pre = btn.closest('pre');
+  if (!pre) return;
+  const code = pre.querySelector('code');
+  if (!code) return;
+  const text = code.textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✔ 已复制';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '✔ 复制'; btn.classList.remove('copied'); }, 2000);
+  }).catch(() => {});
+}
+
+// ===== AI State =====
 function loadAiMessages() {
   try {
     const saved = localStorage.getItem(AI_STORAGE_KEY);
@@ -441,15 +546,61 @@ function saveAiMessages(msgs) {
 function renderAiMessages(msgs, box) {
   if (!box) return;
   if (!msgs.length) {
-    box.innerHTML = '<div class="ai-welcome"><div class="ai-welcome-icon">✦</div><div class="ai-welcome-text">开始和 AI 对话吧<br>输入问题，发送即可</div></div>';
+    box.innerHTML = renderAiWelcome();
     return;
   }
-  box.innerHTML = msgs.map(m =>
-    m.role === 'user'
-      ? '<div class="msg user">' + escapeHtml(m.content) + '</div>'
-      : '<div class="msg ai">' + escapeHtml(m.content) + '</div>'
-  ).join('');
+  box.innerHTML = msgs.map((m, i) => renderAiMessageBlock(m, i === msgs.length - 1)).join('');
   box.scrollTop = box.scrollHeight;
+}
+
+const AI_SUGGESTIONS = [
+  '用中文写一首关于夏天的诗',
+  '解释量子计算的基本原理',
+  '帮我优化这段 JavaScript 代码',
+  'Python 和 JavaScript 的主要区别',
+  '写一个简单的 REST API 设计示例',
+  '如何学习机器学习？给一个路线图',
+];
+
+function renderAiWelcome() {
+  return `
+    <div class="ai-welcome">
+      <div class="ai-welcome-icon">✦</div>
+      <div class="ai-welcome-title">开始 AI 对话</div>
+      <div class="ai-welcome-sub">
+        有任何问题都可以问我 — 编程、写作、分析、创意，无所不答
+      </div>
+      <div class="ai-suggestions">
+        ${AI_SUGGESTIONS.map(s => `<div class="ai-suggestion" onclick="fillAiInput('${escapeHtml(s).replace(/'/g, "\\'")}')">${escapeHtml(s)}</div>`).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function renderAiMessageBlock(m, isLast) {
+  const role = m.role === 'user' ? 'user' : 'ai';
+  const label = m.role === 'user' ? '你' : 'AI';
+  const content = m.role === 'user'
+    ? `<div class="ai-msg-bubble user-msg">${escapeHtml(m.content)}</div>`
+    : `<div class="ai-msg-bubble">${renderMarkdown(m.content)}</div>`;
+  return `
+    <div class="ai-msg-group">
+      <div class="ai-msg-inner">
+        <div class="ai-msg-label ${role}">${label}</div>
+        ${content}
+      </div>
+    </div>
+  `;
+}
+
+function fillAiInput(text) {
+  const input = document.getElementById('aiFullInput');
+  if (!input) return;
+  input.value = text;
+  input.focus();
+  // Trigger auto-resize
+  input.style.height = 'auto';
+  input.style.height = Math.min(input.scrollHeight, 150) + 'px';
 }
 
 function escapeHtml(str) {
@@ -472,17 +623,29 @@ function openAiFullScreen() {
   const box = document.getElementById('aiChatBox');
   if (box) renderAiMessages(aiMessages, box);
 
+  setupAiInput();
+
   setTimeout(() => {
     const input = document.getElementById('aiFullInput');
     if (input) input.focus();
   }, 300);
 }
 
-function handleAiKeydown(e) {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendAiFull();
-  }
+// Auto-resize input on mobile
+function setupAiInput() {
+  const input = document.getElementById('aiFullInput');
+  if (!input) return;
+  // Remove old keydown handler, add new one
+  input.onkeydown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendAiFull();
+    }
+  };
+  input.oninput = () => {
+    input.style.height = 'auto';
+    input.style.height = Math.min(input.scrollHeight, 150) + 'px';
+  };
 }
 
 async function sendAiFull() {
@@ -500,12 +663,28 @@ async function sendAiFull() {
   const welcome = box.querySelector('.ai-welcome');
   if (welcome) box.innerHTML = '';
 
-  box.innerHTML += '<div class="msg user">' + escapeHtml(text) + '</div>';
-  box.innerHTML += '<div class="msg thinking" id="aiThinking">AI思考中...</div>';
+  // Re-render all messages + add thinking state
+  box.innerHTML = aiMessages.map((m, i) => renderAiMessageBlock(m, i === aiMessages.length - 1)).join('');
+  // Add thinking indicator
+  box.innerHTML += `
+    <div class="ai-msg-group" id="aiThinking">
+      <div class="ai-msg-inner" style="border:none">
+        <div class="ai-msg-label ai">AI</div>
+        <div class="ai-thinking">
+          <div class="ai-thinking-dot"></div>
+          <div class="ai-thinking-dot"></div>
+          <div class="ai-thinking-dot"></div>
+        </div>
+      </div>
+    </div>
+  `;
   input.value = '';
+  input.style.height = 'auto';
   box.scrollTop = box.scrollHeight;
 
   isAiLoading = true;
+  const sendBtn = document.getElementById('aiSendBtn');
+  if (sendBtn) sendBtn.disabled = true;
   if (aiTypeTimer) { clearInterval(aiTypeTimer); aiTypeTimer = null; }
   aiAbortController = new AbortController();
 
@@ -523,32 +702,61 @@ async function sendAiFull() {
     if (!document.getElementById('page-ai').classList.contains('active')) return;
 
     const fullReply = data.choices?.[0]?.message?.content || '无响应';
-    const aiMsgDom = document.createElement('div');
-    aiMsgDom.className = 'msg ai';
-    box.appendChild(aiMsgDom);
 
+    // Create the AI message container with rendered markdown
+    const aiGroup = document.createElement('div');
+    aiGroup.className = 'ai-msg-group';
+    aiGroup.innerHTML = `
+      <div class="ai-msg-inner" style="border:none">
+        <div class="ai-msg-label ai">AI</div>
+        <div class="ai-msg-bubble" id="aiReplyBubble"></div>
+      </div>
+    `;
+    box.appendChild(aiGroup);
+
+    const aiBubble = document.getElementById('aiReplyBubble');
+
+    // Streaming typewriter — render markdown progressively
     let idx = 0;
+    let accumulated = '';
     aiTypeTimer = setInterval(() => {
       if (idx >= fullReply.length) {
         clearInterval(aiTypeTimer);
         aiTypeTimer = null;
+        // Final render with markdown
+        aiBubble.innerHTML = renderMarkdown(fullReply);
         aiMessages.push({ role: 'assistant', content: fullReply });
         saveAiMessages(aiMessages);
+        aiBubble.id = '';
+        if (sendBtn) sendBtn.disabled = false;
+        box.scrollTop = box.scrollHeight;
         return;
       }
-      // Type out char by char, but escape at each step is too heavy — use direct text
-      aiMsgDom.textContent += fullReply[idx];
+      accumulated += fullReply[idx];
+      // Batch every 3-4 chars for performance
+      aiBubble.innerHTML = renderMarkdown(accumulated);
       box.scrollTop = box.scrollHeight;
       idx++;
-    }, 25);
+    }, 20);
   } catch (e) {
-    if (e.name === 'AbortError') return;
+    if (e.name === 'AbortError') { if (sendBtn) sendBtn.disabled = false; return; }
     document.getElementById('aiThinking')?.remove();
-    const b = document.getElementById('aiChatBox');
-    if (b && document.getElementById('page-ai').classList.contains('active')) {
-      b.innerHTML += '<div class="msg error">请求失败：' + escapeHtml(e.message) + '</div>';
-    }
+    if (!document.getElementById('page-ai').classList.contains('active')) { if (sendBtn) sendBtn.disabled = false; return; }
+    // Show error inline
+    const errGroup = document.createElement('div');
+    errGroup.className = 'ai-msg-group';
+    errGroup.innerHTML = `
+      <div class="ai-msg-inner" style="border:none">
+        <div class="ai-msg-label ai">AI</div>
+        <div class="ai-msg-bubble error-msg">
+          请求失败：${escapeHtml(e.message)}
+        </div>
+      </div>
+    `;
+    document.getElementById('aiChatBox')?.appendChild(errGroup);
+    showToast('请求失败，请检查网络或重试');
     if (aiTypeTimer) { clearInterval(aiTypeTimer); aiTypeTimer = null; }
+    if (sendBtn) sendBtn.disabled = false;
   } finally {
     isAiLoading = false;
     aiAbortController = null;
@@ -556,7 +764,7 @@ async function sendAiFull() {
 }
 
 function clearAiHistory() {
-  if (aiMessages.length === 0 && !document.getElementById('aiChatBox')?.querySelector('.msg')) {
+  if (aiMessages.length === 0) {
     showToast('暂无对话记录');
     return;
   }
@@ -576,7 +784,7 @@ async function sendAI() {
   if (!text) return;
   const box = document.getElementById('chatBox');
   aiMessages.push({role:'user', content:text});
-  box.innerHTML += '<div class="msg user">'+text+'</div><div class="msg thinking" id="thinking">AI思考中...</div>';
+  box.innerHTML += '<div class="msg user">'+escapeHtml(text)+'</div><div class="msg thinking" id="thinking">AI思考中...</div>';
   input.value = ''; box.scrollTop = box.scrollHeight;
   isAiLoading = true;
   if (aiTypeTimer) { clearInterval(aiTypeTimer); aiTypeTimer=null; }
@@ -590,15 +798,22 @@ async function sendAI() {
     });
     const data = await res.json();
     document.getElementById('thinking')?.remove();
-    if (!document.getElementById('overlay').classList.contains('show')) return;
+    if (!document.getElementById('overlay')?.classList.contains('show')) { isAiLoading=false; return; }
     const fullReply = data.choices?.[0]?.message?.content || '无响应';
     const aiMsgDom = document.createElement('div');
     aiMsgDom.className = 'msg ai';
     box.appendChild(aiMsgDom);
     let idx = 0;
+    let accumulated = '';
     aiTypeTimer = setInterval(() => {
-      if (idx >= fullReply.length) { clearInterval(aiTypeTimer); aiTypeTimer=null; aiMessages.push({role:'assistant',content:fullReply}); return; }
-      aiMsgDom.textContent += fullReply[idx];
+      if (idx >= fullReply.length) {
+        clearInterval(aiTypeTimer); aiTypeTimer=null;
+        aiMessages.push({role:'assistant',content:fullReply});
+        saveAiMessages(aiMessages);
+        return;
+      }
+      accumulated += fullReply[idx];
+      aiMsgDom.innerHTML = renderMarkdown(accumulated);
       box.scrollTop = box.scrollHeight;
       idx++;
     }, 25);
@@ -606,7 +821,7 @@ async function sendAI() {
     if (e.name==='AbortError') return;
     document.getElementById('thinking')?.remove();
     const b = document.getElementById('chatBox');
-    if (b) b.innerHTML += '<div class="msg ai">请求失败：'+e.message+'</div>';
+    if (b) b.innerHTML += '<div class="msg ai">请求失败：'+escapeHtml(e.message)+'</div>';
     if (aiTypeTimer) { clearInterval(aiTypeTimer); aiTypeTimer=null; }
   } finally {
     isAiLoading = false;
@@ -873,8 +1088,11 @@ function resetSpeedUI() {
   if (gauge) gauge.classList.remove('running');
 }
 
-const toolCountEl = document.getElementById('toolCount');
-if (toolCountEl) toolCountEl.textContent = tools.length + ' 个';
+// Set tool counts
+['toolCount','settingsToolCount'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.textContent = tools.length + ' 个工具';
+});
 renderHome();
 
 
