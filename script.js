@@ -237,21 +237,102 @@ function closePanel(e) {
 }
 
 function getPanelHTML(id) {
-  if (id==='pwd') return `<div class="field"><label>长度 <span id="pwdLenVal">16</span></label><input type="range" id="pwdLen" min="8" max="32" value="16" oninput="document.getElementById('pwdLenVal').textContent=this.value"></div><div class="field"><label><input type="checkbox" id="pwdUpper" checked> 大写 &nbsp;<input type="checkbox" id="pwdNum" checked> 数字 &nbsp;<input type="checkbox" id="pwdSym"> 符号</label></div><div class="result-box" id="pwdResult">点击生成</div><div class="btn-row" style="margin-top:12px"><button class="btn btn-primary" onclick="genPwd()">生成</button><button class="btn btn-ghost" onclick="copyText('pwdResult')">复制</button></div>`;
-  if (id==='qr') return `<div class="field"><label>输入文字或链接</label><textarea id="qrInput" placeholder="https://..."></textarea></div><div id="qrOut" style="text-align:center;margin:10px 0"></div><div class="btn-row"><button class="btn btn-primary" onclick="genQR()">生成二维码</button></div>`;
-  if (id==='color') return `<div class="field"><label>HEX</label><input id="hexIn" placeholder="#00b4ff" oninput="debouncedConvertColor('hex')"></div><div class="field"><label>RGB</label><input id="rgbIn" placeholder="0, 180, 255" oninput="debouncedConvertColor('rgb')"></div><div class="field"><label>HSL</label><input id="hslIn" placeholder="197, 100%, 50%" readonly></div><div id="colorPreview" style="height:48px;border-radius:10px;margin-top:8px;border:1px solid rgba(255,255,255,0.1)"></div>`;
-  if (id==='ts') return `<div class="field"><label>当前时间戳</label><div class="result-box" id="tsNow">-</div></div><div class="field"><label>时间戳转日期</label><input id="tsInput" placeholder="1700000000" onkeydown="if(event.key==='Enter')convertTs()"></div><div class="result-box" id="tsResult">-</div><div class="btn-row" style="margin-top:12px"><button class="btn btn-primary" onclick="convertTs()">转换</button><button class="btn btn-ghost" onclick="copyText('tsResult')">复制</button></div>`;
-  if (id==='hash') return `<div class="field"><label>输入文本</label><textarea id="hashInput" placeholder="输入内容..."></textarea></div><div class="field"><label>算法</label><select id="hashAlgo"><option value="SHA-1">SHA-1</option><option value="SHA-256" selected>SHA-256</option><option value="SHA-512">SHA-512</option></select></div><div class="result-box" id="hashResult">-</div><div class="btn-row" style="margin-top:12px"><button class="btn btn-primary" onclick="calcHash()">计算</button><button class="btn btn-ghost" onclick="copyText('hashResult')">复制</button></div>`;
-  if (id==='aes') return `<div class="field"><label>文本</label><textarea id="aesInput" placeholder="输入内容..."></textarea></div><div class="field"><label>密钥</label><input id="aesKey" placeholder="输入任意密码（自动转为32位安全密钥）"></div><div class="result-box" id="aesResult">-</div><div class="btn-row" style="margin-top:12px"><button class="btn btn-primary" onclick="aesEncrypt()">加密</button><button class="btn btn-ghost" onclick="aesDecrypt()">解密</button><button class="btn btn-ghost" onclick="copyText('aesResult')">复制</button></div>`;
-  if (id==='b64') return `<div class="field"><label>输入</label><textarea id="b64Input" placeholder="输入内容..."></textarea></div><div class="result-box" id="b64Result">-</div><div class="btn-row" style="margin-top:12px"><button class="btn btn-primary" onclick="b64Encode()">编码</button><button class="btn btn-ghost" onclick="b64Decode()">解码</button><button class="btn btn-ghost" onclick="copyText('b64Result')">复制</button></div>`;
-  if (id==='json') return `<div class="field"><label>JSON内容</label><textarea id="jsonInput" placeholder='{"key":"value"}' style="min-height:120px"></textarea></div><div class="result-box" id="jsonResult" style="white-space:pre;min-height:80px">-</div><div class="btn-row" style="margin-top:12px"><button class="btn btn-primary" onclick="fmtJson()">格式化</button><button class="btn btn-ghost" onclick="minJson()">压缩</button><button class="btn btn-ghost" onclick="copyText('jsonResult')">复制</button></div>`;
-  if (id==='regex') return `<div class="field"><label>正则表达式</label><input id="regexPat" placeholder="\\d+"></div><div class="field"><label>测试文本</label><textarea id="regexText" placeholder="输入测试内容..."></textarea></div><div class="result-box" id="regexResult">-</div><div class="btn-row" style="margin-top:12px"><button class="btn btn-primary" onclick="testRegex()">测试</button></div>`;
-  if (id==='url') return `<div class="field"><label>输入</label><textarea id="urlInput" placeholder="输入内容..."></textarea></div><div class="result-box" id="urlResult">-</div><div class="btn-row" style="margin-top:12px"><button class="btn btn-primary" onclick="urlEncode()">编码</button><button class="btn btn-ghost" onclick="urlDecode()">解码</button><button class="btn btn-ghost" onclick="copyText('urlResult')">复制</button></div>`;
-  if (id==='ai') return `<div class="chat-box" id="chatBox"></div><div class="field"><textarea id="aiInput" placeholder="输入问题..." style="min-height:60px"></textarea></div><div class="btn-row"><button class="btn btn-primary" onclick="sendAI()">发送</button></div>`;
-  if (id==='ip') return `<div class="field"><label>IP 地址（留空查询本机）</label><input id="ipInput" placeholder="如：1.1.1.1（留空查本机）" onkeydown="if(event.key==='Enter')ipQuery()"></div><div class="btn-row" style="margin-bottom:14px"><button class="btn btn-primary" onclick="ipQuery()">查询</button><button class="btn btn-ghost" onclick="document.getElementById('ipInput').value='';ipQuery()">查本机</button></div><div id="ipResult" class="ip-result-box" style="display:none"></div>`;
-  if (id==='httpcode') return `<div class="field"><input id="httpSearchInput" placeholder="输入状态码或关键词，如：404" oninput="filterHttpCodes(this.value)"></div><div id="httpCodeList" class="http-code-list"></div>`;
-  if (id==='speedtest') return `<div class="speedtest-container"><div class="speedtest-gauge"><div class="speedtest-speed" id="speedVal">0.0</div><div class="speedtest-unit">Mbps</div></div><div class="speedtest-progress-bar"><div class="speedtest-progress-fill" id="speedProgress" style="width: 0%"></div></div><div class="speedtest-meta"><div class="speedtest-meta-item"><span class="label">延迟 (Ping)</span><span class="val" id="speedPing">-</span></div><div class="speedtest-meta-item"><span class="label">已下载</span><span class="val" id="speedLoaded">0.0 MB</span></div></div><div class="speedtest-status" id="speedStatus">点击“开始测试”开始</div><div class="btn-row" style="margin-top:20px; justify-content: center;"><button class="btn btn-primary" id="speedBtn" onclick="runSpeedTest()">开始测试</button></div></div>`;
-  return '<p style="color:rgba(255,255,255,.35);text-align:center;padding:30px">开发中...</p>';
+  // Password generator
+  if (id==='pwd') return `<div class="panel-section">
+    <div class="field"><label>长度 <span id="pwdLenVal">16</span></label><input type="range" id="pwdLen" min="8" max="32" value="16" oninput="document.getElementById('pwdLenVal').textContent=this.value"></div>
+    <div class="field"><label class="checkbox-group"><input type="checkbox" id="pwdUpper" checked> 大写 <input type="checkbox" id="pwdNum" checked> 数字 <input type="checkbox" id="pwdSym"> 符号</label></div>
+    <div class="result-box" id="pwdResult">点击生成</div>
+    <div class="btn-row"><button class="btn btn-primary" onclick="genPwd()">生成</button><button class="btn btn-ghost" onclick="copyText('pwdResult')">复制</button></div>
+  </div>`;
+  // QR Code
+  if (id==='qr') return `<div class="panel-section">
+    <div class="field"><label>输入文字或链接</label><textarea id="qrInput" placeholder="https://..."></textarea></div>
+    <div id="qrOut" class="qr-out"></div>
+    <div class="btn-row"><button class="btn btn-primary" onclick="genQR()">生成二维码</button></div>
+  </div>`;
+  // Color Converter
+  if (id==='color') return `<div class="panel-section">
+    <div class="field"><label>HEX</label><input id="hexIn" placeholder="#00b4ff" oninput="debouncedConvertColor('hex')"></div>
+    <div class="field"><label>RGB</label><input id="rgbIn" placeholder="0, 180, 255" oninput="debouncedConvertColor('rgb')"></div>
+    <div class="field"><label>HSL</label><input id="hslIn" placeholder="197, 100%, 50%" readonly></div>
+    <div class="color-preview" id="colorPreview"></div>
+  </div>`;
+  // Timestamp
+  if (id==='ts') return `<div class="panel-section">
+    <div class="field"><label>当前时间戳</label><div class="result-box" id="tsNow">-</div></div>
+    <div class="field"><label>时间戳转日期</label><input id="tsInput" placeholder="1700000000" onkeydown="if(event.key==='Enter')convertTs()"></div>
+    <div class="result-box" id="tsResult">-</div>
+    <div class="btn-row"><button class="btn btn-primary" onclick="convertTs()">转换</button><button class="btn btn-ghost" onclick="copyText('tsResult')">复制</button></div>
+  </div>`;
+  // Hash Calculator
+  if (id==='hash') return `<div class="panel-section">
+    <div class="field"><label>输入文本</label><textarea id="hashInput" placeholder="输入内容..."></textarea></div>
+    <div class="field"><label>算法</label><select id="hashAlgo"><option value="SHA-1">SHA-1</option><option value="SHA-256" selected>SHA-256</option><option value="SHA-512">SHA-512</option></select></div>
+    <div class="result-box" id="hashResult">-</div>
+    <div class="btn-row"><button class="btn btn-primary" onclick="calcHash()">计算</button><button class="btn btn-ghost" onclick="copyText('hashResult')">复制</button></div>
+  </div>`;
+  // AES Encryption
+  if (id==='aes') return `<div class="panel-section">
+    <div class="field"><label>文本</label><textarea id="aesInput" placeholder="输入内容..."></textarea></div>
+    <div class="field"><label>密钥</label><input id="aesKey" placeholder="输入任意密码（自动转为32位安全密钥）"></div>
+    <div class="result-box" id="aesResult">-</div>
+    <div class="btn-row"><button class="btn btn-primary" onclick="aesEncrypt()">加密</button><button class="btn btn-ghost" onclick="aesDecrypt()">解密</button><button class="btn btn-ghost" onclick="copyText('aesResult')">复制</button></div>
+  </div>`;
+  // Base64
+  if (id==='b64') return `<div class="panel-section">
+    <div class="field"><label>输入</label><textarea id="b64Input" placeholder="输入内容..."></textarea></div>
+    <div class="result-box" id="b64Result">-</div>
+    <div class="btn-row"><button class="btn btn-primary" onclick="b64Encode()">编码</button><button class="btn btn-ghost" onclick="b64Decode()">解码</button><button class="btn btn-ghost" onclick="copyText('b64Result')">复制</button></div>
+  </div>`;
+  // JSON Formatter
+  if (id==='json') return `<div class="panel-section">
+    <div class="field"><label>JSON内容</label><textarea id="jsonInput" placeholder='{"key":"value"}' class="textarea-mono"></textarea></div>
+    <div class="result-box result-mono" id="jsonResult">-</div>
+    <div class="btn-row"><button class="btn btn-primary" onclick="fmtJson()">格式化</button><button class="btn btn-ghost" onclick="minJson()">压缩</button><button class="btn btn-ghost" onclick="copyText('jsonResult')">复制</button></div>
+  </div>`;
+  // Regex Tester
+  if (id==='regex') return `<div class="panel-section">
+    <div class="field"><label>正则表达式</label><input id="regexPat" placeholder="\\d+"></div>
+    <div class="field"><label>测试文本</label><textarea id="regexText" placeholder="输入测试内容..."></textarea></div>
+    <div class="result-box" id="regexResult">-</div>
+    <div class="btn-row"><button class="btn btn-primary" onclick="testRegex()">测试</button></div>
+  </div>`;
+  // URL Codec
+  if (id==='url') return `<div class="panel-section">
+    <div class="field"><label>输入</label><textarea id="urlInput" placeholder="输入内容..."></textarea></div>
+    <div class="result-box" id="urlResult">-</div>
+    <div class="btn-row"><button class="btn btn-primary" onclick="urlEncode()">编码</button><button class="btn btn-ghost" onclick="urlDecode()">解码</button><button class="btn btn-ghost" onclick="copyText('urlResult')">复制</button></div>
+  </div>`;
+  // IP Query
+  if (id==='ip') return `<div class="panel-section">
+    <div class="field"><label>IP 地址（留空查询本机）</label><input id="ipInput" placeholder="如：1.1.1.1（留空查本机）" onkeydown="if(event.key==='Enter')ipQuery()"></div>
+    <div class="btn-row"><button class="btn btn-primary" onclick="ipQuery()">查询</button><button class="btn btn-ghost" onclick="document.getElementById('ipInput').value='';ipQuery()">查本机</button></div>
+    <div id="ipResult" class="ip-result-box" hidden></div>
+  </div>`;
+  // HTTP Status Codes
+  if (id==='httpcode') return `<div class="panel-section">
+    <div class="field"><input id="httpSearchInput" placeholder="输入状态码或关键词，如：404" oninput="filterHttpCodes(this.value)"></div>
+    <div id="httpCodeList" class="http-code-list"></div>
+  </div>`;
+  // Speed Test
+  if (id==='speedtest') return `<div class="panel-section">
+    <div class="speedtest-container">
+      <div class="speedtest-gauge">
+        <div class="speedtest-speed" id="speedVal">0.0</div>
+        <div class="speedtest-unit">Mbps</div>
+      </div>
+      <div class="speedtest-progress-bar">
+        <div class="speedtest-progress-fill" id="speedProgress"></div>
+      </div>
+      <div class="speedtest-meta">
+        <div class="speedtest-meta-item"><span class="label">延迟 (Ping)</span><span class="val" id="speedPing">-</span></div>
+        <div class="speedtest-meta-item"><span class="label">已下载</span><span class="val" id="speedLoaded">0.0 MB</span></div>
+      </div>
+      <div class="speedtest-status" id="speedStatus">点击“开始测试”开始</div>
+      <div class="btn-row btn-row-center"><button class="btn btn-primary" id="speedBtn" onclick="runSpeedTest()">开始测试</button></div>
+    </div>
+  </div>`;
+  return '<div class="panel-section"><p class="panel-placeholder">开发中...</p></div>';
 }
 
 const debouncedConvertColor = debounce(convertColor);
@@ -837,7 +918,7 @@ async function ipQuery() {
   const ip = input.value.trim();
   if (ip && !/^(\d{1,3}\.){3}\d{1,3}$/.test(ip)) { showToast('IP格式不正确'); return; }
   isIpLoading = true;
-  resultBox.style.display = 'block';
+  resultBox.hidden = false;
   resultBox.innerHTML = '<div class="ip-loading">查询中...</div>';
   try {
     const url = ip ? `https://ipapi.co/${ip}/json/` : `https://ipapi.co/json/`;
