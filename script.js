@@ -4,6 +4,18 @@
    All tool & AI logic preserved, DOM adapted to new structure
    ================================================================ */
 
+// ── Debug Overlay ──────────────────────────────────────────────
+function debugLog(msg) {
+  console.log.apply(console, arguments);
+  var msgStr = Array.prototype.join.call(arguments, ' ');
+  var ov = document.getElementById('debug-overlay');
+  if (ov) {
+    var time = new Date().toISOString().substring(11,23);
+    ov.innerHTML += '[' + time + '] ' + msgStr + '<br>';
+    ov.scrollTop = ov.scrollHeight;
+  }
+}
+
 // ── State ──────────────────────────────────────────────────────
 let currentPage = 'home';
 let currentTool = null;
@@ -32,8 +44,8 @@ function showToast(message) {
 // ================================================================
 
 function navigateTo(pageName) {
-  console.log('[TRACE] navigateTo called:', pageName, 'from:', currentPage, 'isTransitioning:', isTransitioning, 'stack:', new Error().stack.split('\\n')[2]);
-  if (isTransitioning || pageName === currentPage) { console.log('[TRACE] navigateTo blocked'); return; }
+  debugLog(' navigateTo called:', pageName, 'from:', currentPage, 'isTransitioning:', isTransitioning, 'stack:', new Error().stack.split('\\n')[2]);
+  if (isTransitioning || pageName === currentPage) { debugLog(' navigateTo blocked'); return; }
   isTransitioning = true;
 
   const oldPage = document.querySelector('.page.active');
@@ -49,7 +61,7 @@ function navigateTo(pageName) {
     oldPage.classList.add('page-exit');
     oldPage.addEventListener('animationend', function handler() {
       oldPage.removeEventListener('animationend', handler);
-      console.log('[TRACE] animationend EXIT: removing active from', oldPage.id);
+      debugLog(' animationend EXIT: removing active from', oldPage.id);
       oldPage.classList.remove('active', 'page-exit');
     }, { once: true });
   }
@@ -57,7 +69,7 @@ function navigateTo(pageName) {
   newPage.classList.add('active', 'page-enter');
   newPage.addEventListener('animationend', function handler() {
     newPage.removeEventListener('animationend', handler);
-    console.log('[TRACE] animationend ENTER: transition complete for', newPage.id);
+    debugLog(' animationend ENTER: transition complete for', newPage.id);
     newPage.classList.remove('page-enter');
     isTransitioning = false;
   }, { once: true });
@@ -73,7 +85,7 @@ function navigateTo(pageName) {
 document.addEventListener('click', (e) => {
   const navItem = e.target.closest('.nav-item');
   if (navItem) {
-    console.log('[TRACE] nav-item clicked:', navItem.dataset.page);
+    debugLog(' nav-item clicked:', navItem.dataset.page);
     navigateTo(navItem.dataset.page);
   }
 });
@@ -167,7 +179,7 @@ document.addEventListener('input', function(e) {
 // ================================================================
 
 function openToolDetail(tool) {
-  console.log('[TRACE] openToolDetail called:', tool.id, 'stack:', new Error().stack.split('\n')[2]);
+  debugLog(' openToolDetail called:', tool.id, 'stack:', new Error().stack.split('\n')[2]);
   currentTool = tool;
   toolDetailOpenTime = Date.now();
   recordToolUse(tool);
@@ -188,20 +200,21 @@ function openToolDetail(tool) {
 }
 
 function hideToolDetail() {
-  console.log('[TRACE] hideToolDetail called, stack:', new Error().stack.split('\n')[2]);
+  debugLog('hideToolDetail called — currentTool:', (currentTool ? currentTool.id : 'null'), 'currentPage:', currentPage, 'stack:', new Error().stack.split('\n')[2]);
   const detail = document.getElementById('tool-detail');
   detail.classList.remove('active');
   document.getElementById('tools-grid').style.display = '';
   document.getElementById('tools-search-wrapper').style.display = '';
   currentTool = null;
+  debugLog('hideToolDetail DONE');
 }
 
 document.addEventListener('click', function(e) {
   const backBtn = e.target.closest('#tool-back');
   if (backBtn) {
-    console.log('[TRACE] #tool-back click detected, age:', Date.now() - toolDetailOpenTime, 'ms, target:', e.target.tagName, e.target.className);
+    debugLog(' #tool-back click detected, age:', Date.now() - toolDetailOpenTime, 'ms, target:', e.target.tagName, e.target.className);
     if (Date.now() - toolDetailOpenTime > 400) hideToolDetail();
-    else console.log('[TRACE] #tool-back click BLOCKED (within 400ms guard)');
+    else debugLog(' #tool-back click BLOCKED (within 400ms guard)');
   }
 });
 
@@ -295,6 +308,7 @@ function renderQuickActions() {
 document.addEventListener('click', function(e) {
   const action = e.target.closest('.quick-action');
   if (action) {
+    debugLog('quick-action clicked:', action.dataset.tool);
     const tool = TOOLS.find(function(t) { return t.id === action.dataset.tool; });
     if (tool) {
       navigateTo('tools');
@@ -1552,6 +1566,7 @@ function updateKbdHint() {
 }
 
 function initApp() {
+  debugLog('initApp START');
   loadChatHistory();
   initModelSelector();
   renderChatMessages();
@@ -1560,6 +1575,7 @@ function initApp() {
   renderToolGrid();
   initLucide();
   updateKbdHint();
+  debugLog('initApp DONE — currentPage:', currentPage);
 }
 
 document.addEventListener('DOMContentLoaded', initApp);
