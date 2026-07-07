@@ -244,10 +244,12 @@ input, textarea, select {
   display: none;
   opacity: 0;
   transform: translateY(4px);
+  pointer-events: none;
 }
 
 .page.active {
   display: block;
+  pointer-events: auto;
 }
 
 .page.page-enter {

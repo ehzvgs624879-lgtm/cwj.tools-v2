@@ -3,6 +3,10 @@ const fs = require('fs');
 const path = require('path');
 
 const port = 3000;
+const LOG_FILE = '/tmp/debug.log';
+
+// Clear log file on server start
+fs.writeFileSync(LOG_FILE, '=== CWJ Tools debug log started at ' + new Date().toISOString() + ' ===\n');
 
 const server = http.createServer((req, res) => {
   // 设置 CORS 头
@@ -20,6 +24,18 @@ const server = http.createServer((req, res) => {
 
   // 查找文件
   const fullPath = path.join(__dirname, filePath);
+
+  // 处理 debug log POST endpoint
+  if (filePath === '/api/log' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk.toString(); });
+    req.on('end', () => {
+      fs.appendFileSync(LOG_FILE, body + '\n');
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true }));
+    });
+    return;
+  }
 
   // 处理 API 请求
   if (filePath.startsWith('/api/')) {

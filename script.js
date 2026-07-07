@@ -4,15 +4,46 @@
    All tool & AI logic preserved, DOM adapted to new structure
    ================================================================ */
 
+// ── BRUTAL TRACE: write directly at script parse time ──────────
+(function(){
+  try {
+    var ov = document.getElementById('debug-overlay');
+    if (ov) {
+      ov.innerHTML = '[PARSE] script.js line 1 executing<br>';
+    }
+  } catch(e) {
+    // Last resort: write to body
+    document.body.insertAdjacentHTML('beforeend', '<div style="position:fixed;top:0;left:0;z-index:999999;background:red;color:white;padding:4px;font:10px monospace">SCRIPT PARSE ERROR: '+e.message+'</div>');
+  }
+})();
+
 // ── Debug Overlay ──────────────────────────────────────────────
+var _debugCalls = 0;
 function debugLog(msg) {
-  console.log.apply(console, arguments);
-  var msgStr = Array.prototype.join.call(arguments, ' ');
+  _debugCalls++;
+  try {
+    console.log.apply(console, arguments);
+  } catch(e) {}
+  var msgStr;
+  try {
+    msgStr = Array.prototype.join.call(arguments, ' ');
+  } catch(e) {
+    msgStr = '[join error: ' + e.message + ']';
+  }
   var ov = document.getElementById('debug-overlay');
   if (ov) {
-    var time = new Date().toISOString().substring(11,23);
-    ov.innerHTML += '[' + time + '] ' + msgStr + '<br>';
-    ov.scrollTop = ov.scrollHeight;
+    try {
+      var time = new Date().toISOString().substring(11,23);
+      ov.innerHTML += '[' + time + '] ' + msgStr + '<br>';
+      ov.scrollTop = ov.scrollHeight;
+    } catch(e) {
+      ov.innerHTML += '[INNERHTML ERROR: ' + e.message + ']<br>';
+    }
+  } else {
+    // Overlay not found — write to body as fallback
+    try {
+      document.body.insertAdjacentHTML('beforeend', '<div style="color:red;font:9px monospace">[NO-OV] ' + msgStr + '</div>');
+    } catch(e2) {}
   }
 }
 
@@ -21,6 +52,41 @@ let currentPage = 'home';
 let currentTool = null;
 let isTransitioning = false;
 let toolDetailOpenTime = 0;
+
+// ── WRITE helper — writes directly to overlay, no dependencies ──
+function _w(msg) {
+  var t = new Date().toISOString().substring(11,23);
+  var line = '[' + t + '] ' + msg;
+  // DOM overlay
+  var ov = document.getElementById('debug-overlay');
+  if (ov) {
+    ov.innerHTML += line + '<br>';
+    ov.scrollTop = ov.scrollHeight;
+  }
+  // Server-side log via POST
+  try {
+    fetch('/api/log', { method: 'POST', body: line, keepalive: true, headers: { 'Content-Type': 'text/plain' } }).catch(function(){});
+  } catch(e) {}
+}
+
+// MutationObserver: detect any clear/set of debug-overlay innerHTML
+(function(){
+  var ov = document.getElementById('debug-overlay');
+  if (ov) {
+    var mo = new MutationObserver(function(muts) {
+      muts.forEach(function(m) {
+        if (m.type === 'childList') {
+          _w(' MUTATION childList: removed=' + m.removedNodes.length + ' added=' + m.addedNodes.length);
+        }
+        if (m.type === 'characterData') {
+          _w(' MUTATION characterData');
+        }
+      });
+    });
+    mo.observe(ov, { childList: true, characterData: true, subtree: true });
+    _w('MUTATION_OBSERVER active on debug-overlay');
+  }
+})();
 
 // ── Lucide Icons Init ──────────────────────────────────────────
 function initLucide() {
@@ -44,14 +110,15 @@ function showToast(message) {
 // ================================================================
 
 function navigateTo(pageName) {
-  debugLog(' navigateTo called:', pageName, 'from:', currentPage, 'isTransitioning:', isTransitioning, 'stack:', new Error().stack.split('\\n')[2]);
-  if (isTransitioning || pageName === currentPage) { debugLog(' navigateTo blocked'); return; }
+  _w('> navigateTo: ' + pageName + ' from=' + currentPage + ' isTrans=' + isTransitioning);
+  debugLog(' navigateTo called:', pageName, 'from:', currentPage, 'isTransitioning:', isTransitioning);
+  if (isTransitioning || pageName === currentPage) { _w('> navigateTo BLOCKED'); debugLog(' navigateTo blocked'); return; }
   isTransitioning = true;
 
   const oldPage = document.querySelector('.page.active');
   const newPage = document.getElementById('page-' + pageName);
 
-  if (!newPage) { isTransitioning = false; return; }
+  if (!newPage) { _w('> navigateTo newPage not found: ' + pageName); isTransitioning = false; return; }
 
   document.querySelectorAll('.nav-item').forEach(item => {
     item.classList.toggle('active', item.dataset.page === pageName);
@@ -66,25 +133,30 @@ function navigateTo(pageName) {
     }, { once: true });
   }
 
+  _w('> navigateTo: setting active+page-enter on ' + newPage.id);
   newPage.classList.add('active', 'page-enter');
   newPage.addEventListener('animationend', function handler() {
     newPage.removeEventListener('animationend', handler);
+    _w('> ANIM-ENTER done: ' + newPage.id + ' setting isTrans=false');
     debugLog(' animationend ENTER: transition complete for', newPage.id);
     newPage.classList.remove('page-enter');
     isTransitioning = false;
   }, { once: true });
 
   currentPage = pageName;
+  _w('> navigateTo: currentPage=' + currentPage);
 
-  if (pageName !== 'tools') hideToolDetail();
+  if (pageName !== 'tools') { _w('> navigateTo calling hideToolDetail (page!==tools)'); hideToolDetail(); }
   if (pageName === 'home') renderRecentTools();
   if (pageName === 'tools') { renderToolGrid(); initLucide(); }
   if (pageName === 'chat') scrollChatToBottom();
+  _w('< navigateTo DONE: ' + pageName);
 }
 
 document.addEventListener('click', (e) => {
   const navItem = e.target.closest('.nav-item');
   if (navItem) {
+    _w('CLICK nav-item: ' + navItem.dataset.page + ' target=' + e.target.tagName + '.' + e.target.className);
     debugLog(' nav-item clicked:', navItem.dataset.page);
     navigateTo(navItem.dataset.page);
   }
@@ -162,9 +234,11 @@ function renderToolGrid(filter) {
 document.addEventListener('click', function(e) {
   const card = e.target.closest('.tool-card');
   if (card) {
+    _w('CLICK tool-card: ' + card.dataset.tool + ' target=' + e.target.tagName + '.' + e.target.className);
     e.stopPropagation();
     const tool = TOOLS.find(function(t) { return t.id === card.dataset.tool; });
-    if (tool) openToolDetail(tool);
+    if (tool) { _w('> calling openToolDetail(' + tool.id + ')'); openToolDetail(tool); _w('< openToolDetail returned'); }
+    else { _w('CLICK tool-card: tool NOT FOUND for ' + card.dataset.tool); }
   }
 });
 
@@ -179,14 +253,17 @@ document.addEventListener('input', function(e) {
 // ================================================================
 
 function openToolDetail(tool) {
+  _w('> openToolDetail START: ' + tool.id + ' currentTool=' + (currentTool?currentTool.id:'null'));
   debugLog(' openToolDetail called:', tool.id, 'stack:', new Error().stack.split('\n')[2]);
   currentTool = tool;
   toolDetailOpenTime = Date.now();
+  _w('> openToolDetail: toolDetailOpenTime=' + toolDetailOpenTime);
   recordToolUse(tool);
 
   document.getElementById('tools-grid').style.display = 'none';
   document.getElementById('tools-search-wrapper').style.display = 'none';
   document.getElementById('tools-empty').style.display = 'none';
+  _w('> openToolDetail: hid grid+search+empty');
 
   const detail = document.getElementById('tool-detail');
   document.getElementById('tool-detail-title').textContent = tool.name;
@@ -194,27 +271,36 @@ function openToolDetail(tool) {
   document.getElementById('tool-detail-body').innerHTML = '';
   detail.classList.add('active');
   detail.style.animation = 'pageIn 200ms cubic-bezier(0.16,1,0.3,1) forwards';
+  _w('> openToolDetail: detail classList=' + detail.classList);
 
   tool.render();
   initLucide();
+  _w('< openToolDetail DONE: currentTool=' + (currentTool?currentTool.id:'null') + ' detail.active=' + detail.classList.contains('active'));
 }
 
 function hideToolDetail() {
-  debugLog('hideToolDetail called — currentTool:', (currentTool ? currentTool.id : 'null'), 'currentPage:', currentPage, 'stack:', new Error().stack.split('\n')[2]);
+  var caller = (new Error().stack.split('\n')[2] || '').trim();
+  _w('> hideToolDetail CALLED by: ' + caller + ' currentTool=' + (currentTool?currentTool.id:'null') + ' currentPage=' + currentPage);
+  debugLog('hideToolDetail called — currentTool:', (currentTool ? currentTool.id : 'null'), 'currentPage:', currentPage, 'stack:', caller);
   const detail = document.getElementById('tool-detail');
+  _w('> hideToolDetail: detail exists=' + !!detail + ' hasActive=' + (detail?detail.classList.contains('active'):'N/A'));
   detail.classList.remove('active');
+  _w('> hideToolDetail: removed active, now hasActive=' + detail.classList.contains('active'));
   document.getElementById('tools-grid').style.display = '';
   document.getElementById('tools-search-wrapper').style.display = '';
   currentTool = null;
+  _w('< hideToolDetail DONE: currentTool=null');
   debugLog('hideToolDetail DONE');
 }
 
 document.addEventListener('click', function(e) {
   const backBtn = e.target.closest('#tool-back');
   if (backBtn) {
-    debugLog(' #tool-back click detected, age:', Date.now() - toolDetailOpenTime, 'ms, target:', e.target.tagName, e.target.className);
-    if (Date.now() - toolDetailOpenTime > 400) hideToolDetail();
-    else debugLog(' #tool-back click BLOCKED (within 400ms guard)');
+    var age = Date.now() - toolDetailOpenTime;
+    _w('CLICK #tool-back: age=' + age + 'ms target=' + e.target.tagName + '.' + e.target.className);
+    debugLog(' #tool-back click detected, age:', age, 'ms, target:', e.target.tagName, e.target.className);
+    if (age > 400) { _w('> #tool-back: passing guard, calling hideToolDetail'); hideToolDetail(); _w('< #tool-back: hideToolDetail returned'); }
+    else { _w('> #tool-back BLOCKED (age=' + age + 'ms < 400ms)'); debugLog(' #tool-back click BLOCKED (within 400ms guard)'); }
   }
 });
 
@@ -266,10 +352,12 @@ function renderRecentTools() {
 document.getElementById('recent-list').addEventListener('click', function(e) {
   const item = e.target.closest('.recent-item');
   if (item) {
+    _w('CLICK recent-item: ' + item.dataset.tool + ' target=' + e.target.tagName + '.' + e.target.className);
     const tool = TOOLS.find(function(t) { return t.id === item.dataset.tool; });
     if (tool) {
+      _w('> recent-item: calling navigateTo(tools) then setTimeout(openToolDetail, 250)');
       navigateTo('tools');
-      setTimeout(function() { openToolDetail(tool); }, 250);
+      setTimeout(function() { _w('> recent-item setTimeout: calling openToolDetail(' + tool.id + ')'); openToolDetail(tool); _w('< recent-item setTimeout: openToolDetail returned'); }, 250);
     }
   }
 });
@@ -308,11 +396,13 @@ function renderQuickActions() {
 document.addEventListener('click', function(e) {
   const action = e.target.closest('.quick-action');
   if (action) {
+    _w('CLICK quick-action: ' + action.dataset.tool + ' target=' + e.target.tagName + '.' + e.target.className);
     debugLog('quick-action clicked:', action.dataset.tool);
     const tool = TOOLS.find(function(t) { return t.id === action.dataset.tool; });
     if (tool) {
+      _w('> quick-action: calling navigateTo(tools) then setTimeout(openToolDetail, 250)');
       navigateTo('tools');
-      setTimeout(function() { openToolDetail(tool); }, 250);
+      setTimeout(function() { _w('> quick-action setTimeout: calling openToolDetail(' + tool.id + ')'); openToolDetail(tool); _w('< quick-action setTimeout: openToolDetail returned'); }, 250);
     }
   }
 });
@@ -1566,16 +1656,49 @@ function updateKbdHint() {
 }
 
 function initApp() {
+  _w('INIT APP START — currentPage=' + currentPage + ' location=' + window.location.href);
   debugLog('initApp START');
-  loadChatHistory();
-  initModelSelector();
-  renderChatMessages();
-  renderQuickActions();
-  renderRecentTools();
-  renderToolGrid();
-  initLucide();
-  updateKbdHint();
+  try { loadChatHistory(); } catch(e) { _w('INIT ERROR loadChatHistory: ' + e.message); }
+  try { initModelSelector(); } catch(e) { _w('INIT ERROR initModelSelector: ' + e.message); }
+  try { renderChatMessages(); } catch(e) { _w('INIT ERROR renderChatMessages: ' + e.message); }
+  try { renderQuickActions(); } catch(e) { _w('INIT ERROR renderQuickActions: ' + e.message); }
+  try { renderRecentTools(); } catch(e) { _w('INIT ERROR renderRecentTools: ' + e.message); }
+  try { renderToolGrid(); } catch(e) { _w('INIT ERROR renderToolGrid: ' + e.message); }
+  try { initLucide(); } catch(e) { _w('INIT ERROR initLucide: ' + e.message); }
+  try { updateKbdHint(); } catch(e) { _w('INIT ERROR updateKbdHint: ' + e.message); }
+  _w('INIT APP DONE — currentPage=' + currentPage + ' #debugLog calls=' + _debugCalls + ' currentTool=' + (currentTool?currentTool.id:'null') + ' tool-detail.active=' + (document.getElementById('tool-detail')?document.getElementById('tool-detail').classList.contains('active'):'N/A'));
   debugLog('initApp DONE — currentPage:', currentPage);
 }
+
+// ── BRUTAL: listen for ALL clicks on document to detect phantom clicks ──
+document.addEventListener('click', function(e) {
+  _w('*CLICK* tag=' + e.target.tagName + ' cls=' + e.target.className + ' id=' + e.target.id + ' closest-tool-card=' + !!e.target.closest('.tool-card') + ' closest-tool-back=' + !!e.target.closest('#tool-back') + ' closest-nav=' + !!e.target.closest('.nav-item'));
+}, true); // CAPTURE phase — fires BEFORE any other handler
+
+// ── BRUTAL: listen for ALL touch events ──
+['touchstart','touchend','touchmove','touchcancel','pointerdown','pointerup'].forEach(function(evtName) {
+  document.addEventListener(evtName, function(e) {
+    _w('*TOUCH* ' + evtName + ' target=' + e.target.tagName + '.' + e.target.className + ' touches=' + (e.touches?e.touches.length:'N/A'));
+  }, true);
+});
+
+// ── BRUTAL: listen for animationend bubbling to #page-tools ──
+(function(){
+  var pt = document.getElementById('page-tools');
+  if (pt) {
+    pt.addEventListener('animationend', function(e) {
+      _w('*ANIMEND on page-tools* target=' + e.target.id + '.' + e.target.className + ' animName=' + e.animationName);
+    });
+    _w('ANIMEND listener active on page-tools');
+  }
+})();
+
+// ── Polling watchdog: every 500ms log tool-detail state ──
+var _watchDog = setInterval(function() {
+  var detail = document.getElementById('tool-detail');
+  var dActive = detail ? detail.classList.contains('active') : 'no-el';
+  var dDisplay = detail ? detail.style.display : 'no-el';
+  _w('WATCHDOG: tool-detail.active=' + dActive + ' display=' + dDisplay + ' currentTool=' + (currentTool?currentTool.id:'null') + ' currentPage=' + currentPage + ' isTrans=' + isTransitioning + ' ovLen=' + (document.getElementById('debug-overlay')?document.getElementById('debug-overlay').innerHTML.length:'no-ov'));
+}, 500);
 
 document.addEventListener('DOMContentLoaded', initApp);
