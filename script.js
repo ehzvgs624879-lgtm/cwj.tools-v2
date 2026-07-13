@@ -149,6 +149,7 @@ document.addEventListener('click', function(e) {
   if (card) {
     e.stopPropagation();
     const tool = TOOLS.find(function(t) { return t.id === card.dataset.tool; });
+    if (tool) openToolDetail(tool);
   }
 });
 
@@ -195,6 +196,7 @@ document.addEventListener('click', function(e) {
   const backBtn = e.target.closest('#tool-back');
   if (backBtn) {
     var age = Date.now() - toolDetailOpenTime;
+    if (age > 400) hideToolDetail();
   }
 });
 
@@ -290,6 +292,7 @@ document.addEventListener('click', function(e) {
     const tool = TOOLS.find(function(t) { return t.id === action.dataset.tool; });
     if (tool) {
       navigateTo('tools');
+      setTimeout(function() { openToolDetail(tool); }, 250);
     }
   }
 });
@@ -540,23 +543,18 @@ async function sendChatMessage(text) {
   scrollChatToBottom();
 
   try {
-    var model = CHAT_MODELS[currentModel];
-    var response = await fetch('/api/chat', {
+    var response = await fetch('https://api.cwj-tools.xyz/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        messages: chatMessages,
-        model: currentModel,
-        provider: model.provider
-      })
+      body: JSON.stringify({ messages: chatMessages, max_tokens: 1000 })
     });
 
     var data = await response.json();
 
-    if (data.status === 'success' && data.reply) {
-      chatMessages.push({ role: 'assistant', content: data.reply });
-    } else if (data.message) {
-      chatMessages.push({ role: 'assistant', content: '[服务器响应] ' + data.message });
+    if (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
+      chatMessages.push({ role: 'assistant', content: data.choices[0].message.content });
+    } else if (data.error) {
+      chatMessages.push({ role: 'assistant', content: '[API 错误] ' + data.error });
     } else {
       chatMessages.push({ role: 'assistant', content: '[服务器未返回有效响应]' });
     }
@@ -564,7 +562,7 @@ async function sendChatMessage(text) {
     console.error('Chat error:', err);
     chatMessages.push({
       role: 'assistant',
-      content: '⚠️ 无法连接到 AI 服务。请确保服务器已启动 (`node server.js`)，且 AI 模型 API 已正确配置。'
+      content: '⚠️ 无法连接到 AI 服务。请检查网络连接后重试。'
     });
   }
 
@@ -924,7 +922,7 @@ function renderAESTool() {
         var combined = new Uint8Array(iv.length + encrypted.byteLength);
         combined.set(iv);
         combined.set(new Uint8Array(encrypted), iv.length);
-        var base64 = btoa(String.fromCharCode.apply(null, combined));
+        var base64 = btoa(Array.from(combined).map(function(b) { return String.fromCharCode(b); }).join(''));
         showToolResult(base64);
       } else {
         var combined2 = Uint8Array.from(atob(text), function(c) { return c.charCodeAt(0); });
@@ -1353,7 +1351,8 @@ function renderIPTool() {
     resultDiv.style.display = '';
     resultContent.innerHTML = '<span style="color:var(--text-secondary)">查询中…</span>';
 
-    fetch('https://ipapi.co/' + ip + '/json/')
+    var url = ip ? 'https://ipapi.co/' + ip + '/json/' : 'https://ipapi.co/json/';
+    fetch(url)
       .then(function(r) { return r.json(); })
       .then(function(d) {
         if (d.error) {
@@ -1508,7 +1507,7 @@ async function runSpeedTest() {
           var speedMbps = (totalBytes * 8 / 1000000) / elapsed;
           document.getElementById('speed-val').textContent = speedMbps.toFixed(1);
           document.getElementById('speed-loaded').textContent = (totalBytes / 1000000).toFixed(1) + ' MB';
-          document.getElementById('speed-progress').style.width = Math.min(100, Math.round((elapsed / 10) * 100)) + '%';
+          document.getElementById('speed-progress').style.width = Math.min(100, Math.round((totalBytes / (3 * 1000000)) * 100)) + '%';
         }
       }
     } catch(e) {
@@ -1543,6 +1542,10 @@ function updateKbdHint() {
 }
 
 function initApp() {
+  renderQuickActions();
+  initModelSelector();
+  loadChatHistory();
+  renderChatMessages();
 }
 
 

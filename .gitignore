@@ -40,6 +40,9 @@ Thumbs.db
 sessions/*.json
 sessions/session_*.json
 
+# Secrets — local API keys, do not commit
+config.json
+
 # Temporary files
 *.tmp
 *.temp
